@@ -11,15 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('failed_jobs', function (Blueprint $table) {
+        Schema::create('purchases', function (Blueprint $table) {
             $table->id();
-            $table->string('uuid')->unique();
-            $table->text('connection');
-            $table->text('queue');
-            $table->longText('payload');
-            $table->longText('exception');
+            $table->uuid('uuid')->unique();
+            $table->unsignedBigInteger('sub_category_id');
+            $table->date('date_puchase');
+            $table->string('code', 10);
+            $table->double('total');
+            $table->unsignedBigInteger('user_id');
             $table->softDeletes();
-            $table->timestamp('failed_at')->useCurrent();
+            $table->timestamps();
         });
     }
 
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('failed_jobs');
+        Schema::dropIfExists('purchases');
     }
 };

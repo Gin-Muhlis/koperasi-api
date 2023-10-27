@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('failed_jobs', function (Blueprint $table) {
+        Schema::create('sub_categories', function (Blueprint $table) {
             $table->id();
-            $table->string('uuid')->unique();
-            $table->text('connection');
-            $table->text('queue');
-            $table->longText('payload');
-            $table->longText('exception');
+            $table->uuid('uuid')->unique();
+            $table->string('code', 10)->unique();
+            $table->enum('type', ['kredit', 'debit']);
+            $table->string('name', 50);
+            $table->unsignedBigInteger('category_id');
             $table->softDeletes();
-            $table->timestamp('failed_at')->useCurrent();
+            $table->timestamps();
         });
     }
 
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('failed_jobs');
+        Schema::dropIfExists('sub_categories');
     }
 };
