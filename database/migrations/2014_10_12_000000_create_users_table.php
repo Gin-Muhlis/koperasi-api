@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('member_id');
             $table->boolean('active')->default('1');
             $table->string('last_login_ip')->nullable();
-            $table->timestamp('last_login_time');
+            $table->timestamp('last_login_time')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->softDeletes();
