@@ -23,10 +23,18 @@ class Member extends Model
         'user_id',
     ];
 
-    protected $searchableFields = ['*'];
-
     public function user()
     {
         return $this->hasOne(User::class);
+    }
+
+    public function savings()
+    {
+        return $this->hasMany(Saving::class);
+    }
+
+    public function loans()
+    {
+        return $this->hasMany(Loan::class);
     }
 }

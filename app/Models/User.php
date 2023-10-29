@@ -17,35 +17,53 @@ class User extends Authenticatable
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
-     */
-    protected $fillable = [
-        'username',
-        'uuid',
+     */ protected $fillable = [
+        'name',
         'email',
         'password',
-        'member_id',
+        'uuid',
         'active',
         'last_login_ip',
         'last_login_time',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $searchableFields = ['*'];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
+    protected $hidden = ['password', 'remember_token'];
+
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'active' => 'boolean',
+        'last_login_time' => 'datetime',
     ];
+
+    public function member()
+    {
+        return $this->hasOne(Member::class);
+    }
+
+    public function savings()
+    {
+        return $this->hasMany(Saving::class);
+    }
+
+    public function loans()
+    {
+        return $this->hasMany(Loan::class);
+    }
+
+    public function purchases()
+    {
+        return $this->hasMany(Purchase::class);
+    }
+
+    public function sales()
+    {
+        return $this->hasMany(Sale::class);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return in_array($this->email, config('auth.super_admins'));
+    }
 }
