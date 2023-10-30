@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Imports\MemberImport;
 use Illuminate\Database\Seeder;
+
+use Maatwebsite\Excel\Facades\Excel;
 
 class MemberSeeder extends Seeder
 {
@@ -12,6 +14,8 @@ class MemberSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $file = base_path('database/data/demoMember.xlsx');
+        
+        Excel::import(new MemberImport, $file);
     }
 }

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum('gender', ['L', 'P']);
             $table->string('identity_number', 20);
             $table->string('religion', 20);
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->date('date_activation');
             $table->softDeletes();
             $table->timestamps();

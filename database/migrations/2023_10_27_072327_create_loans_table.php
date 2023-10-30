@@ -22,9 +22,10 @@ return new class extends Migration
             $table->date('date');
             $table->integer('loan_duration');
             $table->double('loan_interest');
+            $table->double('total_payment');
             $table->enum('status', ['belum bayar', 'berjalan', 'lunas']);
             $table->date('deadline');
-            $table->date('date_completion');
+            $table->date('date_completion')->nullable();
             $table->text('description');
             $table->softDeletes();
             $table->timestamps();

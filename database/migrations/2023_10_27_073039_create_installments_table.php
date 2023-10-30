@@ -16,9 +16,13 @@ return new class extends Migration
             $table->uuid('uuid')->unique();
             $table->string('code', 10);
             $table->unsignedBigInteger('loan_id');
+            $table->unsignedBigInteger('sub_category_id');
             $table->double('amount');
+            $table->date('date');
             $table->softDeletes();
             $table->timestamps();
+
+            $table->foreign('sub_category_id')->references('id')->on('sub_categories')->onDelete('CASCADE')->onUpdate('CASCADE');
         });
     }
 

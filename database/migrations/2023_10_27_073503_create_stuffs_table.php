@@ -16,7 +16,7 @@ return new class extends Migration
             $table->uuid('uuid')->unique();
             $table->string('name', 100);
             $table->double('price');
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->unsignedBigInteger('product_id');
             $table->softDeletes();
             $table->timestamps();
