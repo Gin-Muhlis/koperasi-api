@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 class PurchaseImport implements ToCollection, WithHeadingRow
 {
     /**
+     * import dummy data untuk tabel purchases/pembelian
     * @param Collection $collection
     */
     public function collection(Collection $collection)
@@ -28,12 +29,23 @@ class PurchaseImport implements ToCollection, WithHeadingRow
         }
     }
 
+     /**
+     * mencari sub kategori berdasakan nama dan mereturn idnya
+     *
+     * @param  mixed $name
+     * @return number
+     */
     private function getSubCategory($name) {
         $subCategory = SubCategory::whereName($name)->first();
 
         return $subCategory->id;
     }
 
+      /**
+     * generate angka random untuk code
+     *
+     * @return string
+     */
     private function generateCode()
     {
         $min = 1000000000;

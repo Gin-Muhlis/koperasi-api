@@ -15,6 +15,7 @@ class RolePermissionSeeder extends Seeder
      */
     public function run(): void
     {
+        // membuat permission untuk role
         Permission::create(['name' => 'view categories']);
         Permission::create(['name' => 'create categories']);
         Permission::create(['name' => 'update categories']);
@@ -50,7 +51,7 @@ class RolePermissionSeeder extends Seeder
         Permission::create(['name' => 'update sales']);
         Permission::create(['name' => 'delete sales']);
 
-         Permission::create(['name' => 'view salesdetails']);
+        Permission::create(['name' => 'view salesdetails']);
         Permission::create(['name' => 'create salesdetails']);
         Permission::create(['name' => 'update salesdetails']);
         Permission::create(['name' => 'delete salesdetails']);

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreMemberRequest;
 use App\Repositories\User\UserRepository;
 use App\Http\Requests\UpdateMemberRequest;
+use App\Http\Resources\SavingMemberResource;
 use App\Repositories\Member\MemberRepository;
 
 class MemberController extends Controller
@@ -146,6 +147,22 @@ class MemberController extends Controller
             ]);
         } catch (Exception $e) {
 
+            return $this->errorResponse($e->getMessage());
+        }
+    }
+
+    public function reportSavingMembers()
+    {
+        try {
+            $savingMembers = $this->memberRepo->getSavingMembers();
+
+            $data = SavingMemberResource::collection($savingMembers);
+
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
     }

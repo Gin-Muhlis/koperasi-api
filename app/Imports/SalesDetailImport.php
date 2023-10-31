@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 class SalesDetailImport implements ToCollection, WithHeadingRow
 {
     /**
+     * import dummy data untuk tabel salesDetails/penjualan detail
     * @param Collection $collection
     */
     public function collection(Collection $collection)
@@ -29,6 +30,13 @@ class SalesDetailImport implements ToCollection, WithHeadingRow
         }
     }
 
+        
+    /**
+     * mencari barang berdasarkan nama dan mereturn idnya
+     *
+     * @param  mixed $name
+     * @return number
+     */
     private function getStuff($name) {
         $stuff = Stuff::whereName($name)->first();
 

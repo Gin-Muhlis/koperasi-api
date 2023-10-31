@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 class ProductImport implements ToCollection, WithHeadingRow
 {
     /**
+     * import dummy data untuk tabel product/produk
     * @param Collection $collection
     */
     public function collection(Collection $collection)

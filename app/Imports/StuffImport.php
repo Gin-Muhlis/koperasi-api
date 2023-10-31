@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 class StuffImport implements ToCollection, WithHeadingRow
 {
     /**
+     * import dummy data untuk tabel stuffs/barang
     * @param Collection $collection
     */
     public function collection(Collection $collection)
@@ -24,7 +25,13 @@ class StuffImport implements ToCollection, WithHeadingRow
             ]);
         }
     }
-
+    
+    /**
+     * mencari produk berdasarkan nama dan mereturn idnya
+     *
+     * @param  mixed $name
+     * @return void
+     */
     private function getProduct($name) {
         $product = Product::whereName($name)->first();
 

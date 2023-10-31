@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 class CategoryImport implements ToCollection, WithHeadingRow
 {
     /**
+     * import untuk dummy data tabel categories/kategori
     * @param Collection $collection
     */
     public function collection(Collection $collection)

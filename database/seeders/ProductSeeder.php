@@ -14,8 +14,10 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
+        // Memanggil file dummy data
         $file = base_path('database/data/demoProduct.xlsx');
         
+        // memanggil import untuk menjalankan dummy data
         Excel::import(new ProductImport, $file);
     }
 }

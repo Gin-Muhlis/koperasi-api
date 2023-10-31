@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 class InstallmentImport implements ToCollection, WithHeadingRow
 {
     /**
+     * import untuk dummy data tabel installments/angsuran
     * @param Collection $collection
     */
     public function collection(Collection $collection)
@@ -30,6 +31,12 @@ class InstallmentImport implements ToCollection, WithHeadingRow
 
     }
 
+        
+    /**
+     * generate angka random untuk code
+     *
+     * @return string
+     */
     private function generateCode()
     {
         $min = 1000000000;
@@ -39,7 +46,13 @@ class InstallmentImport implements ToCollection, WithHeadingRow
 
         return str_pad($random_number, 10, '0', STR_PAD_LEFT);
     }
-
+    
+    /**
+     * mencari sub kategori berdasakan nama dan mereturn idnya
+     *
+     * @param  mixed $name
+     * @return number
+     */
     private function getSubCategory($name) {
         $subCategory = SubCategory::whereName($name)->first();
 

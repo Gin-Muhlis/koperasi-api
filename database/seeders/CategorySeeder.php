@@ -14,8 +14,10 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
+        // Memanggil file dummy data
         $file = base_path('database/data/demoCategory.xlsx');
         
+        // memanggil import untuk menjalankan dummy data
         Excel::import(new CategoryImport, $file);
     }
 }

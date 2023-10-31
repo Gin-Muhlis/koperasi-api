@@ -17,6 +17,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // membuat akun member untuk admin
         $member = Member::create([
             'uuid' => Str::uuid(),
             'name' => 'Fubuki Shirakami',
@@ -30,6 +31,7 @@ class UserSeeder extends Seeder
             'date_activation' => Carbon::now()->format('Y-m-d')
         ]);
 
+        // membuat user untuk admin
         User::create([
             'uuid' => Str::uuid(),
             'username' => 'Fubuking',

@@ -14,8 +14,10 @@ class StuffSeeder extends Seeder
      */
     public function run(): void
     {
+        // Memanggil file dummy data
         $file = base_path('database/data/demoStuff.xlsx');
         
+        // memanggil import untuk menjalankan dummy data
         Excel::import(new StuffImport, $file);
     }
 }

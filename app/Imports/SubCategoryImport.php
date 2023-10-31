@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 class SubCategoryImport implements ToCollection, WithHeadingRow
 {
     /**
+     * import dummy data untuk tabel sub_categories/sub kategori
     * @param Collection $collection
     */
     public function collection(Collection $collection)

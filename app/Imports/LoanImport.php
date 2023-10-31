@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 class LoanImport implements ToCollection, WithHeadingRow
 {
     /**
+     * import untuk dummy data table loans/pinjaman
     * @param Collection $collection
     */
     public function collection(Collection $collection)
@@ -38,7 +39,12 @@ class LoanImport implements ToCollection, WithHeadingRow
             ]);
         }
     }
-
+    
+    /**
+     * generate angka random untuk code
+     *
+     * @return string
+     */
     private function generateCode()
     {
         $min = 1000000000;
@@ -48,13 +54,25 @@ class LoanImport implements ToCollection, WithHeadingRow
 
         return str_pad($random_number, 10, '0', STR_PAD_LEFT);
     }
-
+    
+    /**
+     * mencari member berdasarkan nama dan mereturn idnya
+     *
+     * @param  mixed $name
+     * @return void
+     */
     private function getMember($name) {
         $member = Member::whereName($name)->first();
 
         return $member->id;
     }
 
+      /**
+     * mencari sub kategori berdasakan nama dan mereturn idnya
+     *
+     * @param  mixed $name
+     * @return number
+     */
     private function getSubCategory($name) {
         $subCategory = SubCategory::whereName($name)->first();
 

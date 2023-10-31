@@ -14,11 +14,11 @@ use Carbon\Carbon;
 class MemberImport implements ToCollection, WithHeadingRow  
 {
     /**
+     *  import untuk dummy data tabel member/anggota
     * @param Collection $collection
     */
     public function collection(Collection $collection)
     {
-        
         foreach ($collection as $data) 
         {
         
@@ -44,6 +44,11 @@ class MemberImport implements ToCollection, WithHeadingRow
         }
     }
 
+      /**
+     * generate angka random untuk code
+     *
+     * @return string
+     */
     private function generateCode() {
         $min = 1000000000;
         $max = 9999999999;

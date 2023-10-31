@@ -43,4 +43,9 @@ class MemberRepositoryImplement extends Eloquent implements MemberRepository{
     {
         return $this->delete($id);
     }
+
+    public function getSavingMembers()
+    {
+        return $this->model->with('savings.subCategory')->get();
+    }
 }
