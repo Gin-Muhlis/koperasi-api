@@ -11,10 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payment_deteminations', function (Blueprint $table) {
+        Schema::create('special_savings', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('member_id');
+            $table->uuid('uuid');
             $table->unsignedBigInteger('sub_category_id');
+            $table->unsignedBigInteger('member_id');
+            $table->integer('duration');
+            $table->enum('type_duration', ['bulanan', 'tahunan']);
+            $table->date('start_payment');
+            $table->date('end_payment');
+            $table->double('amount');
             $table->timestamps();
         });
     }
@@ -24,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('payment_deteminations');
+        Schema::dropIfExists('special_savings');
     }
 };
