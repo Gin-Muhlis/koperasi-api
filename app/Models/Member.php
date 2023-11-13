@@ -37,4 +37,9 @@ class Member extends Model
     {
         return $this->hasMany(Loan::class);
     }
+
+    public function paymentDetermination()
+    {
+        return $this->belongsTo(PaymentDetermination::class);
+    }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Imports;
 
+require_once app_path() . '/Helpers/helpers.php';
+
 use App\Models\Installment;
 use App\Models\SubCategory;
 use Carbon\Carbon;
@@ -21,7 +23,7 @@ class InstallmentImport implements ToCollection, WithHeadingRow
         foreach ($collection as $data) {
             Installment::create([
                 'uuid' => Str::uuid(),
-                'code' => $this->generateCode(),
+                'code' => generateCode(),
                 'loan_id' => $data['loan_id'],
                 'sub_category_id' => $this->getSubCategory($data['sub_category']),
                 'amount' => $data['amount'],
@@ -37,15 +39,7 @@ class InstallmentImport implements ToCollection, WithHeadingRow
      *
      * @return string
      */
-    private function generateCode()
-    {
-        $min = 1000000000;
-        $max = 9999999999;
-
-        $random_number = mt_rand($min, $max);
-
-        return str_pad($random_number, 10, '0', STR_PAD_LEFT);
-    }
+    
     
     /**
      * mencari sub kategori berdasakan nama dan mereturn idnya

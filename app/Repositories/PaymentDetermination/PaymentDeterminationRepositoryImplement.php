@@ -23,4 +23,12 @@ class PaymentDeterminationRepositoryImplement extends Eloquent implements Paymen
     {
         return $this->create($data);
     }
+
+    public function memberPayment($member_id, $month_year)
+    {
+        return $this->model->where([
+            ['member_id', $member_id],
+            ['payment_month', $month_year]
+        ])->first();
+    }
 }

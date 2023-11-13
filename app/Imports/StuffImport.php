@@ -2,6 +2,8 @@
 
 namespace App\Imports;
 
+require_once app_path() . '/Helpers/helpers.php';
+
 use App\Models\Product;
 use App\Models\Stuff;
 use Illuminate\Support\Collection;
@@ -21,20 +23,9 @@ class StuffImport implements ToCollection, WithHeadingRow
                 'uuid' => Str::uuid(),
                 'name' => $data['name'],
                 'price' => $data['price'],
-                'product_id' => $this->getProduct($data['product']),
+                'product_id' => getProduct($data['product']),
             ]);
         }
     }
-    
-    /**
-     * mencari produk berdasarkan nama dan mereturn idnya
-     *
-     * @param  mixed $name
-     * @return void
-     */
-    private function getProduct($name) {
-        $product = Product::whereName($name)->first();
-
-        return $product->id;
-    }
+ 
 }

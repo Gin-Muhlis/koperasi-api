@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+require_once app_path() . 'Helpers/helpers.php';
+
 use Exception;
 use Carbon\Carbon;
 use App\Models\Member;
@@ -39,7 +41,7 @@ class MemberController extends Controller
                 'data' => MemberResource::collection($data_members)
             ]);
         } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            return errorResponse($e->getMessage());
         }
     }
 
@@ -73,7 +75,7 @@ class MemberController extends Controller
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            return $this->errorResponse($e->getMessage());
+            return errorResponse($e->getMessage());
         }
     }
 
@@ -89,7 +91,7 @@ class MemberController extends Controller
                 'data' => new MemberResource($member)
             ]);
         } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            return errorResponse($e->getMessage());
         }
     }
 
@@ -129,7 +131,7 @@ class MemberController extends Controller
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            return $this->errorResponse($e->getMessage());
+            return errorResponse($e->getMessage());
         }
     }
 
@@ -147,7 +149,7 @@ class MemberController extends Controller
             ]);
         } catch (Exception $e) {
 
-            return $this->errorResponse($e->getMessage());
+            return errorResponse($e->getMessage());
         }
     }
 
@@ -163,17 +165,8 @@ class MemberController extends Controller
                 'data' => $data
             ]);
         } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            return errorResponse($e->getMessage());
         }
-    }
-
-    private function errorResponse($error)
-    {
-        return response()->json([
-            'success' => false,
-            'message' => 'Terjadi kesalahan dengan sistem',
-            'error' => $error,
-        ], 500);
     }
 
     private function generateDataMember($mode, $validated)

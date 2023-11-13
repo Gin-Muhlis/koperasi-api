@@ -2,8 +2,9 @@
 
 namespace App\Imports;
 
+require_once app_path() . '/Helpers/helpers.php';
+
 use App\Models\SalesDetail;
-use App\Models\Stuff;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -24,22 +25,8 @@ class SalesDetailImport implements ToCollection, WithHeadingRow
                 'qty' => $data['qty'],
                 'unit_price' => $data['unit_price'],
                 'sub_total' => $data['sub_total'],
-                'stuff_id' => $this->getStuff($data['stuff']),
-                
+                'stuff_id' => getStuff($data['stuff']),
             ]);
         }
-    }
-
-        
-    /**
-     * mencari barang berdasarkan nama dan mereturn idnya
-     *
-     * @param  mixed $name
-     * @return number
-     */
-    private function getStuff($name) {
-        $stuff = Stuff::whereName($name)->first();
-
-        return $stuff->id;
     }
 }

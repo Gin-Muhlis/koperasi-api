@@ -11,7 +11,7 @@ class StoreSavingRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,11 @@ class StoreSavingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'members_id' => ['required', 'array'],
+            'members_id.*' => ['numeric'],
+            'month_year' => ['required'],
+            'sub_category_id' => ['required', 'exists:sub_categories,id'],
+            'description' => ['required', 'string']
         ];
     }
 }

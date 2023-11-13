@@ -2,6 +2,8 @@
 
 namespace App\Imports;
 
+require_once app_path() . '/Helpers/helpers.php';
+
 use App\Models\Sale;
 use App\Models\SubCategory;
 use Carbon\Carbon;
@@ -22,39 +24,12 @@ class SaleImport implements ToCollection, WithHeadingRow
           
             Sale::create([
                 'uuid' => Str::uuid(),
-                'sub_category_id' => $this->getSubCategory($data['sub_category']),
-                'code' => $this->generateCode(),
+                'sub_category_id' => getSubCategory($data['sub_category']),
+                'code' => generateCode(),
                 'date' => Carbon::now()->format('Y-m-d'),
                 'total_payment' => $data['total_payment'],
                 'user_id' => 1
             ]);
         }
-    }
-
-     /**
-     * mencari sub kategori berdasakan nama dan mereturn idnya
-     *
-     * @param  mixed $name
-     * @return number
-     */
-    private function getSubCategory($name) {
-        $subCategory = SubCategory::whereName($name)->first();
-
-        return $subCategory->id;
-    }
-
-       /**
-     * generate angka random untuk code
-     *
-     * @return string
-     */
-    private function generateCode()
-    {
-        $min = 1000000000;
-        $max = 9999999999;
-
-        $random_number = mt_rand($min, $max);
-
-        return str_pad($random_number, 10, '0', STR_PAD_LEFT);
     }
 }

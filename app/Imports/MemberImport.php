@@ -2,6 +2,8 @@
 
 namespace App\Imports;
 
+require_once app_path() . '/Helpers/helpers.php';
+
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -29,7 +31,7 @@ class MemberImport implements ToCollection, WithHeadingRow
                 'address' => $data['address'],
                 'phone_number' => $data['phone_number'],
                 'gender' => $data['gender'],
-                'identity_number' => $this->generateCode(),
+                'identity_number' => generateCode(),
                 'religion' => $data['religion'],
                 'date_activation' => Carbon::now()->format('Y-m-d')
             ]);
@@ -42,19 +44,5 @@ class MemberImport implements ToCollection, WithHeadingRow
                 'member_id' => $member->id
             ]);
         }
-    }
-
-      /**
-     * generate angka random untuk code
-     *
-     * @return string
-     */
-    private function generateCode() {
-        $min = 1000000000;
-        $max = 9999999999;
-
-        $random_number = mt_rand($min, $max);
-
-        return str_pad($random_number, 10, '0', STR_PAD_LEFT);
     }
 }

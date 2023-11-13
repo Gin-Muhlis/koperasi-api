@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+require_once app_path() . 'Helpers/helpers.php';
+
 use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -13,12 +15,16 @@ use App\Repositories\PaymentDetermination\PaymentDeterminationRepository;
 class PaymentDeterminationController extends Controller
 {
     private $repository;
+
+    public function __construct(PaymentDeterminationRepository $repo)
+    {
+        $this->repository = $repo;
+    }
     /**
      * Display a listing of the resource.
      */
-    public function index(PaymentDeterminationRepository $repo)
+    public function index()
     {
-        $this->repository = $repo;
     }
 
     /**
@@ -29,8 +35,6 @@ class PaymentDeterminationController extends Controller
         try {
             $validated = $request->validated();
 
-            DB::beginTransaction();
-
             foreach ($validated['members_id'] as $member_id) {
                 $data = [
                     'uuid' => Str::uuid(),
@@ -40,18 +44,22 @@ class PaymentDeterminationController extends Controller
                     'payment_month' => $validated['payment_month']
                 ];
 
+                DB::beginTransaction();
+
                 $this->repository->createPaymentDetermination($data);
 
+                DB::commit();
             }
 
-            DB::commit();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Penetapan pembayaran berhasil ditambahkan'
             ]);
         } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            DB::rollBack();
+
+            return errorResponse($e->getMessage());
         }
     }
 
@@ -79,12 +87,4 @@ class PaymentDeterminationController extends Controller
         //
     }
 
-    private function errorResponse($error)
-    {
-        return response()->json([
-            'success' => false,
-            'message' => 'Terjadi kesalahan dengan sistem',
-            'error' => $error,
-        ], 500);
-    }
 }

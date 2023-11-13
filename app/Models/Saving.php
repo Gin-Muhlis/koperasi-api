@@ -18,6 +18,7 @@ class Saving extends Model
         'sub_category_id',
         'user_id',
         'description',
+        'month_year'
     ];
 
     protected $casts = [
