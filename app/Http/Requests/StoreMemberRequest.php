@@ -39,8 +39,7 @@ class StoreMemberRequest extends FormRequest
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
-            'success'   => false,
-            'message'   => 'Validasi Gagal',
+            'message'   => 'Validasi data gagal',
             'data'      => $validator->errors()
         ]));
     }

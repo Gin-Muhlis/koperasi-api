@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
         $member = Member::create([
             'uuid' => Str::uuid(),
             'name' => 'Fubuki Shirakami',
-            'email' => 'fubuki17@gmail.com',
+            'email' => 'fubuki@gmail.com',
             'address' => 'Tokyo, Jepang',
             'phone_number' => '0895325722289',
             'gender' => 'P',
@@ -35,7 +35,7 @@ class UserSeeder extends Seeder
         User::create([
             'uuid' => Str::uuid(),
             'username' => 'Fubuking',
-            'email' => 'fubuki17@gmail.com',
+            'email' => 'fubuki@gmail.com',
             'password' => Hash::make('fubuki123'),
             'member_id' => $member->id
         ]);

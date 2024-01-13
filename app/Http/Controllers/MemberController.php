@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-require_once app_path() . 'Helpers/helpers.php';
+require_once app_path() . '/Helpers/helpers.php';
 
 use Exception;
 use Carbon\Carbon;
-use App\Models\Member;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\MemberResource;
@@ -31,13 +31,12 @@ class MemberController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
             $data_members = $this->memberRepo->getmembers();
 
             return response()->json([
-                'success' => true,
                 'data' => MemberResource::collection($data_members)
             ]);
         } catch (Exception $e) {
@@ -70,7 +69,6 @@ class MemberController extends Controller
             DB::commit();
 
             return response()->json([
-                'success' => true,
                 'message' => 'Data member berhasil ditambahkan'
             ]);
         } catch (Exception $e) {
@@ -87,7 +85,6 @@ class MemberController extends Controller
         try {
             $member = $this->memberRepo->showMember($id);
             return response()->json([
-                'success' => true,
                 'data' => new MemberResource($member)
             ]);
         } catch (Exception $e) {
@@ -126,8 +123,7 @@ class MemberController extends Controller
             DB::commit();
 
             return response()->json([
-                'success' => true,
-                'message' => 'Data member berhasil diedit'
+                'message' => 'Data member berhasil diperbarui'
             ]);
         } catch (Exception $e) {
             DB::rollBack();
@@ -144,11 +140,9 @@ class MemberController extends Controller
             $this->memberRepo->deleteMember($id);
 
             return response()->json([
-                'success' => true,
                 'message' => 'Data member berhasil dihapus'
             ]);
         } catch (Exception $e) {
-
             return errorResponse($e->getMessage());
         }
     }

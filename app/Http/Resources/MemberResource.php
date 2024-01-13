@@ -25,7 +25,7 @@ class MemberResource extends JsonResource
             'identity_number' => $this->identity_number,
             'religion' => $this->religion,
             'date_activation' => $this->date_activation,
-            'image' => str_replace('public/', '', url("storage/{$this->image}")),
+            'image' => $this->image ? str_replace('public/', '', url("storage/{$this->image}")) : '-',
             'user' => [
                 'uuid' => $this->user->uuid,
                 'username' => $this->user->username,

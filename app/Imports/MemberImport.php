@@ -36,13 +36,15 @@ class MemberImport implements ToCollection, WithHeadingRow
                 'date_activation' => Carbon::now()->format('Y-m-d')
             ]);
 
-            User::create([
+            $user = User::create([
                 'uuid' => Str::uuid(),
                 'username' => $data['username'],
                 'email' => $member->email,
                 'password' => Hash::make($data['password']),
                 'member_id' => $member->id
             ]);
+
+            $user->assignRole('member');
         }
     }
 }

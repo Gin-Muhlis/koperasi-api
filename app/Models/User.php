@@ -18,14 +18,17 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */ protected $fillable = [
-        'name',
+        'username',
         'email',
         'password',
         'uuid',
+        'member_id',
         'active',
         'last_login_ip',
         'last_login_time',
     ];
+
+    protected $guard_name = 'api'; 
 
     protected $searchableFields = ['*'];
 
@@ -64,6 +67,6 @@ class User extends Authenticatable
 
     public function isSuperAdmin(): bool
     {
-        return in_array($this->email, config('auth.super_admins'));
+        return $this->hasRole('super-admin');
     }
 }

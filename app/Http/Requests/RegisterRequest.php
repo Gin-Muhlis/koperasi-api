@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateCategoryRequest extends FormRequest
+class RegisterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,14 +24,23 @@ class UpdateCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'max:255', 'string']
+            'username' => ['required', 'max:100', 'string'],
+            'password' => ['required'],
+            'email' => ['required', 'email'],
+            'name' => ['required', 'max:100', 'string'],
+            'address' => ['required', 'string'],
+            'phone_number' => ['required', 'max:20', 'string'],
+            'gender' => ['required', 'in:l,p'],
+            'religion' => ['required', 'max:20', 'string'],
+            'image' => ['nullable', 'image', 'max:2048'],
         ];
     }
 
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
-            'message'   => 'Validasi data gagal',
+            'success'   => false,
+            'message'   => 'Validasi Gagal',
             'data'      => $validator->errors()
         ]));
     }

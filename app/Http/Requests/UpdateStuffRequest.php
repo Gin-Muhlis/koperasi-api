@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdateStuffRequest extends FormRequest
 {
@@ -11,7 +13,7 @@ class UpdateStuffRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +24,18 @@ class UpdateStuffRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required', 'max:255', 'string'],
+            'price' => ['required', 'numeric'],
+            'image' => ['nullable', 'image', 'max:2048'],
+            'product_id' => ['required', 'exists:products,id']
         ];
+    }
+
+    public function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'message'   => 'Validasi data gagal',
+            'data'      => $validator->errors()
+        ]));
     }
 }
