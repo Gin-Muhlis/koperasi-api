@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdatePurchaseRequest extends FormRequest
 {
@@ -11,7 +13,7 @@ class UpdatePurchaseRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +24,17 @@ class UpdatePurchaseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'sub_category_id' => ['required', 'exists:sub_categories,id'],
+            'total' => ['required', 'numeric'],
+            'date_purchase' => [ 'required', 'date'],
+            'user_id' => ['required', 'exists:users,id']
         ];
+    }
+
+    public function failedValidation(Validator $validator) {
+        throw new HttpResponseException(response()->json([
+            'message' => 'Validasi data gagal',
+            'errors' => $validator->errors()
+        ]));
     }
 }

@@ -1,11 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SaleController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\StuffController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\PaymentDeterminationController;
@@ -23,6 +26,10 @@ Route::middleware('json.response')->group(function() {
         Route::apiResource('/sub-category', SubCategoryController::class);
         Route::apiResource('/product', ProductController::class);
         Route::apiResource('/stuff', StuffController::class);
+        Route::apiResource('/purchase', PurchaseController::class);
+        Route::apiResource('/sale', SaleController::class);
+        Route::apiResource('/user', UserController::class);
+
         Route::apiResource('/payment-determination', PaymentDeterminationController::class);
         Route::apiResource('/saving-members', SavingController::class);
     

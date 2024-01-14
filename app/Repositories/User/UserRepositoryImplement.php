@@ -7,7 +7,7 @@ use App\Models\User;
 
 class UserRepositoryImplement extends Eloquent implements UserRepository{
 
-   
+    
     protected $model;
 
     public function __construct(User $model)
@@ -15,13 +15,23 @@ class UserRepositoryImplement extends Eloquent implements UserRepository{
         $this->model = $model;
     }
 
-    public function createUser($request)
-    {
+    public function getUsers() {
+        return $this->all();
+    }
+
+    public function createUser($request) {
         return $this->create($request);
     }
 
-    public function updateUser($id, $request)
-    {
+    public function showUser($id) {
+        return $this->findOrFail($id);
+    }
+
+    public function updateUser($id, $request) {
         return $this->update($id, $request);
+    }
+
+    public function deleteUser($id) {
+        return $this->delete($id);
     }
 }

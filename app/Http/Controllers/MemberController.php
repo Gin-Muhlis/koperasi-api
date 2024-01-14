@@ -99,7 +99,7 @@ class MemberController extends Controller
     {
         try {
             $validated = $request->validated();
-
+            
             $member = $this->memberRepo->showMember($id);
 
             if ($request->hasFile('image')) {
