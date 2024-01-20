@@ -4,134 +4,133 @@ namespace App\Http\Controllers\Auth;
 
 require_once app_path() . '/Helpers/helpers.php';
 
-use Exception;
-use Carbon\Carbon;
-use App\Models\User;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
-use App\Repositories\User\UserRepository;
+use App\Models\User;
 use App\Repositories\Member\MemberRepository;
+use App\Repositories\User\UserRepository;
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
-class AuthController extends Controller
-{
-    private $memberRepo;
-    private $userRepo;
+class AuthController extends Controller {
+	private $memberRepo;
+	private $userRepo;
 
-    public function __construct(MemberRepository $member, UserRepository $user)
-    {
-        $this->memberRepo = $member;
-        $this->userRepo = $user;
-    }
-    public function register(RegisterRequest $request)
-    {
-        try {
-            $validated = $request->validated();
+	public function __construct(MemberRepository $member, UserRepository $user) {
+		$this->memberRepo = $member;
+		$this->userRepo = $user;
+	}
+	public function register(RegisterRequest $request) {
+		try {
 
-            if ($request->hasFile('image')) {
-                $validated['image'] = $request->file('image')->store('public/member');
-            }
+			$validated = $request->validated();
 
-            $data_member = $this->generateDataMember($validated);
+			if ($request->hasFile('image')) {
+				$validated['image'] = $request->file('image')->store('public/member');
+			}
 
-            DB::beginTransaction();
+			$data_member = $this->generateDataMember($validated);
 
-            $member = $this->memberRepo->createMember($data_member);
+			DB::beginTransaction();
 
-            $data_user = $this->generateDataUser($member, $validated);
+			$member = $this->memberRepo->createMember($data_member);
 
-            $user = $this->userRepo->createUser($data_user);
+			$data_user = $this->generateDataUser($member, $validated);
 
-            $user->assignRole('member');
+			$user = $this->userRepo->createUser($data_user);
 
-            DB::commit();
+			$user->assignRole('member');
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Pendaftaran Berhasil'
-            ]);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return errorResponse($e->getMessage());
-        }
-    }
+			DB::commit();
 
-    public function login(LoginRequest $request)
-    {
-        try {
-            $credentials = $request->validated();
+			return response()->json([
+				'message' => 'Pendaftaran Berhasil',
+			]);
+		} catch (Exception $e) {
+			DB::rollBack();
+			return errorResponse($e->getMessage());
+		}
+	}
 
-            $isUser = User::where('email', $credentials['email'])->first();
+	public function login(LoginRequest $request) {
+		try {
+			$credentials = $request->validated();
 
-            if (!Auth::guard('api')->setUser($isUser)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Email atau Password salah'
-                ], 400);
-            }
+			$isUser = User::where('email', $credentials['email'])->first();
 
-            $user = Auth::guard('api')->user();
+			if (!$isUser) {
+				return response()->json([
+					'message' => 'Email atau Password salah',
+				], 400);
+			}
 
-            $token = $user->createToken('auth-token')->accessToken;
+			Auth::guard('api')->setUser($isUser);
 
-            return response()->json([
-                'success' => true,
-                'data' => $user,
-                'token' => $token
-            ]);
-        } catch (Exception $e) {
-            return errorResponse($e->getMessage());
-        }
-    }
+			$user = Auth::guard('api')->user();
 
-    public function logout(Request $request)
-    {
-        try {
-            $request->user()->token()->revoke();
+			$token = $user->createToken('auth-token')->accessToken;
 
-            return response()->json([
-                'message' => 'Logout Berhasil'
-            ]);
-        } catch (Exception $e) {
-            return errorResponse($e->getMessage());
-        }
-    }
+			return response()->json([
+				'name' => $user->username,
+				'role' => $user->getRoleNames()->first(),
+				'accessToken' => $token,
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
 
-    private function generateDataMember($validated)
-    {
-        $min = 1000000000;
-        $max = 9999999999;
+	public function logout(Request $request) {
+		try {
+			$request->user()->token()->revoke();
 
-        $random_number = mt_rand($min, $max);
+			return response()->json([
+				'message' => 'Logout Berhasil',
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
 
-        return [
-            'uuid' => Str::uuid(),
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'address' => $validated['address'],
-            'phone_number' => $validated['phone_number'],
-            'gender' => $validated['gender'],
-            'identity_number' => str_pad($random_number, 10, '0', STR_PAD_LEFT),
-            'religion' => $validated['religion'],
-            'image' => $validated['image'],
-            'date_activation' => Carbon::now()->format('Y-m-d')
-        ];
-    }
+	private function generateDataMember($validated) {
+		$min = 1000000000;
+		$max = 9999999999;
 
-    private function generateDataUser($member, $validated)
-    {
-        return [
-            'username' => $validated['username'],
-            'password' => Hash::make($validated['password']),
-            'email' => $member->email,
-            'uuid' => $member->uuid,
-            'member_id' => $member->id,
-            'active' => 1,
-        ];
-    }
+		$random_number = mt_rand($min, $max);
+
+		return [
+			'uuid' => Str::uuid(),
+			'name' => $validated['name'],
+			'email' => $validated['email'],
+			'address' => $validated['address'],
+			'phone_number' => $validated['phone_number'],
+			'position' => $validated['position'],
+			'gender' => $validated['gender'],
+			'identity_number' => str_pad($random_number, 10, '0', STR_PAD_LEFT),
+			'religion' => $validated['religion'],
+			'image' => $validated['image'],
+			'date_activation' => Carbon::now()->format('Y-m-d'),
+		];
+	}
+
+	private function generateDataUser($member, $validated) {
+		$name_split = explode(' ', $member->name);
+		$first_name = $name_split[0];
+		$second_name = $name_split[1] ? $name_split[1] : '';
+		$name = "{$first_name} {$second_name}";
+		return [
+			'username' => $name,
+			'password' => Hash::make($validated['password']),
+			'email' => $member->email,
+			'uuid' => $member->uuid,
+			'member_id' => $member->id,
+			'active' => 1,
+		];
+	}
 }
