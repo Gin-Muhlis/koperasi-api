@@ -62,7 +62,7 @@ class AuthController extends Controller {
 		try {
 			$credentials = $request->validated();
 
-			$isUser = User::where('email', $credentials['email'])->first();
+			$isUser = User::with('member')->where('email', $credentials['email'])->first();
 
 			if (!$isUser) {
 				return response()->json([
@@ -79,6 +79,7 @@ class AuthController extends Controller {
 			return response()->json([
 				'name' => $user->username,
 				'role' => $user->getRoleNames()->first(),
+				'imageProfile' => $user->member->image,
 				'accessToken' => $token,
 			]);
 		} catch (Exception $e) {
