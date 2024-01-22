@@ -79,7 +79,7 @@ class AuthController extends Controller {
 			return response()->json([
 				'name' => $user->username,
 				'role' => $user->getRoleNames()->first(),
-				'imageProfile' => $user->member->image,
+				'imageProfile' => str_replace('public/', '', url("storage/{$user->member->image}")),
 				'accessToken' => $token,
 			]);
 		} catch (Exception $e) {

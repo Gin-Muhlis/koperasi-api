@@ -9,64 +9,57 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
-{
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+class User extends Authenticatable {
+	use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */ protected $fillable = [
-        'username',
-        'email',
-        'password',
-        'uuid',
-        'member_id',
-        'active',
-        'last_login_ip',
-        'last_login_time',
-    ];
+	/**
+	 * The attributes that are mass assignable.
+	 *
+	 * @var array<int, string>
+	 */protected $fillable = [
+		'username',
+		'email',
+		'password',
+		'uuid',
+		'member_id',
+		'active',
+		'last_login_ip',
+		'last_login_time',
+	];
 
-    protected $guard_name = 'api'; 
+	protected $guard_name = 'api';
 
-    protected $searchableFields = ['*'];
+	protected $searchableFields = ['*'];
 
-    protected $hidden = ['password', 'remember_token'];
+	protected $hidden = ['password', 'remember_token'];
 
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'active' => 'boolean',
-        'last_login_time' => 'datetime',
-    ];
+	protected $casts = [
+		'email_verified_at' => 'datetime',
+		'active' => 'boolean',
+		'last_login_time' => 'datetime',
+	];
 
-    public function member()
-    {
-        return $this->hasOne(Member::class);
-    }
+	public function member() {
+		return $this->belongsTo(Member::class);
+	}
 
-    public function savings()
-    {
-        return $this->hasMany(Saving::class);
-    }
+	public function savings() {
+		return $this->hasMany(Saving::class);
+	}
 
-    public function loans()
-    {
-        return $this->hasMany(Loan::class);
-    }
+	public function loans() {
+		return $this->hasMany(Loan::class);
+	}
 
-    public function purchases()
-    {
-        return $this->hasMany(Purchase::class);
-    }
+	public function purchases() {
+		return $this->hasMany(Purchase::class);
+	}
 
-    public function sales()
-    {
-        return $this->hasMany(Sale::class);
-    }
+	public function sales() {
+		return $this->hasMany(Sale::class);
+	}
 
-    public function isSuperAdmin(): bool
-    {
-        return $this->hasRole('super-admin');
-    }
+	public function isSuperAdmin(): bool {
+		return $this->hasRole('super-admin');
+	}
 }
