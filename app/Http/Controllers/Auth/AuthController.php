@@ -7,6 +7,7 @@ require_once app_path() . '/Helpers/helpers.php';
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Resources\ProfileResource;
 use App\Models\User;
 use App\Repositories\Member\MemberRepository;
 use App\Repositories\User\UserRepository;
@@ -79,7 +80,7 @@ class AuthController extends Controller {
 			return response()->json([
 				'name' => $user->username,
 				'role' => $user->getRoleNames()->first(),
-				'imageProfile' => str_replace('public/', '', url("storage/{$user->member->image}")),
+				'imageProfile' => $user->member?->image ? str_replace('public/', '', url("storage/{$user->member->image}")) : config('app.url') . '/images/profile-default.png',
 				'accessToken' => $token,
 			]);
 		} catch (Exception $e) {
@@ -93,6 +94,18 @@ class AuthController extends Controller {
 
 			return response()->json([
 				'message' => 'Logout Berhasil',
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	public function profile(Request $request) {
+		try {
+			$data_user = $request->user();
+
+			return response()->json([
+				'data' => new ProfileResource($data_user),
 			]);
 		} catch (Exception $e) {
 			return errorResponse($e->getMessage());

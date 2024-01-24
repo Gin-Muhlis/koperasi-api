@@ -31,6 +31,7 @@ class StoreMemberRequest extends FormRequest {
 			'religion' => ['required', 'max:20', 'string'],
 			'image' => ['nullable', 'image', 'max:2048'],
 			'position' => ['required', 'in:pns,p3k,cpns'],
+			'role' => ['required', 'string'],
 		];
 	}
 

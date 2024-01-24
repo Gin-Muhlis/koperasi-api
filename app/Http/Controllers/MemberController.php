@@ -4,220 +4,212 @@ namespace App\Http\Controllers;
 
 require_once app_path() . '/Helpers/helpers.php';
 
-use Exception;
+use App\Http\Requests\StoreMemberRequest;
+use App\Http\Requests\UpdateMemberRequest;
+use App\Http\Resources\MemberResource;
+use App\Http\Resources\SavingMemberResource;
+use App\Repositories\Member\MemberRepository;
+use App\Repositories\User\UserRepository;
 use Carbon\Carbon;
-use Illuminate\Support\Str;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Resources\MemberResource;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\StoreMemberRequest;
-use App\Repositories\User\UserRepository;
-use App\Http\Requests\UpdateMemberRequest;
-use App\Http\Resources\SavingMemberResource;
-use App\Repositories\Member\MemberRepository;
+use Illuminate\Support\Str;
 
-class MemberController extends Controller
-{
-    private $memberRepo;
-    private $userRepo;
+class MemberController extends Controller {
+	private $memberRepo;
+	private $userRepo;
 
-    public function __construct(MemberRepository $member, UserRepository $user)
-    {
-        $this->memberRepo = $member;
-        $this->userRepo = $user;
-    }
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
-    {
-        try {
-            $data_members = $this->memberRepo->getmembers();
+	public function __construct(MemberRepository $member, UserRepository $user) {
+		$this->memberRepo = $member;
+		$this->userRepo = $user;
+	}
+	/**
+	 * Display a listing of the resource.
+	 */
+	public function index(Request $request) {
+		try {
+			$data_members = $this->memberRepo->getmembers();
 
-            return response()->json([
-                'data' => MemberResource::collection($data_members)
-            ]);
-        } catch (Exception $e) {
-            return errorResponse($e->getMessage());
-        }
-    }
+			return response()->json([
+				'data' => MemberResource::collection($data_members),
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreMemberRequest $request)
-    {
-        try {
-            $validated = $request->validated();
+	/**
+	 * Store a newly created resource in storage.
+	 */
+	public function store(StoreMemberRequest $request) {
+		try {
+			$validated = $request->validated();
 
-            if ($request->hasFile('image')) {
-                $validated['image'] = $request->file('image')->store('public/member');
-            }
+			if ($request->hasFile('image')) {
+				$validated['image'] = $request->file('image')->store('public/member');
+			}
 
-            $data_member = $this->generateDataMember('store', $validated);
+			$data_member = $this->generateDataMember('store', $validated);
 
-            DB::beginTransaction();
+			DB::beginTransaction();
 
-            $member = $this->memberRepo->createMember($data_member);
+			$member = $this->memberRepo->createMember($data_member);
 
-            $data_user = $this->generateDataUser('store', $member, $validated);
+			$data_user = $this->generateDataUser('store', $member, $validated);
 
-            $this->userRepo->createUser($data_user);
+			$user = $this->userRepo->createUser($data_user);
 
-            DB::commit();
+			$user->assignRole($validated['role']);
 
-            return response()->json([
-                'message' => 'Data member berhasil ditambahkan'
-            ]);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return errorResponse($e->getMessage());
-        }
-    }
+			DB::commit();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show($id)
-    {
-        try {
-            $member = $this->memberRepo->showMember($id);
-            return response()->json([
-                'data' => new MemberResource($member)
-            ]);
-        } catch (Exception $e) {
-            return errorResponse($e->getMessage());
-        }
-    }
+			return response()->json([
+				'message' => 'Data member berhasil ditambahkan',
+			]);
+		} catch (Exception $e) {
+			DB::rollBack();
+			return errorResponse($e->getMessage());
+		}
+	}
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateMemberRequest $request, $id)
-    {
-        try {
-            $validated = $request->validated();
-            
-            $member = $this->memberRepo->showMember($id);
+	/**
+	 * Display the specified resource.
+	 */
+	public function show($id) {
+		try {
+			$member = $this->memberRepo->showMember($id);
+			return response()->json([
+				'data' => new MemberResource($member),
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
 
-            if ($request->hasFile('image')) {
-                if ($member->image) {
-                    Storage::delete($member->image);
-                }
+	/**
+	 * Update the specified resource in storage.
+	 */
+	public function update(UpdateMemberRequest $request, $id) {
+		try {
+			$validated = $request->validated();
 
-                $validated['image'] = $request->file('image')->store('public/member');
-            }
+			$member = $this->memberRepo->showMember($id);
 
-            $data_member = $this->generateDataMember('update', $validated);
+			if ($request->hasFile('image')) {
+				if ($member->image) {
+					Storage::delete($member->image);
+				}
 
-            DB::beginTransaction();
+				$validated['image'] = $request->file('image')->store('public/member');
+			}
 
-            $this->memberRepo->updateMember($id, $data_member);
+			$data_member = $this->generateDataMember('update', $validated);
 
-            $data_user = $this->generateDataUser('update', $member, $validated);
+			DB::beginTransaction();
 
-            $this->userRepo->updateUser($member->id, $data_user);
+			$this->memberRepo->updateMember($id, $data_member);
 
-            DB::commit();
+			$data_user = $this->generateDataUser('update', $member, $validated);
 
-            return response()->json([
-                'message' => 'Data member berhasil diperbarui'
-            ]);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return errorResponse($e->getMessage());
-        }
-    }
+			$this->userRepo->updateUser($member->id, $data_user);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        try {
-            $this->memberRepo->deleteMember($id);
+			DB::commit();
 
-            return response()->json([
-                'message' => 'Data member berhasil dihapus'
-            ]);
-        } catch (Exception $e) {
-            return errorResponse($e->getMessage());
-        }
-    }
+			return response()->json([
+				'message' => 'Data member berhasil diperbarui',
+			]);
+		} catch (Exception $e) {
+			DB::rollBack();
+			return errorResponse($e->getMessage());
+		}
+	}
 
-    public function reportSavingMembers()
-    {
-        try {
-            $savingMembers = $this->memberRepo->getSavingMembers();
+	/**
+	 * Remove the specified resource from storage.
+	 */
+	public function destroy($id) {
+		try {
+			$this->memberRepo->deleteMember($id);
 
-            $data = SavingMemberResource::collection($savingMembers);
+			return response()->json([
+				'message' => 'Data member berhasil dihapus',
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
 
-            return response()->json([
-                'success' => true,
-                'data' => $data
-            ]);
-        } catch (Exception $e) {
-            return errorResponse($e->getMessage());
-        }
-    }
+	public function reportSavingMembers() {
+		try {
+			$savingMembers = $this->memberRepo->getSavingMembers();
 
-    private function generateDataMember($mode, $validated)
-    {
-        if ($mode == 'store') {
-            $min = 1000000000;
-            $max = 9999999999;
+			$data = SavingMemberResource::collection($savingMembers);
 
-            $random_number = mt_rand($min, $max);
+			return response()->json([
+				'success' => true,
+				'data' => $data,
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
 
-            return [
-                'uuid' => Str::uuid(),
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'address' => $validated['address'],
-                'phone_number' => $validated['phone_number'],
-                'gender' => $validated['gender'],
-                'identity_number' => str_pad($random_number, 10, '0', STR_PAD_LEFT),
-                'religion' => $validated['religion'],
-                'image' => $validated['image'],
-                'date_activation' => Carbon::now()->format('Y-m-d')
-            ];
-        } else if ($mode == 'update') {
-            return [
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'address' => $validated['address'],
-                'phone_number' => $validated['phone_number'],
-                'gender' => $validated['gender'],
-                'religion' => $validated['religion'],
-                'image' => $validated['image'],
-            ];
-        }
+	private function generateDataMember($mode, $validated) {
+		if ($mode == 'store') {
+			$min = 1000000000;
+			$max = 9999999999;
 
-        return true;
-    }
+			$random_number = mt_rand($min, $max);
 
-    private function generateDataUser($mode, $member, $validated)
-    {
-        if ($mode == 'store') {
-            return [
-                'username' => $validated['username'],
-                'password' => Hash::make($validated['password']),
-                'email' => $member->email,
-                'uuid' => $member->uuid,
-                'member_id' => $member->id,
-                'active' => 1,
-            ];
-        } else if ($mode == 'update') {
-            return [
-                'username' => $validated['username'],
-                'password' => $validated['password'] ? Hash::make($validated['password']) : $member->user->password,
-                'email' => $validated['email'],
-                'active' => $validated['active'],
-            ];
-        }
+			return [
+				'uuid' => Str::uuid(),
+				'name' => $validated['name'],
+				'email' => $validated['email'],
+				'address' => $validated['address'],
+				'phone_number' => $validated['phone_number'],
+				'gender' => $validated['gender'],
+				'identity_number' => str_pad($random_number, 10, '0', STR_PAD_LEFT),
+				'religion' => $validated['religion'],
+				'image' => $validated['image'],
+				'date_activation' => Carbon::now()->format('Y-m-d'),
+			];
+		} else if ($mode == 'update') {
+			return [
+				'name' => $validated['name'],
+				'email' => $validated['email'],
+				'address' => $validated['address'],
+				'phone_number' => $validated['phone_number'],
+				'gender' => $validated['gender'],
+				'religion' => $validated['religion'],
+				'image' => $validated['image'] ?? null,
+			];
+		}
 
-        return true;
-    }
+		return true;
+	}
+
+	private function generateDataUser($mode, $member, $validated) {
+		if ($mode == 'store') {
+			return [
+				'username' => $validated['username'],
+				'password' => Hash::make($validated['password']),
+				'email' => $member->email,
+				'uuid' => $member->uuid,
+				'member_id' => $member->id,
+				'active' => 1,
+			];
+		} else if ($mode == 'update') {
+			return [
+				'username' => $validated['username'],
+				'password' => $validated['password'] ? Hash::make($validated['password']) : $member->user->password,
+				'email' => $validated['email'],
+				'active' => $validated['active'],
+			];
+		}
+
+		return true;
+	}
 }

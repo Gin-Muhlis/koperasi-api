@@ -24,14 +24,12 @@ class MemberResource extends JsonResource {
 			'identity_number' => $this->identity_number,
 			'religion' => $this->religion,
 			'date_activation' => $this->date_activation,
-			'imageProfile' => $this->image ? str_replace('public/', '', url("storage/{$this->image}")) : '-',
-			'user' => [
-				'uuid' => $this->user->uuid,
-				'username' => $this->user->username,
-				'active' => $this->user->active,
-				'last_login_ip' => $this->user->last_login_ip,
-				'last_login_time' => $this->user->last_login_time,
-			],
+			'imageProfile' => $this->image ? str_replace('public/', '', url("storage/{$this->image}")) : config('app.url') . '/images/profile-default.png',
+			'username' => $this->user->username,
+			'active' => $this->user->active,
+			'role' => $this->user->getRoleNames()->first(),
+			'last_login_ip' => $this->user->last_login_ip,
+			'last_login_time' => $this->user->last_login_time,
 		];
 	}
 }
