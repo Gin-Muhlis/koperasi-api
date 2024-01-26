@@ -19,7 +19,7 @@ class MemberResource extends JsonResource {
 			'email' => $this->email,
 			'address' => $this->address,
 			'phone_number' => $this->phone_number,
-			'gender' => $this->gender,
+			'gender' => $this->gender == 'P' ? 'Perempuan' : 'Laki-laki',
 			'position' => $this->position,
 			'identity_number' => $this->identity_number,
 			'religion' => $this->religion,
