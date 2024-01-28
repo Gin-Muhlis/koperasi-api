@@ -21,16 +21,16 @@ class StoreMemberRequest extends FormRequest {
 	 */
 	public function rules(): array {
 		return [
-			'username' => ['required', 'max:100', 'string'],
-			'password' => ['required'],
-			'email' => ['required', 'email', 'unique:members,email'],
 			'name' => ['required', 'max:100', 'string'],
+			'email' => ['required', 'email', 'unique:members,email'],
 			'address' => ['required', 'string'],
 			'phone_number' => ['required', 'max:20', 'string'],
-			'gender' => ['required', 'in:L,P'],
 			'religion' => ['required', 'max:20', 'string'],
-			'image' => ['nullable', 'image', 'max:2048'],
+			'gender' => ['required', 'in:L,P'],
 			'position' => ['required', 'in:pns,p3k,cpns'],
+			'image' => ['required', 'image', 'max:2048'],
+			'username' => ['required', 'max:100', 'string'],
+			'password' => ['required'],
 			'role' => ['required', 'string'],
 		];
 	}
