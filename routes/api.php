@@ -36,6 +36,8 @@ Route::middleware('json.response')->group(function () {
 		Route::apiResource('/stuff', StuffController::class);
 		Route::apiResource('/role', RoleController::class);
 
+		Route::get('/saving/sub-category', [SubCategoryController::class, 'subCategorySaving']);
+
 		// transaksi
 		Route::apiResource('/purchase', PurchaseController::class);
 		Route::apiResource('/sale', SaleController::class);

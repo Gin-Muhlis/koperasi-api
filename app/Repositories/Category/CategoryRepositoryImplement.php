@@ -5,9 +5,10 @@ namespace App\Repositories\Category;
 use LaravelEasyRepository\Implementations\Eloquent;
 use App\Models\Category;
 
-class CategoryRepositoryImplement extends Eloquent implements CategoryRepository{
+class CategoryRepositoryImplement extends Eloquent implements CategoryRepository
+{
 
-    
+
     protected $model;
 
     public function __construct(Category $model)
@@ -15,23 +16,33 @@ class CategoryRepositoryImplement extends Eloquent implements CategoryRepository
         $this->model = $model;
     }
 
-    public function getCategories() {
+    public function getCategories()
+    {
         return $this->all();
     }
 
-    public function createCategory($request) {
+    public function createCategory($request)
+    {
         return $this->create($request);
     }
 
-    public function showCategory($id) {
+    public function showCategory($id)
+    {
         return $this->findOrFail($id);
     }
 
-    public function updateCategory($id, $request) {
+    public function updateCategory($id, $request)
+    {
         return $this->update($id, $request);
     }
 
-    public function deleteCategory($id) {
+    public function deleteCategory($id)
+    {
         return $this->delete($id);
+    }
+
+    public function getByName($name)
+    {
+        return $this->model->where('name', $name)->first();
     }
 }

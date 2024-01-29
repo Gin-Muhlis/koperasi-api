@@ -26,7 +26,8 @@ class StoreSavingRequest extends FormRequest
             'members_id.*' => ['numeric'],
             'month_year' => ['required'],
             'sub_category_id' => ['required', 'exists:sub_categories,id'],
-            'description' => ['required', 'string']
+            'description' => ['required', 'string'],
+            'amount' => ['nullable', 'numeric']
         ];
     }
 }

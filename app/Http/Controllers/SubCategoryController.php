@@ -11,14 +11,18 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Resources\SubCategoryResource;
 use App\Http\Requests\StoreSubCategoryRequest;
 use App\Http\Requests\UpdateSubCategoryRequest;
+use App\Repositories\Category\CategoryRepository;
 use App\Repositories\SubCategory\SubCategoryRepository;
 
 class SubCategoryController extends Controller
 {
     private $subCategoryRepo;
+    private $categoryRepo;
 
-    public function __construct(SubCategoryRepository $subCategoryRepository) {
+    public function __construct(SubCategoryRepository $subCategoryRepository, CategoryRepository $categoryRepository)
+    {
         $this->subCategoryRepo = $subCategoryRepository;
+        $this->categoryRepo = $categoryRepository;
     }
     /**
      * Display a listing of the resource.
@@ -55,7 +59,6 @@ class SubCategoryController extends Controller
             return response()->json([
                 'message' => 'Data sub kategori berhasil ditambahkan'
             ]);
-
         } catch (Exception $e) {
             DB::rollBack();
             return errorResponse($e->getMessage());
@@ -108,7 +111,7 @@ class SubCategoryController extends Controller
     {
         try {
             DB::beginTransaction();
-            
+
             $this->subCategoryRepo->deleteSubcategory($id);
 
             DB::commit();
@@ -118,6 +121,19 @@ class SubCategoryController extends Controller
             ]);
         } catch (Exception $e) {
             DB::rollBack();
+            return errorResponse($e->getMessage());
+        }
+    }
+
+    public function subCategorySaving()
+    {
+        try {
+            $savingCategory = $this->categoryRepo->getByName('simpanan');
+            $sub_categories = $this->subCategoryRepo->getByCategory($savingCategory->id);
+            return response()->json([
+                'data' => SubCategoryResource::collection($sub_categories)
+            ]);
+        } catch (Exception $e) {
             return errorResponse($e->getMessage());
         }
     }
