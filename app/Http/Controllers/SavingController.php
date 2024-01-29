@@ -49,7 +49,7 @@ class SavingController extends Controller {
 					'uuid' => Str::uuid(),
 					'code' => generateCode(),
 					'member_id' => $member->id,
-					'amount' => $memberPayment->amount,
+					'amount' => $validated['type_saving'] == 'simpanan wajib' ? $validated['amount'] : $memberPayment->amount,
 					'date' => Carbon::now()->format('Y-m-d'),
 					'sub_category_id' => $validated['sub_category_id'],
 					'month_year' => $validated['month_year'],
