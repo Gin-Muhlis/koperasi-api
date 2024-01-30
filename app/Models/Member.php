@@ -14,6 +14,7 @@ class Member extends Model
         'email',
         'name',
         'address',
+        'position',
         'phone_number',
         'gender',
         'identity_number',
@@ -38,8 +39,8 @@ class Member extends Model
         return $this->hasMany(Loan::class);
     }
 
-    public function paymentDetermination()
+    public function paymentDeterminations()
     {
-        return $this->belongsTo(PaymentDetermination::class);
+        return $this->hasMany(PaymentDetermination::class);
     }
 }

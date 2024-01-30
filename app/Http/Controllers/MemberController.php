@@ -18,18 +18,21 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class MemberController extends Controller {
+class MemberController extends Controller
+{
 	private $memberRepo;
 	private $userRepo;
 
-	public function __construct(MemberRepository $member, UserRepository $user) {
+	public function __construct(MemberRepository $member, UserRepository $user)
+	{
 		$this->memberRepo = $member;
 		$this->userRepo = $user;
 	}
 	/**
 	 * Display a listing of the resource.
 	 */
-	public function index(Request $request) {
+	public function index(Request $request)
+	{
 		try {
 			$data_members = $this->memberRepo->getmembers();
 
@@ -44,7 +47,8 @@ class MemberController extends Controller {
 	/**
 	 * Store a newly created resource in storage.
 	 */
-	public function store(StoreMemberRequest $request) {
+	public function store(StoreMemberRequest $request)
+	{
 		try {
 			$validated = $request->validated();
 
@@ -78,7 +82,8 @@ class MemberController extends Controller {
 	/**
 	 * Display the specified resource.
 	 */
-	public function show($id) {
+	public function show($id)
+	{
 		try {
 			$member = $this->memberRepo->showMember($id);
 			return response()->json([
@@ -92,7 +97,8 @@ class MemberController extends Controller {
 	/**
 	 * Update the specified resource in storage.
 	 */
-	public function update(UpdateMemberRequest $request, $id) {
+	public function update(UpdateMemberRequest $request, $id)
+	{
 		try {
 			$validated = $request->validated();
 
@@ -130,7 +136,8 @@ class MemberController extends Controller {
 	/**
 	 * Remove the specified resource from storage.
 	 */
-	public function destroy($id) {
+	public function destroy($id)
+	{
 		try {
 			$this->memberRepo->deleteMember($id);
 
@@ -142,7 +149,8 @@ class MemberController extends Controller {
 		}
 	}
 
-	public function reportSavingMembers() {
+	public function reportSavingMembers()
+	{
 		try {
 			$savingMembers = $this->memberRepo->getSavingMembers();
 
@@ -157,7 +165,8 @@ class MemberController extends Controller {
 		}
 	}
 
-	private function generateDataMember($mode, $validated) {
+	private function generateDataMember($mode, $validated)
+	{
 		if ($mode == 'store') {
 			$min = 1000000000;
 			$max = 9999999999;
@@ -169,6 +178,7 @@ class MemberController extends Controller {
 				'name' => $validated['name'],
 				'email' => $validated['email'],
 				'address' => $validated['address'],
+				'position' => $validated['position'],
 				'phone_number' => $validated['phone_number'],
 				'gender' => $validated['gender'],
 				'identity_number' => str_pad($random_number, 10, '0', STR_PAD_LEFT),
@@ -181,6 +191,7 @@ class MemberController extends Controller {
 				'name' => $validated['name'],
 				'email' => $validated['email'],
 				'address' => $validated['address'],
+				'position' => $validated['position'],
 				'phone_number' => $validated['phone_number'],
 				'gender' => $validated['gender'],
 				'religion' => $validated['religion'],
@@ -191,7 +202,8 @@ class MemberController extends Controller {
 		return true;
 	}
 
-	private function generateDataUser($mode, $member, $validated) {
+	private function generateDataUser($mode, $member, $validated)
+	{
 		if ($mode == 'store') {
 			return [
 				'username' => $validated['username'],

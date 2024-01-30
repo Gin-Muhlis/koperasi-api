@@ -15,13 +15,15 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class SavingController extends Controller {
+class SavingController extends Controller
+{
 	private $savingRepository;
 	private $memberRepository;
 
 	private $paymentDeterminationRepository;
 
-	public function __construct(SavingRepository $savingRepository, MemberRepository $memberRepository, PaymentDeterminationRepository $paymentDeterminationRepository) {
+	public function __construct(SavingRepository $savingRepository, MemberRepository $memberRepository, PaymentDeterminationRepository $paymentDeterminationRepository)
+	{
 		$this->savingRepository = $savingRepository;
 		$this->memberRepository = $memberRepository;
 		$this->paymentDeterminationRepository = $paymentDeterminationRepository;
@@ -29,14 +31,16 @@ class SavingController extends Controller {
 	/**
 	 * Display a listing of the resource.
 	 */
-	public function index() {
+	public function index()
+	{
 		//
 	}
 
 	/**
 	 * Store a newly created resource in storage.
 	 */
-	public function store(StoreSavingRequest $request) {
+	public function store(StoreSavingRequest $request)
+	{
 		try {
 			$validated = $request->validated();
 
@@ -44,12 +48,11 @@ class SavingController extends Controller {
 				$member = $this->memberRepository->showMember($member_id);
 
 				$memberPayment = $this->paymentDeterminationRepository->memberPayment($member->id, $validated['month_year']);
-
 				$data = [
 					'uuid' => Str::uuid(),
 					'code' => generateCode(),
 					'member_id' => $member->id,
-					'amount' => $validated['type_saving'] == 'simpanan wajib' ? $validated['amount'] : $memberPayment->amount,
+					'amount' => $validated['type_saving'] !== 'simpanan wajib' ? $validated['amount'] : $memberPayment->amount,
 					'date' => Carbon::now()->format('Y-m-d'),
 					'sub_category_id' => $validated['sub_category_id'],
 					'month_year' => $validated['month_year'],
@@ -78,22 +81,24 @@ class SavingController extends Controller {
 	/**
 	 * Display the specified resource.
 	 */
-	public function show(Saving $saving) {
+	public function show(Saving $saving)
+	{
 		//
 	}
 
 	/**
 	 * Update the specified resource in storage.
 	 */
-	public function update(UpdateSavingRequest $request, Saving $saving) {
+	public function update(UpdateSavingRequest $request, Saving $saving)
+	{
 		//
 	}
 
 	/**
 	 * Remove the specified resource from storage.
 	 */
-	public function destroy(Saving $saving) {
+	public function destroy(Saving $saving)
+	{
 		//
 	}
-
 }

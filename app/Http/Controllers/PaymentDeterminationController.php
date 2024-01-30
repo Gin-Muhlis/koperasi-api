@@ -6,28 +6,42 @@ require_once app_path() . '/Helpers/helpers.php';
 
 use App\Http\Requests\StorePaymentDeterminationRequest;
 use App\Http\Requests\UpdatePaymentDeterminationRequest;
+use App\Http\Resources\PaymentDeterminationResource;
 use App\Models\PaymentDetermination;
 use App\Repositories\PaymentDetermination\PaymentDeterminationRepository;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class PaymentDeterminationController extends Controller {
+class PaymentDeterminationController extends Controller
+{
 	private $repository;
 
-	public function __construct(PaymentDeterminationRepository $repo) {
+	public function __construct(PaymentDeterminationRepository $repo)
+	{
 		$this->repository = $repo;
 	}
 	/**
 	 * Display a listing of the resource.
 	 */
-	public function index() {
+	public function index()
+	{
+		try {
+			$payments = $this->repository->getPayments();
+
+			return response()->json([
+				'data' => PaymentDeterminationResource::collection($payments)
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
 	}
 
 	/**
 	 * Store a newly created resource in storage.
 	 */
-	public function store(StorePaymentDeterminationRequest $request) {
+	public function store(StorePaymentDeterminationRequest $request)
+	{
 		try {
 			$validated = $request->validated();
 
@@ -61,22 +75,24 @@ class PaymentDeterminationController extends Controller {
 	/**
 	 * Display the specified resource.
 	 */
-	public function show(PaymentDetermination $paymentDeteminations) {
+	public function show(PaymentDetermination $paymentDeteminations)
+	{
 		//
 	}
 
 	/**
 	 * Update the specified resource in storage.
 	 */
-	public function update(UpdatePaymentDeterminationRequest $request, PaymentDetermination $paymentDeteminations) {
+	public function update(UpdatePaymentDeterminationRequest $request, PaymentDetermination $paymentDeteminations)
+	{
 		//
 	}
 
 	/**
 	 * Remove the specified resource from storage.
 	 */
-	public function destroy(PaymentDetermination $paymentDeteminations) {
+	public function destroy(PaymentDetermination $paymentDeteminations)
+	{
 		//
 	}
-
 }

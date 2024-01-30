@@ -5,14 +5,20 @@ namespace App\Repositories\PaymentDetermination;
 use LaravelEasyRepository\Implementations\Eloquent;
 use App\Models\PaymentDetermination;
 
-class PaymentDeterminationRepositoryImplement extends Eloquent implements PaymentDeterminationRepository{
+class PaymentDeterminationRepositoryImplement extends Eloquent implements PaymentDeterminationRepository
+{
 
-   
+
     protected $model;
 
     public function __construct(PaymentDetermination $model)
     {
         $this->model = $model;
+    }
+
+    public function getPayments()
+    {
+        return $this->all();
     }
 
     public function createPaymentDetermination($data)

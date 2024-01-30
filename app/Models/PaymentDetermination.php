@@ -11,7 +11,18 @@ class PaymentDetermination extends Model
 
     protected $fillable = ['uuid', 'member_id', 'sub_category_id', 'amount', 'payment_month'];
 
-    public function scopeWherePaymentMonth($query, $monthYear) {
+    public function scopeWherePaymentMonth($query, $monthYear)
+    {
         return $query->where('payment_month', $monthYear);
+    }
+
+    public function member()
+    {
+        return $this->belongsTo(member::class);
+    }
+
+    public function subCategory()
+    {
+        return $this->belongsTo(SubCategory::class);
     }
 }
