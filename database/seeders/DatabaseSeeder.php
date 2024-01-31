@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call(MemberSeeder::class);
         $this->call(CategorySeeder::class);
         $this->call(SubCategorySeeder::class);
-        $this->call(SavingSeeder::class);
+        // $this->call(SavingSeeder::class);
         $this->call(productSeeder::class);
         $this->call(StuffSeeder::class);
         $this->call(PurchaseSeeder::class);
@@ -27,5 +27,6 @@ class DatabaseSeeder extends Seeder
         $this->call(LoanSeeder::class);
         $this->call(InstallmentSeeder::class);
         $this->call(PaymentDeteminationsSeeder::class);
+        $this->call(PositionCategorySeeder::class);
     }
 }

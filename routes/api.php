@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PaymentDeterminationController;
+use App\Http\Controllers\PositionCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\RoleController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\StuffController;
 use App\Http\Controllers\SubCategoryController;
+use App\Http\Controllers\TabController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +37,8 @@ Route::middleware('json.response')->group(function () {
 		Route::apiResource('/product', ProductController::class);
 		Route::apiResource('/stuff', StuffController::class);
 		Route::apiResource('/role', RoleController::class);
+		Route::apiResource('/payment-determination', PaymentDeterminationController::class);
+		Route::apiResource('/position-category', PositionCategoryController::class);
 
 		Route::get('/saving/sub-category', [SubCategoryController::class, 'subCategorySaving']);
 
@@ -46,8 +50,10 @@ Route::middleware('json.response')->group(function () {
 		Route::apiResource('/user', UserController::class);
 
 		// app
-		Route::apiResource('/payment-determination', PaymentDeterminationController::class);
 		Route::apiResource('/saving-members', SavingController::class);
+
+		// Tab
+		Route::get('/tab/principal-saving', [TabController::class, 'principalSaving']);
 
 		// laporan
 		Route::prefix('report')->group(function () {
