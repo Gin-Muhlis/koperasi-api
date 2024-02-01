@@ -15,21 +15,26 @@ class PositionCategorySeeder extends Seeder
     {
         $data = [
             [
-                'position' => 'pns',
-                'pokok' => 100000,
-                'min_wajib' => 30000,
-                'min_wajib_khusus' => 10000,
+                'position' => 'PNS Golongan IV',
+                'pokok' => 25000,
+                'wajib' => 60000,
+                'wajib_khusus' => 10000,
             ],
             [
-                'position' => 'p3k',
-                'pokok' => 50000,
-                'min_wajib' => 20000,
-                'min_wajib_khusus' => 5000,
+                'position' => 'PNS Golongan III',
+                'pokok' => 20000,
+                'wajib' => 40000,
+                'wajib_khusus' => 7500,
             ], [
-                'position' => 'cpns',
-                'pokok' => 70000,
-                'min_wajib' => 10000,
-                'min_wajib_khusus' => 5000,
+                'position' => 'p3k',
+                'pokok' => 15000,
+                'wajib' => 25000,
+                'wajib_khusus' => 5000,
+            ], [
+                'position' => 'honor',
+                'pokok' => 15000,
+                'wajib' => 25000,
+                'wajib_khusus' => 5000,
             ]
         ];
 

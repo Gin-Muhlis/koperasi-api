@@ -18,8 +18,8 @@ class PositionCategoryResource extends JsonResource
             'id' => $this->id,
             'position' => $this->position,
             'pokok' => $this->pokok,
-            'min_wajib' => $this->min_wajib,
-            'min_wajib_khusus' => $this->min_wajib_khusus
+            'wajib' => $this->wajib,
+            'wajib_khusus' => $this->wajib_khusus
         ];
     }
 }

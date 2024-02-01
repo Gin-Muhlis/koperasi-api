@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('position', 100);
             $table->double('pokok');
-            $table->double('min_wajib');
-            $table->double('min_wajib_khusus');
+            $table->double('wajib');
+            $table->double('wajib_khusus');
             $table->timestamps();
         });
     }
