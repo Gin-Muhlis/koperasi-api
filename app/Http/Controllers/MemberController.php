@@ -34,10 +34,18 @@ class MemberController extends Controller
 	public function index(Request $request)
 	{
 		try {
-			$data_members = $this->memberRepo->getmembers();
+			$members = $this->memberRepo->getmembers();
+
+			$filtered_members = [];
+
+			foreach ($members as $member) {
+				if (!$member->user->hasRole('super-admin')) {
+					$filtered_members[] = $member;
+				}
+			}
 
 			return response()->json([
-				'data' => MemberResource::collection($data_members),
+				'data' => MemberResource::collection($filtered_members),
 			]);
 		} catch (Exception $e) {
 			return errorResponse($e->getMessage());

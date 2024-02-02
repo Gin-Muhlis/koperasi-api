@@ -54,6 +54,7 @@ Route::middleware('json.response')->group(function () {
 
 		// Tab
 		Route::get('/tab/principal-saving', [TabController::class, 'principalSaving']);
+		Route::get('/tab/receivable', [TabController::class, 'receivable']);
 
 		// laporan
 		Route::prefix('report')->group(function () {

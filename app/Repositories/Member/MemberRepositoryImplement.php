@@ -5,9 +5,10 @@ namespace App\Repositories\Member;
 use LaravelEasyRepository\Implementations\Eloquent;
 use App\Models\Member;
 
-class MemberRepositoryImplement extends Eloquent implements MemberRepository{
+class MemberRepositoryImplement extends Eloquent implements MemberRepository
+{
 
- 
+
     protected $model;
 
     public function __construct(Member $model)
@@ -15,7 +16,7 @@ class MemberRepositoryImplement extends Eloquent implements MemberRepository{
         $this->model = $model;
     }
 
-    public function getMembers() 
+    public function getMembers()
     {
         return $this->all();
     }
@@ -25,12 +26,12 @@ class MemberRepositoryImplement extends Eloquent implements MemberRepository{
         return $this->create($request);
     }
 
-    public function showMember($id) 
+    public function showMember($id)
     {
         return $this->findOrFail($id);
     }
 
-    public function updateMember($id, $request) 
+    public function updateMember($id, $request)
     {
         return $this->update($id, $request);
     }
@@ -43,5 +44,14 @@ class MemberRepositoryImplement extends Eloquent implements MemberRepository{
     public function getSavingMembers()
     {
         return $this->model->with('savings.subCategory')->get();
+    }
+
+    public function getNotPaidMembers()
+    {
+        return $this->model->with(['loans' => function ($query) {
+            $query->where('status', '!=', 'lunas');
+        }])->whereHas('loans', function ($query) {
+            $query->where('status', '!=', 'lunas');
+        })->get();
     }
 }
