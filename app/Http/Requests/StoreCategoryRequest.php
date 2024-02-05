@@ -6,11 +6,13 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class StoreCategoryRequest extends FormRequest {
+class StoreCategoryRequest extends FormRequest
+{
 	/**
 	 * Determine if the user is authorized to make this request.
 	 */
-	public function authorize(): bool {
+	public function authorize(): bool
+	{
 		return true;
 	}
 
@@ -19,13 +21,15 @@ class StoreCategoryRequest extends FormRequest {
 	 *
 	 * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
 	 */
-	public function rules(): array {
+	public function rules(): array
+	{
 		return [
 			'name' => ['required', 'max:255', 'string'],
 		];
 	}
 
-	public function messages(): array {
+	public function messages(): array
+	{
 		return [
 			'name.required' => 'Field nama harus diisi.',
 			'name.max' => 'Panjang teks pada field nama tidak boleh melebihi 255 karakter.',
@@ -33,10 +37,11 @@ class StoreCategoryRequest extends FormRequest {
 		];
 	}
 
-	public function failedValidation(Validator $validator) {
+	public function failedValidation(Validator $validator)
+	{
 		throw new HttpResponseException(response()->json([
 			'message' => 'Validasi data gagal',
 			'data' => $validator->errors(),
-		]));
+		], 422));
 	}
 }

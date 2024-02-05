@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 require_once app_path() . '/Helpers/helpers.php';
 
+use App\Http\Requests\MultipleSavingRequest;
 use App\Http\Requests\StoreSavingRequest;
 use App\Http\Requests\UpdateSavingRequest;
 use App\Models\Saving;
@@ -12,6 +13,7 @@ use App\Repositories\PaymentDetermination\PaymentDeterminationRepository;
 use App\Repositories\Saving\SavingRepository;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -42,6 +44,7 @@ class SavingController extends Controller
 	public function store(StoreSavingRequest $request)
 	{
 		try {
+			$user = Auth::user();
 			$validated = $request->validated();
 
 			foreach ($validated['members_id'] as $member_id) {
@@ -56,7 +59,7 @@ class SavingController extends Controller
 					'date' => Carbon::now()->format('Y-m-d'),
 					'sub_category_id' => $validated['sub_category_id'],
 					'month_year' => $validated['month_year'],
-					'user_id' => '1',
+					'user_id' => $user->id,
 					'description' => $validated['description'],
 				];
 
@@ -100,5 +103,33 @@ class SavingController extends Controller
 	public function destroy(Saving $saving)
 	{
 		//
+	}
+
+	// function untuk menghandle semua jenis simpanan sekaligus
+	public function savings(MultipleSavingRequest $request)
+	{
+		try {
+			$validated = $request->validated();
+
+			foreach ($validated['principal_savings'] as $data) {
+				$saving_data = $this->generateSavingData($data, 'simpanan pokok', $validated['description']);
+			}
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	private function generateSavingData($data, $sub_category, $description) {
+		return [
+			'uuid' => Str::uuid(),
+			'code' => generateCode(),
+			'member_id' => $data->id,
+			'amount' => $data->amount,
+			'date' => Carbon::now()->format('Y-m-d'),
+			'sub_category_id' => '',
+			'month_year' => Carbon::now()->format('m-Y'),
+			'user_id' => Auth::user()->id,
+			'description' => $description,
+		];
 	}
 }

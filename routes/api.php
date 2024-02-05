@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PaymentDeterminationController;
 use App\Http\Controllers\PositionCategoryController;
@@ -51,10 +52,14 @@ Route::middleware('json.response')->group(function () {
 
 		// app
 		Route::apiResource('/saving-members', SavingController::class);
+		Route::post('/savings', [SavingController::class, 'savings']);
 
 		// Tab
 		Route::get('/tab/principal-saving', [TabController::class, 'principalSaving']);
 		Route::get('/tab/receivable', [TabController::class, 'receivable']);
+
+		// Export
+		Route::post('/export/payment-report', [ExportController::class, 'reportPayment']);
 
 		// laporan
 		Route::prefix('report')->group(function () {

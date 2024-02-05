@@ -7,15 +7,19 @@ use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
-class ReportPaymentExport implements FromView, WithTitle, WithEvents {
+class ReportPaymentExport implements FromView, WithTitle, WithEvents
+{
 	private $principal_savings;
 	private $mandatory_savings;
 	private $special_mandatory_savings;
 	private $voluntary_savings;
 	private $recretional_savings;
 
-	private function __construc($principal_savings, $mandatory_savings, $special_mandatory_savings, $voluntary_savings, $recretional_savings) {
+	public function __construct($principal_savings, $mandatory_savings, $special_mandatory_savings, $voluntary_savings, $recretional_savings)
+	{
 		$this->principal_savings = $principal_savings;
 		$this->mandatory_savings = $mandatory_savings;
 		$this->special_mandatory_savings = $special_mandatory_savings;
@@ -25,8 +29,17 @@ class ReportPaymentExport implements FromView, WithTitle, WithEvents {
 	/**
 	 * @return \Illuminate\Support\Collection
 	 */
-	public function view(): View {
+	public function view(): View
+	{
 		$members = Member::all();
+
+		$filtered_members = [];
+
+		foreach ($members as $member) {
+			if (!$member->user->hasRole('super-admin')) {
+				$filtered_members[] = $member;
+			}
+		}
 
 		$total_principal_saving = 0;
 		$total_mandatory_saving = 0;
@@ -37,7 +50,7 @@ class ReportPaymentExport implements FromView, WithTitle, WithEvents {
 
 		$members_data = [];
 
-		foreach ($members as $member) {
+		foreach ($filtered_members as $member) {
 			$principal_saving = collect($this->principal_savings)->where('id', $member->id)->first();
 			$mandatory_saving = collect($this->mandatory_savings)->where('id', $member->id)->first();
 			$special_mandatory_saving = collect($this->special_mandatory_savings)->where('id', $member->id)->first();
@@ -73,7 +86,7 @@ class ReportPaymentExport implements FromView, WithTitle, WithEvents {
 		}
 
 		foreach ($this->recretional_savings as $data) {
-			$recretional_saving += $data['amount'];
+			$total_recretional_saving += $data['amount'];
 		}
 
 		$total_payment = $total_principal_saving + $total_mandatory_saving + $total_special_mandatory_saving + $total_voluntary_saving + $total_recretional_saving;
@@ -81,11 +94,13 @@ class ReportPaymentExport implements FromView, WithTitle, WithEvents {
 		return view('exports.paymentReport', compact('members_data', 'total_principal_saving', 'total_mandatory_saving', 'total_special_mandatory_saving', 'total_voluntary_saving', 'total_recretional_saving', 'total_payment'));
 	}
 
-	public function title(): string {
-		return 'Data Tagihan Gabungan';
+	public function title(): string
+	{
+		return 'Data Koperasi';
 	}
 
-	public function registerEvents(): array {
+	public function registerEvents(): array
+	{
 		return [
 			AfterSheet::class => function (AfterSheet $event) {
 				$event->sheet->getColumnDimension('A')->setAutoSize(true);
@@ -102,9 +117,9 @@ class ReportPaymentExport implements FromView, WithTitle, WithEvents {
 				$event->sheet->mergeCells('A2:H2');
 				$event->sheet->setCellValue('A1', 'DATA TAGIHAN GABUNGAN');
 
-				$event->sheet->getStyle('A1:D2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 				$event->sheet->getStyle('A')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-				$event->sheet->getStyle('E')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+				$event->sheet->getStyle('A1:H2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+				$event->sheet->getStyle('A4:H4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
 				$event->sheet->getStyle('A4:H4')->applyFromArray([
 					'fill' => [
