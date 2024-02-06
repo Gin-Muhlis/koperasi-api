@@ -5,38 +5,34 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Saving extends Model
-{
-    use HasFactory;
+class Saving extends Model {
+	use HasFactory;
 
-    protected $fillable = [
-        'uuid',
-        'code',
-        'amount',
-        'date',
-        'member_id',
-        'sub_category_id',
-        'user_id',
-        'description',
-        'month_year'
-    ];
+	protected $fillable = [
+		'uuid',
+		'code',
+		'amount',
+		'date',
+		'member_id',
+		'sub_category_id',
+		'user_id',
+		'description',
+		'month_year',
+	];
 
-    protected $casts = [
-        'date' => 'date',
-    ];
+	protected $casts = [
+		'date' => 'date',
+	];
 
-    public function member()
-    {
-        return $this->belongsTo(Member::class);
-    }
+	public function member() {
+		return $this->belongsTo(Member::class);
+	}
 
-    public function subCategory()
-    {
-        return $this->belongsTo(SubCategory::class);
-    }
+	public function subCategory() {
+		return $this->belongsTo(SubCategory::class);
+	}
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+	public function user() {
+		return $this->belongsTo(User::class);
+	}
 }

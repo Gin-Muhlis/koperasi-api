@@ -8,84 +8,81 @@ use App\Http\Resources\MandatoryResource;
 use App\Http\Resources\PrincipalSavingResource;
 use App\Http\Resources\ReceivableResource;
 use App\Repositories\Member\MemberRepository;
+use App\Repositories\Saving\SavingRepository;
+use App\Repositories\SubCategory\SubCategoryRepository;
 use Exception;
-use Illuminate\Http\Request;
 
-class TabController extends Controller
-{
-    private $memberRepo;
+class TabController extends Controller {
+	private $memberRepo;
+	private $savingRepo;
+	private $subCategoryRepo;
 
-    public function __construct(MemberRepository $memberRepository)
-    {
-        $this->memberRepo = $memberRepository;
-    }
-    public function principalSaving()
-    {
-        try {
-            $members = $this->memberRepo->getMembers();
+	public function __construct(MemberRepository $memberRepository, SavingRepository $savingRepository, SubCategoryRepository $subCategoryRepository) {
+		$this->memberRepo = $memberRepository;
+		$this->savingRepo = $savingRepository;
+		$this->subCategoryRepo = $subCategoryRepository;
+	}
 
-            $member_principaL_saving = [];
-            $filtered_members = $this->filterMember(($members));
-            foreach ($filtered_members as $member) {
-                $member_savings = $member->savings;
+	public function principalSaving() {
+		try {
+			$sub_category = $this->subCategoryRepo->getByName('simpanan pokok');
+			$members = $this->memberRepo->getMembers();
 
-                $isPrincipalSaving = $member_savings->contains(function ($object) {
-                    return $object->subCategory->name = 'simpanan pokok';
-                });
+			$member_principaL_saving = [];
+			$filtered_members = $this->filterMember(($members));
+			foreach ($filtered_members as $member) {
+				$member_savings = $this->savingRepo->getMemberSpesificSavings($member->id, $sub_category->id);
 
-                if (!$isPrincipalSaving) {
-                    $member_principaL_saving[] = $member;
-                }
-            }
+				if (count($member_savings) < 1) {
+					$member_principaL_saving[] = $member;
+				}
+			}
 
-            return response()->json([
-                'data' => PrincipalSavingResource::collection($member_principaL_saving)
-            ]);
-        } catch (Exception $e) {
-            return errorResponse($e->getMessage());
-        }
-    }
+			return response()->json([
+				'data' => PrincipalSavingResource::collection($member_principaL_saving),
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
 
-    public function mandatorySaving()
-    {
-        try {
-            $members = $this->memberRepo->getMembers();
+	public function mandatorySaving() {
+		try {
+			$members = $this->memberRepo->getMembers();
 
-            $filtered_members = $this->filterMember(($members));
+			$filtered_members = $this->filterMember(($members));
 
-            return response()->json([
-                'data' => MandatoryResource::collection($filtered_members)
-            ]);
-        } catch (Exception $e) {
-            return errorResponse($e->getMessage());
-        }
-    }
+			return response()->json([
+				'data' => MandatoryResource::collection($filtered_members),
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
 
-    public function receivable()
-    {
-        try {
-            $members = $this->memberRepo->getMembers();
+	public function receivable() {
+		try {
+			$members = $this->memberRepo->getMembers();
 
-            $filtered_members = $this->filterMember(($members));
+			$filtered_members = $this->filterMember(($members));
 
-            return response()->json([
-                'data' => ReceivableResource::collection($filtered_members)
-            ]);
-        } catch (Exception $e) {
-            return errorResponse($e->getMessage());
-        }
-    }
+			return response()->json([
+				'data' => ReceivableResource::collection($filtered_members),
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
 
-    private function filterMember($data)
-    {
-        $filtered_members = [];
+	private function filterMember($data) {
+		$filtered_members = [];
 
-        foreach ($data as $member) {
-            if (!$member->user->hasRole('super-admin')) {
-                $filtered_members[] = $member;
-            }
-        }
+		foreach ($data as $member) {
+			if (!$member->user->hasRole('super-admin')) {
+				$filtered_members[] = $member;
+			}
+		}
 
-        return $filtered_members;
-    }
+		return $filtered_members;
+	}
 }
