@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 require_once app_path() . '/Helpers/helpers.php';
 
+use App\Http\Resources\MandatoryResource;
 use App\Http\Resources\PrincipalSavingResource;
 use App\Http\Resources\ReceivableResource;
 use App\Repositories\Member\MemberRepository;
@@ -24,22 +25,15 @@ class TabController extends Controller
             $members = $this->memberRepo->getMembers();
 
             $member_principaL_saving = [];
-            $filtered_members = [];
-
-            foreach ($members as $member) {
-                if (!$member->user->hasRole('super-admin')) {
-                    $filtered_members[] = $member;
-                }
-            }
-
+            $filtered_members = $this->filterMember(($members));
             foreach ($filtered_members as $member) {
                 $member_savings = $member->savings;
 
-                $isPrincipanSaving = $member_savings->contains(function ($object) {
+                $isPrincipalSaving = $member_savings->contains(function ($object) {
                     return $object->subCategory->name = 'simpanan pokok';
                 });
 
-                if (!$isPrincipanSaving) {
+                if (!$isPrincipalSaving) {
                     $member_principaL_saving[] = $member;
                 }
             }
@@ -51,16 +45,47 @@ class TabController extends Controller
             return errorResponse($e->getMessage());
         }
     }
-    public function receivable()
+
+    public function mandatorySaving()
     {
         try {
-            $members = $this->memberRepo->getNotPaidMembers();
+            $members = $this->memberRepo->getMembers();
+
+            $filtered_members = $this->filterMember(($members));
 
             return response()->json([
-                'data' => ReceivableResource::collection($members)
+                'data' => MandatoryResource::collection($filtered_members)
             ]);
         } catch (Exception $e) {
             return errorResponse($e->getMessage());
         }
+    }
+
+    public function receivable()
+    {
+        try {
+            $members = $this->memberRepo->getMembers();
+
+            $filtered_members = $this->filterMember(($members));
+
+            return response()->json([
+                'data' => ReceivableResource::collection($filtered_members)
+            ]);
+        } catch (Exception $e) {
+            return errorResponse($e->getMessage());
+        }
+    }
+
+    private function filterMember($data)
+    {
+        $filtered_members = [];
+
+        foreach ($data as $member) {
+            if (!$member->user->hasRole('super-admin')) {
+                $filtered_members[] = $member;
+            }
+        }
+
+        return $filtered_members;
     }
 }

@@ -56,6 +56,7 @@ Route::middleware('json.response')->group(function () {
 
 		// Tab
 		Route::get('/tab/principal-saving', [TabController::class, 'principalSaving']);
+		Route::get('/tab/mandatory-saving', [TabController::class, 'mandatorySaving']);
 		Route::get('/tab/receivable', [TabController::class, 'receivable']);
 
 		// Export

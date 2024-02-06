@@ -131,5 +131,5 @@ class SavingController extends Controller
 			'user_id' => Auth::user()->id,
 			'description' => $description,
 		];
-	}
+	} 	
 }
