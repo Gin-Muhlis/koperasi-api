@@ -18,28 +18,25 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class MemberController extends Controller
-{
+class MemberController extends Controller {
 	private $memberRepo;
 	private $userRepo;
 
-	public function __construct(MemberRepository $member, UserRepository $user)
-	{
+	public function __construct(MemberRepository $member, UserRepository $user) {
 		$this->memberRepo = $member;
 		$this->userRepo = $user;
 	}
 	/**
 	 * Display a listing of the resource.
 	 */
-	public function index(Request $request)
-	{
+	public function index(Request $request) {
 		try {
 			$members = $this->memberRepo->getmembers();
 
 			$filtered_members = [];
 
 			foreach ($members as $member) {
-				if (!$member->user->hasRole('super-admin')) {
+				if ($member->user->hasRole('member')) {
 					$filtered_members[] = $member;
 				}
 			}
@@ -55,8 +52,7 @@ class MemberController extends Controller
 	/**
 	 * Store a newly created resource in storage.
 	 */
-	public function store(StoreMemberRequest $request)
-	{
+	public function store(StoreMemberRequest $request) {
 		try {
 			$validated = $request->validated();
 
@@ -90,8 +86,7 @@ class MemberController extends Controller
 	/**
 	 * Display the specified resource.
 	 */
-	public function show($id)
-	{
+	public function show($id) {
 		try {
 			$member = $this->memberRepo->showMember($id);
 			return response()->json([
@@ -105,8 +100,7 @@ class MemberController extends Controller
 	/**
 	 * Update the specified resource in storage.
 	 */
-	public function update(UpdateMemberRequest $request, $id)
-	{
+	public function update(UpdateMemberRequest $request, $id) {
 		try {
 			$validated = $request->validated();
 
@@ -144,8 +138,7 @@ class MemberController extends Controller
 	/**
 	 * Remove the specified resource from storage.
 	 */
-	public function destroy($id)
-	{
+	public function destroy($id) {
 		try {
 			$this->memberRepo->deleteMember($id);
 
@@ -157,8 +150,7 @@ class MemberController extends Controller
 		}
 	}
 
-	public function reportSavingMembers()
-	{
+	public function reportSavingMembers() {
 		try {
 			$savingMembers = $this->memberRepo->getSavingMembers();
 
@@ -173,8 +165,7 @@ class MemberController extends Controller
 		}
 	}
 
-	private function generateDataMember($mode, $validated)
-	{
+	private function generateDataMember($mode, $validated) {
 		if ($mode == 'store') {
 			$min = 1000000000;
 			$max = 9999999999;
@@ -210,8 +201,7 @@ class MemberController extends Controller
 		return true;
 	}
 
-	private function generateDataUser($mode, $member, $validated)
-	{
+	private function generateDataUser($mode, $member, $validated) {
 		if ($mode == 'store') {
 			return [
 				'username' => $validated['username'],

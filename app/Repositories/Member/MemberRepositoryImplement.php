@@ -2,56 +2,52 @@
 
 namespace App\Repositories\Member;
 
-use LaravelEasyRepository\Implementations\Eloquent;
 use App\Models\Member;
+use LaravelEasyRepository\Implementations\Eloquent;
 
-class MemberRepositoryImplement extends Eloquent implements MemberRepository
-{
+class MemberRepositoryImplement extends Eloquent implements MemberRepository {
 
+	protected $model;
 
-    protected $model;
+	public function __construct(Member $model) {
+		$this->model = $model;
+	}
 
-    public function __construct(Member $model)
-    {
-        $this->model = $model;
-    }
+	public function getMembers() {
+		return $this->all();
+	}
 
-    public function getMembers()
-    {
-        return $this->all();
-    }
+	public function createMember($request) {
+		return $this->create($request);
+	}
 
-    public function createMember($request)
-    {
-        return $this->create($request);
-    }
+	public function showMember($id) {
+		return $this->findOrFail($id);
+	}
 
-    public function showMember($id)
-    {
-        return $this->findOrFail($id);
-    }
+	public function updateMember($id, $request) {
+		return $this->update($id, $request);
+	}
 
-    public function updateMember($id, $request)
-    {
-        return $this->update($id, $request);
-    }
+	public function deleteMember($id) {
+		return $this->delete($id);
+	}
 
-    public function deleteMember($id)
-    {
-        return $this->delete($id);
-    }
+	public function getSavingMembers() {
+		return $this->model->with('savings.subCategory')->get();
+	}
 
-    public function getSavingMembers()
-    {
-        return $this->model->with('savings.subCategory')->get();
-    }
-
-    public function getNotPaidMembers()
-    {
-        return $this->model->with(['loans' => function ($query) {
-            $query->where('status', '!=', 'lunas');
-        }])->whereHas('loans', function ($query) {
-            $query->where('status', '!=', 'lunas');
-        })->get();
-    }
+	public function getNotPaidMembers($sub_category) {
+		return $this->model->with(['loans' => function ($query) use ($sub_category) {
+			$query->where([
+				['status', '!=', 'lunas'],
+				['sub_category_id', $sub_category],
+			]);
+		}])->whereHas('loans', function ($query) use ($sub_category) {
+			$query->where([
+				['status', '!=', 'lunas'],
+				['sub_category_id', $sub_category],
+			]);
+		})->get();
+	}
 }
