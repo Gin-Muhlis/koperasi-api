@@ -9,6 +9,7 @@ use App\Http\Resources\MandatoryResource;
 use App\Http\Resources\PrincipalSavingResource;
 use App\Http\Resources\ReceivableResource;
 use App\Repositories\Installment\InstallmentRepository;
+use App\Repositories\Invoice\InvoiceRepository;
 use App\Repositories\Loan\LoanRepository;
 use App\Repositories\Member\MemberRepository;
 use App\Repositories\Saving\SavingRepository;
@@ -25,13 +26,15 @@ class TabController extends Controller {
 	private $installmentRepo;
 	private $loanRepo;
 	private $subCategoryRepo;
+	private $invoiceRepo;
 
-	public function __construct(MemberRepository $memberRepository, SavingRepository $savingRepository, SubCategoryRepository $subCategoryRepository, InstallmentRepository $installmentRepository, LoanRepository $loanRepository) {
+	public function __construct(MemberRepository $memberRepository, SavingRepository $savingRepository, SubCategoryRepository $subCategoryRepository, InstallmentRepository $installmentRepository, LoanRepository $loanRepository, InvoiceRepository $invoiceRepository) {
 		$this->memberRepo = $memberRepository;
 		$this->savingRepo = $savingRepository;
 		$this->subCategoryRepo = $subCategoryRepository;
 		$this->installmentRepo = $installmentRepository;
 		$this->loanRepo = $loanRepository;
+		$this->invoiceRepo = $invoiceRepository;
 	}
 
 	public function principalSaving() {
@@ -40,7 +43,7 @@ class TabController extends Controller {
 			$members = $this->memberRepo->getMembers();
 
 			$member_principaL_saving = [];
-			$filtered_members = $this->filterMember(($members));
+			$filtered_members = $this->filterMember($members);
 			foreach ($filtered_members as $member) {
 				$member_savings = $this->savingRepo->getMemberSpesificSavings($member->id, $sub_category->id);
 
@@ -61,7 +64,7 @@ class TabController extends Controller {
 		try {
 			$members = $this->memberRepo->getMembers();
 
-			$filtered_members = $this->filterMember(($members));
+			$filtered_members = $this->filterMember($members);
 
 			return response()->json([
 				'data' => MandatoryResource::collection($filtered_members),
@@ -243,6 +246,24 @@ class TabController extends Controller {
 				} else {
 					$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'berjalan']);
 				}
+			}
+
+			foreach ($validated['invoices'] as $invoice) {
+				$data = [
+					'uuid' => Str::uuid(),
+					'member_id' => $invoice['memberId'],
+					'user_id' => Auth::user()->id,
+					'principal_saving' => $invoice['principalSaving'],
+					'mandatory_saving' => $invoice['mandatorySaving'],
+					'special_mandatory_saving' => $invoice['specialMandatorySaving'],
+					'voluntary_saving' => $invoice['voluntarySaving'],
+					'recretional_saving' => $invoice['recretionalSaving'],
+					'receivable' => $invoice['receivable'],
+					'account_receivable' => $invoice['accountReceivable'],
+					'month_year' => $validated['month_year'],
+				];
+
+				$this->invoiceRepo->createInvoice($data);
 			}
 
 			DB::commit();

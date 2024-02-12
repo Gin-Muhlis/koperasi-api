@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PaymentDeterminationController;
 use App\Http\Controllers\PositionCategoryController;
@@ -40,6 +41,7 @@ Route::middleware('json.response')->group(function () {
 		Route::apiResource('/role', RoleController::class);
 		Route::apiResource('/payment-determination', PaymentDeterminationController::class);
 		Route::apiResource('/position-category', PositionCategoryController::class);
+		Route::apiResource('invoice', InvoiceController::class);
 
 		Route::get('/saving/sub-category', [SubCategoryController::class, 'subCategorySaving']);
 
