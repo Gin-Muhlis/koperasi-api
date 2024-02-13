@@ -11,17 +11,15 @@ return new class extends Migration {
 	public function up(): void {
 		Schema::create('invoices', function (Blueprint $table) {
 			$table->id();
-			$table->uuid('uuid')->unique();
-			$table->unsignedBigInteger('member_id');
+			$table->string('invoice_code', 10);
+			$table->string('invoice_name', 100);
+			$table->date('date');
+			$table->date('due_date');
+			$table->enum('payment_source', ['gaji pns', 'gaji p3k', 'komite', 'TPP']);
+			$table->enum('status', ['belum bayar', 'dibayar']);
+			$table->enum('payment_method', ['cash', 'transfer']);
+			$table->date('payment_date')->nullable();
 			$table->unsignedBigInteger('user_id');
-			$table->double('principal_saving');
-			$table->double('mandatory_saving');
-			$table->double('special_mandatory_saving');
-			$table->double('voluntary_saving');
-			$table->double('recretional_saving');
-			$table->double('receivable');
-			$table->double('account_receivable');
-			$table->string('month_year', 20);
 			$table->softDeletes();
 			$table->timestamps();
 		});

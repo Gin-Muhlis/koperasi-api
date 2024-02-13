@@ -123,9 +123,30 @@ class TabController extends Controller {
 
 			DB::beginTransaction();
 
+			// invoice
+			foreach ($validated['invoices'] as $invoice) {
+				$data = [
+					'uuid' => Str::uuid(),
+					'member_id' => $invoice['memberId'],
+					'user_id' => Auth::user()->id,
+					'principal_saving' => $invoice['principalSaving'],
+					'mandatory_saving' => $invoice['mandatorySaving'],
+					'special_mandatory_saving' => $invoice['specialMandatorySaving'],
+					'voluntary_saving' => $invoice['voluntarySaving'],
+					'recretional_saving' => $invoice['recretionalSaving'],
+					'receivable' => $invoice['receivable'],
+					'account_receivable' => $invoice['accountReceivable'],
+					'month_year' => $validated['month_year'],
+					'status' => 'belum bayar',
+				];
+
+				$this->invoiceRepo->createInvoice($data);
+			}
+
 			// simpanan pokok
 			foreach ($validated['principal_savings'] as $item) {
 				$sub_category = $this->subCategoryRepo->getByName('simpanan pokok');
+				$invoice = $this->invoiceRepo->getMemberInvoice($item['id'], $validated['month_year']);
 				$is_principal_saving = $this->savingRepo->getMemberSpesificSavings($item['id'], $sub_category->id);
 
 				if (count($is_principal_saving) > 0) {
@@ -134,7 +155,7 @@ class TabController extends Controller {
 					], 400);
 				}
 
-				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year']);
+				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year'], $invoice->id);
 
 				$this->savingRepo->makeSavingMembers($data);
 			}
@@ -142,7 +163,7 @@ class TabController extends Controller {
 			// simpanan wajib
 			foreach ($validated['mandatory_savings'] as $item) {
 				$sub_category = $this->subCategoryRepo->getByName('simpanan wajib');
-
+				$invoice = $this->invoiceRepo->getMemberInvoice($item['id'], $validated['month_year']);
 				$is_mandatory_saving = $this->savingRepo->getMemberSpesificSavings($item['id'], $sub_category->id);
 
 				if (count($is_mandatory_saving) > 0 && $is_mandatory_saving->contains('month_year', $validated['month_year'])) {
@@ -151,7 +172,7 @@ class TabController extends Controller {
 					], 400);
 				}
 
-				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year']);
+				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year'], $invoice->id);
 
 				$this->savingRepo->makeSavingMembers($data);
 			}
@@ -159,6 +180,7 @@ class TabController extends Controller {
 			// simpanan wajib khusus
 			foreach ($validated['special_mandatory_savings'] as $item) {
 				$sub_category = $this->subCategoryRepo->getByName('simpanan wajib khusus');
+				$invoice = $this->invoiceRepo->getMemberInvoice($item['id'], $validated['month_year']);
 
 				$is_mandatory_saving = $this->savingRepo->getMemberSpesificSavings($item['id'], $sub_category->id);
 
@@ -168,7 +190,7 @@ class TabController extends Controller {
 					], 400);
 				}
 
-				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year']);
+				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year'], $invoice->id);
 
 				$this->savingRepo->makeSavingMembers($data);
 			}
@@ -176,7 +198,9 @@ class TabController extends Controller {
 			// simpanan sukarela
 			foreach ($validated['voluntary_savings'] as $item) {
 				$sub_category = $this->subCategoryRepo->getByName('simpanan sukarela');
-				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year']);
+				$invoice = $this->invoiceRepo->getMemberInvoice($item['id'], $validated['month_year']);
+
+				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year'], $invoice->id);
 
 				$this->savingRepo->makeSavingMembers($data);
 			}
@@ -184,7 +208,9 @@ class TabController extends Controller {
 			// tabungan rekreasi
 			foreach ($validated['recretional_savings'] as $item) {
 				$sub_category = $this->subCategoryRepo->getByName('tabungan rekreasi');
-				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year']);
+				$invoice = $this->invoiceRepo->getMemberInvoice($item['id'], $validated['month_year']);
+
+				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year'], $invoice->id);
 
 				$this->savingRepo->makeSavingMembers($data);
 			}
@@ -192,6 +218,7 @@ class TabController extends Controller {
 			// piutang s/p
 			foreach ($validated['receivables'] as $item) {
 				$sub_category = $this->subCategoryRepo->getByName('piutang s/p');
+				$invoice = $this->invoiceRepo->getMemberInvoice($item['id'], $validated['month_year']);
 
 				$month = explode('-', $validated['month_year'])[0];
 
@@ -203,7 +230,7 @@ class TabController extends Controller {
 					], 400);
 				}
 
-				$data = $this->generateInstallmentData($item, $sub_category->id);
+				$data = $this->generateInstallmentData($item, $sub_category->id, $invoice->id);
 
 				$this->installmentRepo->makeInstallmentMembers($data);
 
@@ -222,6 +249,7 @@ class TabController extends Controller {
 			// piutang dagang
 			foreach ($validated['accounts_receivable'] as $item) {
 				$sub_category = $this->subCategoryRepo->getByName('piutang dagang');
+				$invoice = $this->invoiceRepo->getMemberInvoice($item['id'], $validated['month_year']);
 
 				$month = explode('-', $validated['month_year'])[0];
 
@@ -233,7 +261,7 @@ class TabController extends Controller {
 					], 400);
 				}
 
-				$data = $this->generateInstallmentData($item, $sub_category->id);
+				$data = $this->generateInstallmentData($item, $sub_category->id, $invoice->id);
 
 				$this->installmentRepo->makeInstallmentMembers($data);
 
@@ -248,24 +276,6 @@ class TabController extends Controller {
 				}
 			}
 
-			foreach ($validated['invoices'] as $invoice) {
-				$data = [
-					'uuid' => Str::uuid(),
-					'member_id' => $invoice['memberId'],
-					'user_id' => Auth::user()->id,
-					'principal_saving' => $invoice['principalSaving'],
-					'mandatory_saving' => $invoice['mandatorySaving'],
-					'special_mandatory_saving' => $invoice['specialMandatorySaving'],
-					'voluntary_saving' => $invoice['voluntarySaving'],
-					'recretional_saving' => $invoice['recretionalSaving'],
-					'receivable' => $invoice['receivable'],
-					'account_receivable' => $invoice['accountReceivable'],
-					'month_year' => $validated['month_year'],
-				];
-
-				$this->invoiceRepo->createInvoice($data);
-			}
-
 			DB::commit();
 			return response()->json([
 				'message' => 'Data berhasil ditambahkan',
@@ -276,7 +286,7 @@ class TabController extends Controller {
 		}
 	}
 
-	private function generateSavingData($data, $sub_category, $description, $month_year) {
+	private function generateSavingData($data, $sub_category, $description, $month_year, $invoice_id) {
 		return [
 			'uuid' => Str::uuid(),
 			'code' => generateCode(),
@@ -286,11 +296,12 @@ class TabController extends Controller {
 			'sub_category_id' => $sub_category,
 			'month_year' => $month_year,
 			'user_id' => Auth::user()->id,
+			'invoice_id' => $invoice_id,
 			'description' => $description,
 		];
 	}
 
-	private function generateInstallmentData($data, $sub_category) {
+	private function generateInstallmentData($data, $sub_category, $invoice_id) {
 		return [
 			'uuid' => Str::uuid(),
 			'code' => generateCode(),
@@ -299,6 +310,7 @@ class TabController extends Controller {
 			'date' => Carbon::now()->format('Y-m-d'),
 			'sub_category_id' => $sub_category,
 			'user_id' => Auth::user()->id,
+			'invoice_id' => $invoice_id,
 		];
 	}
 }

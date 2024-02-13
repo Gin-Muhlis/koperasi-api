@@ -9,14 +9,13 @@ return new class extends Migration {
 	 * Run the migrations.
 	 */
 	public function up(): void {
-		Schema::table('invoices', function (Blueprint $table) {
-
+		Schema::table('members', function (Blueprint $table) {
 			$table
-				->foreign('user_id')
+				->foreign('group_id')
 				->references('id')
-				->on('users')
-				->onDelete('CASCADE')
-				->onUpdate('CASCADE');
+				->on('position_categories')
+				->onUpdate('CASCADE')
+				->onDelete('CASCADE');
 		});
 	}
 
@@ -24,7 +23,7 @@ return new class extends Migration {
 	 * Reverse the migrations.
 	 */
 	public function down(): void {
-		Schema::table('invoices', function (Blueprint $table) {
+		Schema::table('members', function (Blueprint $table) {
 			//
 		});
 	}

@@ -24,6 +24,7 @@ class UserSeeder extends Seeder {
 			'gender' => 'P',
 			'identity_number' => '123456789',
 			'religion' => 'islam',
+			'group_id' => '1',
 			'image' => null,
 			'date_activation' => Carbon::now()->format('Y-m-d'),
 		]);

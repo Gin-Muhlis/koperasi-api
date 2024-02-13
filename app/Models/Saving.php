@@ -16,8 +16,10 @@ class Saving extends Model {
 		'member_id',
 		'sub_category_id',
 		'user_id',
+		'invoice_id',
 		'description',
 		'month_year',
+		'status',
 	];
 
 	protected $casts = [

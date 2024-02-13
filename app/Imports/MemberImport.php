@@ -5,6 +5,7 @@ namespace App\Imports;
 require_once app_path() . '/Helpers/helpers.php';
 
 use App\Models\Member;
+use App\Models\PositionCategory;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -20,6 +21,7 @@ class MemberImport implements ToCollection, WithHeadingRow {
 	 */
 	public function collection(Collection $collection) {
 		foreach ($collection as $data) {
+			$group = PositionCategory::where('position', $data['group'])->first();
 
 			$member = Member::create([
 				'uuid' => Str::uuid(),
@@ -30,6 +32,8 @@ class MemberImport implements ToCollection, WithHeadingRow {
 				'gender' => $data['gender'],
 				'identity_number' => generateCode(),
 				'religion' => $data['religion'],
+				'position' => $data['position'],
+				'group_id' => $group->id,
 				'date_activation' => Carbon::now()->format('Y-m-d'),
 			]);
 

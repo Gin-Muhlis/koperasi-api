@@ -9,11 +9,11 @@ return new class extends Migration {
 	 * Run the migrations.
 	 */
 	public function up(): void {
-		Schema::table('installments', function (Blueprint $table) {
+		Schema::table('savings', function (Blueprint $table) {
 			$table
-				->foreign('loan_id')
+				->foreign('member_id')
 				->references('id')
-				->on('loans')
+				->on('members')
 				->onUpdate('CASCADE')
 				->onDelete('CASCADE');
 
@@ -30,6 +30,14 @@ return new class extends Migration {
 				->on('users')
 				->onUpdate('CASCADE')
 				->onDelete('CASCADE');
+
+			$table
+				->foreign('invoice_id')
+				->references('id')
+				->on('invoices')
+				->onUpdate('CASCADE')
+				->onDelete('CASCADE');
+
 		});
 	}
 
@@ -37,7 +45,7 @@ return new class extends Migration {
 	 * Reverse the migrations.
 	 */
 	public function down(): void {
-		Schema::table('installments', function (Blueprint $table) {
+		Schema::table('savings', function (Blueprint $table) {
 			//
 		});
 	}
