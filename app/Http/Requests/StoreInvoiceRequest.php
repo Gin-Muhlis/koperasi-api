@@ -21,25 +21,24 @@ class StoreInvoiceRequest extends FormRequest {
 	 */
 	public function rules(): array {
 		return [
-			'principal_savings' => ['array'],
-			'mandatory_savings' => ['array'],
-			'special_mandatory_savings' => ['array'],
-			'voluntary_savings' => ['array'],
-			'recretional_savings' => ['array'],
-			'receivables' => ['array'],
-			'accounts_receivable' => ['array'],
-			'invoices' => ['array'],
-			'month_year' => ['string'],
-			'description' => ['string'],
+			'invoice_name' => ['string', 'required', 'max:100'],
+			'due_date' => ['required', 'date'],
+			'payment_source' => ['required', 'in:gaji pns,gaji p3k,komite,TPP'],
+			'payment_method' => ['required', 'in:cash,transfer'],
 		];
 	}
 
 	public function messages(): array {
 		return [
-			'month_year.required' => 'Data waktu tidak valid',
-			'month_year.string' => 'Data waktu tidak valid',
-			'description.required' => 'Deskripsi tidak valid',
-			'description.string' => 'Deskripsi tidak valid',
+			'invoice_name.required' => 'Nama invoice harus diisi.',
+			'invoice_name.string' => 'Nama invoice harus berupa teks.',
+			'invoice_name.max' => 'Nama invoice tidak boleh lebih dari 100 karakter.',
+			'due_date.required' => 'Tanggal jatuh tempo harus diisi.',
+			'due_date.date' => 'Tanggal jatuh tempo harus dalam format tanggal yang valid.',
+			'payment_source.required' => 'Sumber pembayaran harus dipilih.',
+			'payment_source.in' => 'Sumber pembayaran yang dipilih tidak valid.',
+			'payment_method.required' => 'Metode pembayaran harus dipilih.',
+			'payment_method.in' => 'Metode pembayaran yang dipilih tidak valid.',
 		];
 	}
 

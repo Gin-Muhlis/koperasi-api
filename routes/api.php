@@ -11,7 +11,6 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
-use App\Http\Controllers\SavingController;
 use App\Http\Controllers\StuffController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\TabController;
@@ -53,8 +52,11 @@ Route::middleware('json.response')->group(function () {
 		Route::apiResource('/user', UserController::class);
 
 		// app
-		Route::apiResource('/saving-members', SavingController::class);
-		Route::post('/invoice', [TabController::class, 'storeDataInvoice']);
+		// Route::apiResource('/saving-members', SavingController::class);
+		// Route::post('/invoice', [TabController::class, 'storeDataInvoice']);
+
+		// Invoice
+		Route::apiResource('invoice', InvoiceController::class);
 
 		// Tab
 		Route::get('/tab/principal-saving', [TabController::class, 'principalSaving']);

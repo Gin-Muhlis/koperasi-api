@@ -14,16 +14,15 @@ class InvoiceResource extends JsonResource {
 	public function toArray(Request $request): array {
 		return [
 			'id' => $this->id,
-			'uuid' => $this->id,
-			'name' => $this->member->name,
-			'principal_saving' => $this->principal_saving,
-			'mandatory_saving' => $this->mandatory_saving,
-			'special_mandatory_saving' => $this->special_mandatory_saving,
-			'voluntary_saving' => $this->voluntary_saving,
-			'recretional_saving' => $this->recretional_saving,
-			'receivable' => $this->receivable,
-			'account_receivable' => $this->account_receivable,
-			'month_year' => $this->month_year,
+			'invoice_code' => $this->invoice_code,
+			'invoice_name' => $this->invoice_name,
+			'payment_source' => $this->payment_source,
+			'status' => $this->status,
+			'date' => $this->date,
+			'due_date' => $this->due_date,
+			'payment_method' => $this->payment_method,
+			'payment_date' => $this->payment_date,
+			'user' => $this->user->username,
 		];
 	}
 }
