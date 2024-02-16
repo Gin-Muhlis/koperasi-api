@@ -37,7 +37,7 @@ class TabController extends Controller {
 		$this->invoiceRepo = $invoiceRepository;
 	}
 
-	public function principalSaving() {
+	public function memberPrincipal() {
 		try {
 			$sub_category = $this->subCategoryRepo->getByName('simpanan pokok');
 			$members = $this->memberRepo->getMembers();
