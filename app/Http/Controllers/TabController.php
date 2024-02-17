@@ -60,7 +60,7 @@ class TabController extends Controller {
 		}
 	}
 
-	public function mandatorySaving() {
+	public function memberMandatory() {
 		try {
 			$members = $this->memberRepo->getMembers();
 

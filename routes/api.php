@@ -57,9 +57,11 @@ Route::middleware('json.response')->group(function () {
 
 		// Invoice
 		Route::apiResource('invoice', InvoiceController::class);
+		Route::post('/invoice-detail', [InvoiceController::class, 'storeDetailInvoice']);
 
 		// sub kategori invoice
 		Route::get('member-principal', [TabController::class, 'memberPrincipal']);
+		Route::get('member-mandatory', [TabController::class, 'memberMandatory']);
 
 		// Tab
 		Route::get('/tab/principal-saving', [TabController::class, 'principalSaving']);

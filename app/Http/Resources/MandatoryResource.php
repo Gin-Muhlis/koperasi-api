@@ -2,41 +2,33 @@
 
 namespace App\Http\Resources;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class MandatoryResource extends JsonResource
-{
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(Request $request): array
-    {
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'position' => $this->position,
-            'month_remain' => $this->handleRemainMonth($this->savings)
-        ];
-    }
+class MandatoryResource extends JsonResource {
+	/**
+	 * Transform the resource into an array.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public function toArray(Request $request): array {
+		return [
+			'id' => $this->id,
+			'name' => $this->name,
+			'position' => $this->position,
+			'payment' => $this->handlePayment($this->savings) ?? $this->positionCategory->wajib,
+		];
+	}
 
-    private function handleRemainMonth($data_savings) {
-        $current_year = Carbon::now()->format('Y'); 
-        $total_month = 12;
+	private function handlePayment($data_savings) {
+		$is_saving = count($data_savings);
 
-        $filtered_savings = [];
+		if ($is_saving > 0) {
+			$last_saving = $data_savings->last();
 
-        foreach ($data_savings as $data) {
-            if ($data->subCategory->name == 'simpanan wajib' && str_contains($data->month_year, $current_year)) {
-                $filtered_savings[] = $data;
-            }
-        }
+			return $last_saving->amount;
+		}
 
-        $total_remain = $total_month - count($filtered_savings);
-
-        return $total_remain;
-    }
+		return null;
+	}
 }

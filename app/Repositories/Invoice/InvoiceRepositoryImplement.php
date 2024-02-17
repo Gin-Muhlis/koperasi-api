@@ -23,7 +23,7 @@ class InvoiceRepositoryImplement extends Eloquent implements InvoiceRepository {
 	}
 
 	public function createInvoice($data) {
-		$this->create($data);
+		return $this->create($data);
 	}
 
 	public function getMemberInvoice($member_id, $month_year) {
