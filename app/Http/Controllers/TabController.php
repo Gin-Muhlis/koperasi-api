@@ -8,6 +8,9 @@ use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Resources\MandatoryResource;
 use App\Http\Resources\PrincipalSavingResource;
 use App\Http\Resources\ReceivableResource;
+use App\Http\Resources\RecretionalResource;
+use App\Http\Resources\SpecialMandatoryResource;
+use App\Http\Resources\VoluntaryResource;
 use App\Repositories\Installment\InstallmentRepository;
 use App\Repositories\Invoice\InvoiceRepository;
 use App\Repositories\Loan\LoanRepository;
@@ -62,12 +65,58 @@ class TabController extends Controller {
 
 	public function memberMandatory() {
 		try {
+
 			$members = $this->memberRepo->getMembers();
 
 			$filtered_members = $this->filterMember($members);
 
 			return response()->json([
 				'data' => MandatoryResource::collection($filtered_members),
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	public function memberSpecialMandatory() {
+		try {
+			$sub_category = $this->subCategoryRepo->getByName('simpanan wajib khusus');
+			$members = $this->memberRepo->getMembers();
+
+			$filtered_members = $this->filterMember($members);
+
+			return response()->json([
+				'data' => SpecialMandatoryResource::collection($filtered_members, $sub_category->id),
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	public function memberVoluntary() {
+		try {
+			$sub_category = $this->subCategoryRepo->getByName('simpanan sukarela');
+			$members = $this->memberRepo->getMembers();
+
+			$filtered_members = $this->filterMember($members);
+
+			return response()->json([
+				'data' => VoluntaryResource::collection($filtered_members, $sub_category->id),
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	public function memberRecretional() {
+		try {
+			$sub_category = $this->subCategoryRepo->getByName('tabungan rekreasi');
+			$members = $this->memberRepo->getMembers();
+
+			$filtered_members = $this->filterMember($members);
+
+			return response()->json([
+				'data' => RecretionalResource::collection($filtered_members, $sub_category->id),
 			]);
 		} catch (Exception $e) {
 			return errorResponse($e->getMessage());

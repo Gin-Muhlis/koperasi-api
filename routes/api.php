@@ -62,6 +62,11 @@ Route::middleware('json.response')->group(function () {
 		// sub kategori invoice
 		Route::get('member-principal', [TabController::class, 'memberPrincipal']);
 		Route::get('member-mandatory', [TabController::class, 'memberMandatory']);
+		Route::get('member-special-mandatory', [TabController::class, 'memberSpecialMandatory']);
+		Route::get('member-voluntary', [TabController::class, 'memberVoluntary']);
+		Route::get('member-recretional', [TabController::class, 'memberRecretional']);
+		Route::get('member-receivable', [TabController::class, 'memberReceivable']);
+		Route::get('member-account-receivable', [TabController::class, 'memberAccountReceivable']);
 
 		// Tab
 		Route::get('/tab/principal-saving', [TabController::class, 'principalSaving']);

@@ -15,7 +15,6 @@ class ReceivableResource extends JsonResource {
 		return [
 			'id' => $this->id,
 			'name' => $this->name,
-			'position' => $this->position,
 			'loan_id' => $this->loans->first()->id,
 			'total_payment' => $this->loans->first()->total_payment,
 			'paid' => $this->handlePaid($this->loans->first()->installments),
