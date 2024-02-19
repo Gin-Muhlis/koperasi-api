@@ -23,7 +23,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class TabController extends Controller {
+class TabController extends Controller
+{
 	private $memberRepo;
 	private $savingRepo;
 	private $installmentRepo;
@@ -31,7 +32,8 @@ class TabController extends Controller {
 	private $subCategoryRepo;
 	private $invoiceRepo;
 
-	public function __construct(MemberRepository $memberRepository, SavingRepository $savingRepository, SubCategoryRepository $subCategoryRepository, InstallmentRepository $installmentRepository, LoanRepository $loanRepository, InvoiceRepository $invoiceRepository) {
+	public function __construct(MemberRepository $memberRepository, SavingRepository $savingRepository, SubCategoryRepository $subCategoryRepository, InstallmentRepository $installmentRepository, LoanRepository $loanRepository, InvoiceRepository $invoiceRepository)
+	{
 		$this->memberRepo = $memberRepository;
 		$this->savingRepo = $savingRepository;
 		$this->subCategoryRepo = $subCategoryRepository;
@@ -40,7 +42,8 @@ class TabController extends Controller {
 		$this->invoiceRepo = $invoiceRepository;
 	}
 
-	public function memberPrincipal() {
+	public function memberPrincipal()
+	{
 		try {
 			$sub_category = $this->subCategoryRepo->getByName('simpanan pokok');
 			$members = $this->memberRepo->getMembers();
@@ -63,7 +66,8 @@ class TabController extends Controller {
 		}
 	}
 
-	public function memberMandatory() {
+	public function memberMandatory()
+	{
 		try {
 
 			$members = $this->memberRepo->getMembers();
@@ -78,52 +82,53 @@ class TabController extends Controller {
 		}
 	}
 
-	public function memberSpecialMandatory() {
+	public function memberSpecialMandatory()
+	{
 		try {
-			$sub_category = $this->subCategoryRepo->getByName('simpanan wajib khusus');
 			$members = $this->memberRepo->getMembers();
 
 			$filtered_members = $this->filterMember($members);
 
 			return response()->json([
-				'data' => SpecialMandatoryResource::collection($filtered_members, $sub_category->id),
+				'data' => SpecialMandatoryResource::collection($filtered_members),
 			]);
 		} catch (Exception $e) {
 			return errorResponse($e->getMessage());
 		}
 	}
 
-	public function memberVoluntary() {
+	public function memberVoluntary()
+	{
 		try {
-			$sub_category = $this->subCategoryRepo->getByName('simpanan sukarela');
 			$members = $this->memberRepo->getMembers();
 
 			$filtered_members = $this->filterMember($members);
 
 			return response()->json([
-				'data' => VoluntaryResource::collection($filtered_members, $sub_category->id),
+				'data' => VoluntaryResource::collection($filtered_members),
 			]);
 		} catch (Exception $e) {
 			return errorResponse($e->getMessage());
 		}
 	}
 
-	public function memberRecretional() {
+	public function memberRecretional()
+	{
 		try {
-			$sub_category = $this->subCategoryRepo->getByName('tabungan rekreasi');
 			$members = $this->memberRepo->getMembers();
 
 			$filtered_members = $this->filterMember($members);
 
 			return response()->json([
-				'data' => RecretionalResource::collection($filtered_members, $sub_category->id),
+				'data' => RecretionalResource::collection($filtered_members),
 			]);
 		} catch (Exception $e) {
 			return errorResponse($e->getMessage());
 		}
 	}
 
-	public function receivable() {
+	public function memberReceivable()
+	{
 		try {
 			$sub_category = $this->subCategoryRepo->getByName('piutang s/p');
 			$members = $this->memberRepo->getNotPaidMembers($sub_category->id);
@@ -138,7 +143,8 @@ class TabController extends Controller {
 		}
 	}
 
-	public function accountsReceivable() {
+	public function memberAccountReceivable()
+	{
 		try {
 			$sub_category = $this->subCategoryRepo->getByName('piutang dagang');
 			$members = $this->memberRepo->getNotPaidMembers($sub_category->id);
@@ -153,7 +159,8 @@ class TabController extends Controller {
 		}
 	}
 
-	private function filterMember($data) {
+	private function filterMember($data)
+	{
 		$filtered_members = [];
 
 		foreach ($data as $member) {
@@ -166,7 +173,8 @@ class TabController extends Controller {
 	}
 
 	// function untuk menghandle semua jenis simpanan sekaligus
-	public function storeDataInvoice(StoreInvoiceRequest $request) {
+	public function storeDataInvoice(StoreInvoiceRequest $request)
+	{
 		try {
 			$validated = $request->validated();
 
@@ -292,7 +300,6 @@ class TabController extends Controller {
 				} else {
 					$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'berjalan']);
 				}
-
 			}
 
 			// piutang dagang
@@ -335,7 +342,8 @@ class TabController extends Controller {
 		}
 	}
 
-	private function generateSavingData($data, $sub_category, $description, $month_year, $invoice_id) {
+	private function generateSavingData($data, $sub_category, $description, $month_year, $invoice_id)
+	{
 		return [
 			'uuid' => Str::uuid(),
 			'code' => generateCode(),
@@ -350,7 +358,8 @@ class TabController extends Controller {
 		];
 	}
 
-	private function generateInstallmentData($data, $sub_category, $invoice_id) {
+	private function generateInstallmentData($data, $sub_category, $invoice_id)
+	{
 		return [
 			'uuid' => Str::uuid(),
 			'code' => generateCode(),

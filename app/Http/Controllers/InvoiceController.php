@@ -21,14 +21,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class InvoiceController extends Controller {
+class InvoiceController extends Controller
+{
 	private $invoiceRepo;
 	private $savingRepo;
 	private $installmentRepo;
 	private $loanRepo;
 	private $subCategoryRepo;
+	private $memberRepo;
 
-	public function __construct(MemberRepository $memberRepository, SavingRepository $savingRepository, SubCategoryRepository $subCategoryRepository, InstallmentRepository $installmentRepository, LoanRepository $loanRepository, InvoiceRepository $invoiceRepository) {
+	public function __construct(MemberRepository $memberRepository, SavingRepository $savingRepository, SubCategoryRepository $subCategoryRepository, InstallmentRepository $installmentRepository, LoanRepository $loanRepository, InvoiceRepository $invoiceRepository)
+	{
 		$this->memberRepo = $memberRepository;
 		$this->savingRepo = $savingRepository;
 		$this->subCategoryRepo = $subCategoryRepository;
@@ -39,7 +42,8 @@ class InvoiceController extends Controller {
 	/**
 	 * Display a listing of the resource.
 	 */
-	public function index() {
+	public function index()
+	{
 		try {
 			$invoices = $this->invoiceRepo->getInvoices();
 
@@ -49,13 +53,13 @@ class InvoiceController extends Controller {
 		} catch (Exception $e) {
 			return errorResponse($e->getMessage());
 		}
-
 	}
 
 	/**
 	 * Store a newly created resource in storage.
 	 */
-	public function store(StoreInvoiceRequest $request) {
+	public function store(StoreInvoiceRequest $request)
+	{
 		try {
 			$validated = $request->validated();
 
@@ -87,7 +91,8 @@ class InvoiceController extends Controller {
 	 * store detial invoice
 	 */
 
-	public function storeDetailInvoice(StoreDetailInvoiceRequest $request) {
+	public function storeDetailInvoice(StoreDetailInvoiceRequest $request)
+	{
 		try {
 			$validated = $request->validated();
 
@@ -126,103 +131,95 @@ class InvoiceController extends Controller {
 			}
 
 			// simpanan wajib khusus
-			// foreach ($validated['special_mandatory_savings'] as $item) {
-			// 	$sub_category = $this->subCategoryRepo->getByName('simpanan wajib khusus');
-			// 	$invoice = $this->invoiceRepo->getMemberInvoice($item['id'], $validated['month_year']);
+			foreach ($validated['special_mandatory_savings'] as $item) {
+				$sub_category = $this->subCategoryRepo->getByName('simpanan wajib khusus');
 
-			// 	$is_mandatory_saving = $this->savingRepo->getMemberSpesificSavings($item['id'], $sub_category->id);
+				$is_mandatory_saving = $this->savingRepo->getMemberSpesificSavings($item['id'], $sub_category->id);
 
-			// 	if (count($is_mandatory_saving) > 0 && $is_mandatory_saving->contains('month_year', $validated['month_year'])) {
-			// 		return response()->json([
-			// 			'message' => 'Terdapat data member yang sudah membayar simpanan wajib khusus pada bulan yang ditentukan',
-			// 		], 400);
-			// 	}
+				if (count($is_mandatory_saving) > 0 && $is_mandatory_saving->contains('month_year', $validated['month_year'])) {
+					return response()->json([
+						'message' => 'Terdapat data member yang sudah membayar simpanan wajib khusus pada bulan yang ditentukan',
+					], 400);
+				}
 
-			// 	$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year'], $invoice->id);
+				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year'], $validated['invoice_id']);
 
-			// 	$this->savingRepo->makeSavingMembers($data);
-			// }
+				$this->savingRepo->makeSavingMembers($data);
+			}
 
 			// simpanan sukarela
-			// foreach ($validated['voluntary_savings'] as $item) {
-			// 	$sub_category = $this->subCategoryRepo->getByName('simpanan sukarela');
-			// 	$invoice = $this->invoiceRepo->getMemberInvoice($item['id'], $validated['month_year']);
+			foreach ($validated['voluntary_savings'] as $item) {
+				$sub_category = $this->subCategoryRepo->getByName('simpanan sukarela');
 
-			// 	$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year'], $invoice->id);
-
-			// 	$this->savingRepo->makeSavingMembers($data);
-			// }
+				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year'], $validated['invoice_id']);
+				$this->savingRepo->makeSavingMembers($data);
+			}
 
 			// tabungan rekreasi
-			// foreach ($validated['recretional_savings'] as $item) {
-			// 	$sub_category = $this->subCategoryRepo->getByName('tabungan rekreasi');
-			// 	$invoice = $this->invoiceRepo->getMemberInvoice($item['id'], $validated['month_year']);
+			foreach ($validated['recretional_savings'] as $item) {
+				$sub_category = $this->subCategoryRepo->getByName('tabungan rekreasi');
 
-			// 	$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year'], $invoice->id);
-
-			// 	$this->savingRepo->makeSavingMembers($data);
-			// }
+				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year'], $validated['invoice_id']);
+				$this->savingRepo->makeSavingMembers($data);
+			}
 
 			// piutang s/p
-			// foreach ($validated['receivables'] as $item) {
-			// 	$sub_category = $this->subCategoryRepo->getByName('piutang s/p');
-			// 	$invoice = $this->invoiceRepo->getMemberInvoice($item['id'], $validated['month_year']);
+			foreach ($validated['receivables'] as $item) {
+				$sub_category = $this->subCategoryRepo->getByName('piutang s/p');
 
-			// 	$month = explode('-', $validated['month_year'])[0];
+				$month = explode('-', $validated['month_year'])[0];
 
-			// 	$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($month, $item['loanId']);
+				$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($month, $item['loanId']);
 
-			// 	if (count($is_month_payed) > 0) {
-			// 		return response()->json([
-			// 			'message' => 'Terdapat data member yang sudah membayar piutang s/p pada bulan yang ditentukan',
-			// 		], 400);
-			// 	}
+				if (count($is_month_payed) > 0) {
+					return response()->json([
+						'message' => 'Terdapat data member yang sudah membayar piutang s/p pada bulan yang ditentukan',
+					], 400);
+				}
 
-			// 	$data = $this->generateInstallmentData($item, $sub_category->id, $invoice->id);
+				$data = $this->generateInstallmentData($item, $sub_category->id, $validated['invoice_id']);
 
-			// 	$this->installmentRepo->makeInstallmentMembers($data);
+				$this->installmentRepo->makeInstallmentMembers($data);
 
-			// 	$loan_member = $this->loanRepo->findLoan($item['loanId']);
+				$loan_member = $this->loanRepo->findLoan($item['loanId']);
 
-			// 	$total_payment_member = $this->installmentRepo->getSumPayment($loan_member->id);
+				$total_payment_member = $this->installmentRepo->getSumPayment($loan_member->id);
 
-			// 	if ($total_payment_member >= $loan_member->total_payment) {
-			// 		$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'lunas']);
-			// 	} else {
-			// 		$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'berjalan']);
-			// 	}
-
-			// }
+				if ($total_payment_member >= $loan_member->total_payment) {
+					$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'lunas']);
+				} else {
+					$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'berjalan']);
+				}
+			}
 
 			// piutang dagang
-			// foreach ($validated['accounts_receivable'] as $item) {
-			// 	$sub_category = $this->subCategoryRepo->getByName('piutang dagang');
-			// 	$invoice = $this->invoiceRepo->getMemberInvoice($item['id'], $validated['month_year']);
+			foreach ($validated['accounts_receivable'] as $item) {
+				$sub_category = $this->subCategoryRepo->getByName('piutang dagang');
 
-			// 	$month = explode('-', $validated['month_year'])[0];
+				$month = explode('-', $validated['month_year'])[0];
 
-			// 	$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($month, $item['loanId']);
+				$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($month, $item['loanId']);
 
-			// 	if (count($is_month_payed) > 0) {
-			// 		return response()->json([
-			// 			'message' => 'Terdapat data member yang sudah membayar piutang dagang pada bulan yang ditentukan',
-			// 		], 400);
-			// 	}
+				if (count($is_month_payed) > 0) {
+					return response()->json([
+						'message' => 'Terdapat data member yang sudah membayar piutang dagang pada bulan yang ditentukan',
+					], 400);
+				}
 
-			// 	$data = $this->generateInstallmentData($item, $sub_category->id, $invoice->id);
+				$data = $this->generateInstallmentData($item, $sub_category->id, $validated['invoice_id']);
 
-			// 	$this->installmentRepo->makeInstallmentMembers($data);
+				$this->installmentRepo->makeInstallmentMembers($data);
 
-			// 	$loan_member = $this->loanRepo->findLoan($item['loanId']);
+				$loan_member = $this->loanRepo->findLoan($item['loanId']);
 
-			// 	$total_payment_member = $this->installmentRepo->getSumPayment($loan_member->id);
+				$total_payment_member = $this->installmentRepo->getSumPayment($loan_member->id);
 
-			// 	if ($total_payment_member >= $loan_member->total_payment) {
-			// 		$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'lunas']);
-			// 	} else {
-			// 		$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'berjalan']);
-			// 	}
-			// }
+				if ($total_payment_member >= $loan_member->total_payment) {
+					$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'lunas']);
+				} else {
+					$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'berjalan']);
+				}
+			}
 
 			DB::commit();
 			return response()->json([
@@ -237,25 +234,29 @@ class InvoiceController extends Controller {
 	/**
 	 * Display the specified resource.
 	 */
-	public function show(Invoice $invoice) {
+	public function show(Invoice $invoice)
+	{
 		//
 	}
 
 	/**
 	 * Update the specified resource in storage.
 	 */
-	public function update(UpdateInvoiceRequest $request, Invoice $invoice) {
+	public function update(UpdateInvoiceRequest $request, Invoice $invoice)
+	{
 		//
 	}
 
 	/**
 	 * Remove the specified resource from storage.
 	 */
-	public function destroy(Invoice $invoice) {
+	public function destroy(Invoice $invoice)
+	{
 		//
 	}
 
-	private function generateSavingData($data, $sub_category, $description, $month_year, $invoice_id) {
+	private function generateSavingData($data, $sub_category, $description, $month_year, $invoice_id)
+	{
 		return [
 			'uuid' => Str::uuid(),
 			'code' => generateCode(),
@@ -270,7 +271,8 @@ class InvoiceController extends Controller {
 		];
 	}
 
-	private function generateInstallmentData($data, $sub_category, $invoice_id) {
+	private function generateInstallmentData($data, $sub_category, $invoice_id)
+	{
 		return [
 			'uuid' => Str::uuid(),
 			'code' => generateCode(),
@@ -282,5 +284,4 @@ class InvoiceController extends Controller {
 			'invoice_id' => $invoice_id,
 		];
 	}
-
 }
