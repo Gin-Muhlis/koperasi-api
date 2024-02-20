@@ -10,11 +10,16 @@ class Invoice extends Model {
 
 	protected $fillable = ['invoice_code', 'invoice_name', 'date', 'due_date', 'payment_source', 'status', 'payment_date', 'payment_method', 'user_id'];
 
-	public function member() {
-		return $this->belongsTo(Member::class);
+	public function savings() {
+		return $this->hasMany(Saving::class);
+	}
+
+	public function installments() {
+		return $this->hasMany(Installment::class);
 	}
 
 	public function user() {
 		return $this->belongsTo(User::class);
 	}
+
 }

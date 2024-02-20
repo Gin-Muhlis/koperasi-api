@@ -19,7 +19,7 @@ class InvoiceRepositoryImplement extends Eloquent implements InvoiceRepository {
 	}
 
 	public function getInvoices() {
-		return $this->all();
+		return $this->model->latest()->get();
 	}
 
 	public function createInvoice($data) {
@@ -32,5 +32,9 @@ class InvoiceRepositoryImplement extends Eloquent implements InvoiceRepository {
 			['month_year', $month_year],
 			['status', 'belum bayar'],
 		])->first();
+	}
+
+	public function getDetailInvoiceByCode($code) {
+		return $this->model->with(['savings', 'installments', 'user'])->where('invoice_code', $code)->first();
 	}
 }

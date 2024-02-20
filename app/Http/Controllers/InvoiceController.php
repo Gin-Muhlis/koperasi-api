@@ -7,6 +7,7 @@ require_once app_path() . '/Helpers/helpers.php';
 use App\Http\Requests\StoreDetailInvoiceRequest;
 use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Requests\UpdateInvoiceRequest;
+use App\Http\Resources\DetailInvoiceResource;
 use App\Http\Resources\InvoiceResource;
 use App\Models\Invoice;
 use App\Repositories\Installment\InstallmentRepository;
@@ -21,8 +22,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class InvoiceController extends Controller
-{
+class InvoiceController extends Controller {
 	private $invoiceRepo;
 	private $savingRepo;
 	private $installmentRepo;
@@ -30,8 +30,7 @@ class InvoiceController extends Controller
 	private $subCategoryRepo;
 	private $memberRepo;
 
-	public function __construct(MemberRepository $memberRepository, SavingRepository $savingRepository, SubCategoryRepository $subCategoryRepository, InstallmentRepository $installmentRepository, LoanRepository $loanRepository, InvoiceRepository $invoiceRepository)
-	{
+	public function __construct(MemberRepository $memberRepository, SavingRepository $savingRepository, SubCategoryRepository $subCategoryRepository, InstallmentRepository $installmentRepository, LoanRepository $loanRepository, InvoiceRepository $invoiceRepository) {
 		$this->memberRepo = $memberRepository;
 		$this->savingRepo = $savingRepository;
 		$this->subCategoryRepo = $subCategoryRepository;
@@ -42,8 +41,7 @@ class InvoiceController extends Controller
 	/**
 	 * Display a listing of the resource.
 	 */
-	public function index()
-	{
+	public function index() {
 		try {
 			$invoices = $this->invoiceRepo->getInvoices();
 
@@ -58,8 +56,7 @@ class InvoiceController extends Controller
 	/**
 	 * Store a newly created resource in storage.
 	 */
-	public function store(StoreInvoiceRequest $request)
-	{
+	public function store(StoreInvoiceRequest $request) {
 		try {
 			$validated = $request->validated();
 
@@ -87,12 +84,25 @@ class InvoiceController extends Controller
 		}
 	}
 
+	// get detail invoice
+	public function detailInvoice($code) {
+
+		try {
+			$detailInvoice = $this->invoiceRepo->getDetailInvoiceByCode($code);
+
+			return response()->json([
+				'data' => new DetailInvoiceResource($detailInvoice),
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
 	/**
 	 * store detial invoice
 	 */
 
-	public function storeDetailInvoice(StoreDetailInvoiceRequest $request)
-	{
+	public function storeDetailInvoice(StoreDetailInvoiceRequest $request) {
 		try {
 			$validated = $request->validated();
 
@@ -234,29 +244,25 @@ class InvoiceController extends Controller
 	/**
 	 * Display the specified resource.
 	 */
-	public function show(Invoice $invoice)
-	{
+	public function show(Invoice $invoice) {
 		//
 	}
 
 	/**
 	 * Update the specified resource in storage.
 	 */
-	public function update(UpdateInvoiceRequest $request, Invoice $invoice)
-	{
+	public function update(UpdateInvoiceRequest $request, Invoice $invoice) {
 		//
 	}
 
 	/**
 	 * Remove the specified resource from storage.
 	 */
-	public function destroy(Invoice $invoice)
-	{
+	public function destroy(Invoice $invoice) {
 		//
 	}
 
-	private function generateSavingData($data, $sub_category, $description, $month_year, $invoice_id)
-	{
+	private function generateSavingData($data, $sub_category, $description, $month_year, $invoice_id) {
 		return [
 			'uuid' => Str::uuid(),
 			'code' => generateCode(),
@@ -271,8 +277,7 @@ class InvoiceController extends Controller
 		];
 	}
 
-	private function generateInstallmentData($data, $sub_category, $invoice_id)
-	{
+	private function generateInstallmentData($data, $sub_category, $invoice_id) {
 		return [
 			'uuid' => Str::uuid(),
 			'code' => generateCode(),
