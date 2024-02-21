@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentDeterminationController;
 use App\Http\Controllers\PositionCategoryController;
 use App\Http\Controllers\ProductController;
@@ -59,6 +60,9 @@ Route::middleware('json.response')->group(function () {
 		Route::apiResource('invoice', InvoiceController::class);
 		Route::post('/invoice-detail', [InvoiceController::class, 'storeDetailInvoice']);
 		Route::get('/invoice-detail/{code}', [InvoiceController::class, 'detailInvoice']);
+
+		// payment
+		Route::apiResource('payment', PaymentController::class);
 
 		// sub kategori invoice
 		Route::get('member-principal', [TabController::class, 'memberPrincipal']);

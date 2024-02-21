@@ -37,4 +37,8 @@ class InvoiceRepositoryImplement extends Eloquent implements InvoiceRepository {
 	public function getDetailInvoiceByCode($code) {
 		return $this->model->with(['savings', 'installments', 'user'])->where('invoice_code', $code)->first();
 	}
+
+	public function updateStatusInvoice($id) {
+		$this->model->find($id)->update(['status' => 'dibayar']);
+	}
 }
