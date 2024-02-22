@@ -8,20 +8,24 @@
 			<th>Simpanan Wajib Khusus</th>
 			<th>Simpanan Sukarela</th>
 			<th>Tabungan Rekreasi</th>
+			<th>Piutang S/P</th>
+			<th>Piutang Dagang</th>
 			<th>Jumlah</th>
 		</tr>
 	</thead>
 	<tbody>
-		@foreach ($dataInvoice as $data)
+		@foreach ($row_data as $data)
 			<tr>
 				<td>{{ $loop->index + 1 }}</td>
 				<td>{{ $data['name'] }}</td>
-				<td>{{ $data['principal_saving'] }}</td>
-				<td>{{ $data['mandatory_saving'] }}</td>
-				<td>{{ $data['special_mandatory_saving'] }}</td>
-				<td>{{ $data['voluntary_saving'] }}</td>
-				<td>{{ $data['recretional_saving'] }}</td>
-				<td>{{ $data['total_payment_member'] }}</td>
+				<td>{{ $data['principalSaving'] }}</td>
+				<td>{{ $data['mandatorySaving'] }}</td>
+				<td>{{ $data['specialMandatorySaving'] }}</td>
+				<td>{{ $data['voluntarySaving'] }}</td>
+				<td>{{ $data['recretionalSaving'] }}</td>
+				<td>{{ $data['receivable'] }}</td>
+				<td>{{ $data['accountReceivable'] }}</td>
+				<td>{{ $data['totalRow'] }}</td>
 			</tr>
 		@endforeach
 		<tr>
@@ -31,7 +35,9 @@
 			<td>{{ $total_special_mandatory_saving }}</td>
 			<td>{{ $total_voluntary_saving }}</td>
 			<td>{{ $total_recretional_saving }}</td>
-			<td>{{ $total_payment }}</td>
+			<td>{{ $total_receivable }}</td>
+			<td>{{ $total_account_receivable }}</td>
+			<td>{{ $total_invoice }}</td>
 		</tr>
 	</tbody>
 </table>
