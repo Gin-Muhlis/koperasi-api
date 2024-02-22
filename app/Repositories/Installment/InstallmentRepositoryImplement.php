@@ -7,11 +7,7 @@ use LaravelEasyRepository\Implementations\Eloquent;
 
 class InstallmentRepositoryImplement extends Eloquent implements InstallmentRepository {
 
-	/**
-	 * Model class to be used in this repository for the common methods inside Eloquent
-	 * Don't remove or change $this->model variable name
-	 * @property Model|mixed $model;
-	 */
+	
 	protected $model;
 
 	public function __construct(Installment $model) {
@@ -28,5 +24,13 @@ class InstallmentRepositoryImplement extends Eloquent implements InstallmentRepo
 
 	public function getSumPayment($loan_id) {
 		return $this->model->where('loan_id', $loan_id)->sum('amount');
+	}
+
+	public function getInstalmentByInvoiceId($invoice_id) {
+		return $this->model->where('invoice_id', $invoice_id)->get();
+	}
+
+	public function updateStatusIsntallment($id) {
+		$this->model->where('id', $id)->update(['status' => 'dibayar']);
 	}
 }

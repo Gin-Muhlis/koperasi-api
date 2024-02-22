@@ -7,8 +7,10 @@ require_once app_path() . '/Helpers/helpers.php';
 use App\Http\Requests\StorePaymentRequest;
 use App\Http\Requests\UpdatePaymentRequest;
 use App\Models\Payment;
+use App\Repositories\Installment\InstallmentRepository;
 use App\Repositories\Invoice\InvoiceRepository;
 use App\Repositories\Payment\PaymentRepository;
+use App\Repositories\Saving\SavingRepository;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -16,10 +18,15 @@ use Illuminate\Support\Facades\DB;
 class PaymentController extends Controller {
 	private $paymentRepo;
 	private $invoiceRepo;
+	private $savingRepo;
+	private $installmentRepo;
 
-	public function __construct(PaymentRepository $paymentRepository, InvoiceRepository $invoiceRepository) {
+	public function __construct(PaymentRepository $paymentRepository, InvoiceRepository $invoiceRepository, SavingRepository $savingRepository, InstallmentRepository $installmentRepository
+	) {
 		$this->paymentRepo = $paymentRepository;
 		$this->invoiceRepo = $invoiceRepository;
+		$this->savingRepo = $savingRepository;
+		$this->installmentRepo = $installmentRepository;
 	}
 	/**
 	 * Display a listing of the resource.
@@ -56,8 +63,20 @@ class PaymentController extends Controller {
 			];
 
 			$this->paymentRepo->createPayment($data);
-
+		
 			$this->invoiceRepo->updateStatusInvoice($validated['invoice_id']);
+			
+			$savingsInvoice = $this->savingRepo->getSavingByInvoiceId($validated['invoice_id']);
+			
+			foreach ($savingsInvoice as $saving) {
+				$this->savingRepo->updateStatusSaving($saving->id);
+			}
+
+			$installmentsInvoice = $this->installmentRepo->getInstalmentByInvoiceId($validated['invoice_id']);
+			
+			foreach ($installmentsInvoice as $saving) {
+				$this->installmentRepo->updateStatusIsntallment($saving->id);
+			}
 
 			DB::commit();
 

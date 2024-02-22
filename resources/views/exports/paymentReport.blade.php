@@ -12,7 +12,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		@foreach ($members_data as $data)
+		@foreach ($dataInvoice as $data)
 			<tr>
 				<td>{{ $loop->index + 1 }}</td>
 				<td>{{ $data['name'] }}</td>

@@ -23,4 +23,12 @@ class SavingRepositoryImplement extends Eloquent implements SavingRepository {
 			['sub_category_id', $sub_category_id],
 		])->get();
 	}
+
+	public function getSavingByInvoiceId($invoice_id) {
+		return $this->model->where('invoice_id', $invoice_id)->get();
+	}
+
+	public function updateStatusSaving($id) {
+		$this->model->where('id', $id)->update(['status' => 'dibayar']);
+	}
 }

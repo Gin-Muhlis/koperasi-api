@@ -80,7 +80,7 @@ Route::middleware('json.response')->group(function () {
 		Route::get('/tab/accounts-receivable', [TabController::class, 'accountsReceivable']);
 
 		// Export
-		Route::post('/export/payment-report', [ExportController::class, 'reportPayment']);
+		Route::post('/export/invoice-excel', [ExportController::class, 'detailInvoiceExportExcel']);
 
 		// laporan
 		Route::prefix('report')->group(function () {

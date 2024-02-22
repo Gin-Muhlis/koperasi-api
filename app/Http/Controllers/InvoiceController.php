@@ -71,6 +71,7 @@ class InvoiceController extends Controller {
 			DB::beginTransaction();
 
 			$invoice = $this->invoiceRepo->createInvoice($data);
+			
 
 			DB::commit();
 
