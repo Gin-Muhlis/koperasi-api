@@ -23,4 +23,13 @@ class DownloadInvoiceRequest extends FormRequest {
 			'time_invoice' => ['required', 'string'],
 		];
 	}
+
+	public function message(): array {
+		return [
+			'data.required' => 'Data Invoice tidak valid',
+			'data.array' => 'Data Invoice tidak valid',
+			'time_invoice.required' => 'Waktu invoice tidak ditemukan',
+			'time_invoice.string' => 'Waktu invoice tidak valid',
+		];
+	}
 }

@@ -178,6 +178,7 @@ class MemberController extends Controller {
 				'email' => $validated['email'],
 				'address' => $validated['address'],
 				'position' => $validated['position'],
+				'group_id' => $validated['group_id'],
 				'phone_number' => $validated['phone_number'],
 				'gender' => $validated['gender'],
 				'identity_number' => str_pad($random_number, 10, '0', STR_PAD_LEFT),

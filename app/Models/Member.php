@@ -14,6 +14,7 @@ class Member extends Model {
 		'name',
 		'address',
 		'position',
+		'group_id',
 		'phone_number',
 		'gender',
 		'identity_number',
@@ -33,10 +34,6 @@ class Member extends Model {
 
 	public function loans() {
 		return $this->hasMany(Loan::class);
-	}
-
-	public function paymentDeterminations() {
-		return $this->hasMany(PaymentDetermination::class);
 	}
 
 	public function positionCategory() {

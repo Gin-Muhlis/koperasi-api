@@ -7,13 +7,11 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 
-class UpdateMemberRequest extends FormRequest
-{
+class UpdateMemberRequest extends FormRequest {
 	/**
 	 * Determine if the user is authorized to make this request.
 	 */
-	public function authorize(): bool
-	{
+	public function authorize(): bool {
 		return true;
 	}
 
@@ -22,29 +20,30 @@ class UpdateMemberRequest extends FormRequest
 	 *
 	 * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
 	 */
-	public function rules(): array
-	{
+	public function rules(): array {
 		return [
 			'email' => [
 				'required',
 				Rule::unique('members', 'email')->ignore($this->member),
-				'email'
+				'email',
 			],
 			'name' => ['required', 'max:100', 'string'],
 			'address' => ['required', 'max:255', 'string'],
 			'phone_number' => ['required', 'max:20', 'string'],
 			'gender' => ['required', 'in:L,P'],
 			'religion' => ['required', 'max:20', 'string'],
+			'group_id' => ['required', 'exists:position_categories,id'],
 			'position' => ['required', 'in:pns,p3k,cpns'],
 			'image' => ['nullable', 'image', 'max:2048'],
 			'username' => ['required', 'max:100', 'string'],
 			'password' => ['nullable'],
 			'active' => ['required', 'boolean'],
+			'group_id.required' => 'Golongan member tidak boleh kosong',
+			'group_id.exists' => 'Golongan Member tidak valid',
 		];
 	}
 
-	public function messages()
-	{
+	public function messages() {
 		return [
 			'name.required' => 'Nama harus diisi.',
 			'name.max' => 'Nama tidak boleh lebih dari 100 karakter.',
@@ -80,8 +79,7 @@ class UpdateMemberRequest extends FormRequest
 	 *
 	 * @return [type]
 	 */
-	public function failedValidation(Validator $validator)
-	{
+	public function failedValidation(Validator $validator) {
 		throw new HttpResponseException(response()->json([
 			'message' => 'Validasi Gagal',
 			'errors' => $validator->errors(),

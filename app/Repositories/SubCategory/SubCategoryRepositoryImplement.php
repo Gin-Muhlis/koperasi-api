@@ -14,7 +14,7 @@ class SubCategoryRepositoryImplement extends Eloquent implements SubCategoryRepo
 	}
 
 	public function getSubCategories() {
-		return $this->all();
+		return $this->model->with('category')->latest()->get();
 	}
 
 	public function createSubCategory($request) {

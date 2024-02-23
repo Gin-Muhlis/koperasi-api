@@ -14,7 +14,7 @@ class MemberRepositoryImplement extends Eloquent implements MemberRepository {
 	}
 
 	public function getMembers() {
-		return $this->all();
+		return $this->model->with(['user', 'positionCategory'])->latest()->get();
 	}
 
 	public function createMember($request) {

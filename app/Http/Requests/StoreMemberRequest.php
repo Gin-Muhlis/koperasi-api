@@ -28,6 +28,7 @@ class StoreMemberRequest extends FormRequest {
 			'religion' => ['required', 'max:20', 'string'],
 			'gender' => ['required', 'in:L,P'],
 			'position' => ['required', 'in:pns,p3k,cpns'],
+			'group_id' => ['required', 'exists:position_categories,id'],
 			'image' => ['required', 'image', 'max:2048'],
 			'username' => ['required', 'max:100', 'string'],
 			'password' => ['required'],
@@ -62,6 +63,8 @@ class StoreMemberRequest extends FormRequest {
 			'image.nullable' => 'Format gambar tidak valid.',
 			'image.image' => 'Format file harus berupa gambar.',
 			'image.max' => 'Ukuran gambar tidak boleh lebih dari 2MB.',
+			'group_id.required' => 'Golongan member tidak boleh kosong',
+			'group_id.exists' => 'Golongan Member tidak valid',
 		];
 	}
 
