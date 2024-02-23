@@ -20,6 +20,7 @@ class DownloadInvoiceRequest extends FormRequest {
 	public function rules(): array {
 		return [
 			'data' => ['required', 'array'],
+			'time_invoice' => ['required', 'string'],
 		];
 	}
 }

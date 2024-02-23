@@ -81,6 +81,7 @@ Route::middleware('json.response')->group(function () {
 
 		// Export
 		Route::post('/export/invoice-excel', [ExportController::class, 'detailInvoiceExportExcel']);
+		Route::post('/export/invoice-pdf', [ExportController::class, 'detailInvoiceExportPdf']);
 
 		// laporan
 		Route::prefix('report')->group(function () {

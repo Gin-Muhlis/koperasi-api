@@ -15,9 +15,13 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 class InvoiceExportExcel implements FromView, WithTitle, WithEvents {
 
 	private $dataInvoice;
+	private $time_invoice;
 
-	public function __construct($dataInvoice) {
+	public function __construct($dataInvoice, $timeInvoice) {
 		$this->dataInvoice = $dataInvoice;
+		$split_time = explode(' ', $timeInvoice);
+
+		$this->time_invoice = $split_time[1] . ' ' . $split_time[2];
 	}
 	/**
 	 * @return \Illuminate\Support\Collection
@@ -71,6 +75,7 @@ class InvoiceExportExcel implements FromView, WithTitle, WithEvents {
 	}
 
 	public function registerEvents(): array {
+
 		return [
 			AfterSheet::class => function (AfterSheet $event) {
 				$event->sheet->getColumnDimension('A')->setAutoSize(true);
@@ -87,7 +92,7 @@ class InvoiceExportExcel implements FromView, WithTitle, WithEvents {
 				$event->sheet->insertNewRowBefore(1, 3);
 				$event->sheet->mergeCells('A1:J1');
 				$event->sheet->mergeCells('A2:J2');
-				$event->sheet->setCellValue('A1', 'DATA TAGIHAN GABUNGAN');
+				$event->sheet->setCellValue('A1', 'Pembayaran Koperasi' . ' ' . $this->time_invoice);
 
 				$event->sheet->getStyle('A')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 				$event->sheet->getStyle('A1:J2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
