@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdatePositionCategoryRequest extends FormRequest
 {
@@ -11,7 +13,7 @@ class UpdatePositionCategoryRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +24,33 @@ class UpdatePositionCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'position' => ['required', 'string'],
+            'pokok' => ['required', 'numeric'],
+            'wajib' => ['required', 'numeric'],
+            'wajib_khusus' => ['required', 'numeric'],
         ];
+    }
+
+
+    public function messages(): array
+    {
+        return [
+            'position.required' => 'Nama posisi tidak boleh kosong',
+            'position.string' => 'Nama posisi tidak valid',
+            'pokok.required' => 'Jumlah pokok tidak boleh kosong',
+            'pokok.number' => 'Jumlah pokok tidak valid',
+            'wajib.required' => 'Jumlah wajib tidak boleh kosong',
+            'wajib.string' => 'Jumlah wajib tidak valid',
+            'wajib_khusus.required' => 'Jumlah wajib khusus tidak boleh kosong',
+            'wajib_khusus.string' => 'Jumlah Wajib khusus tidak valid',
+        ];
+    }
+
+    public function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'message' => 'Validasi data gagal',
+            'errors' => $validator->errors(),
+        ], 422));
     }
 }

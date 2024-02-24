@@ -11,6 +11,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SavingController;
 use App\Http\Controllers\StuffController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\TabController;
@@ -39,9 +40,6 @@ Route::middleware('json.response')->group(function () {
 		Route::apiResource('/stuff', StuffController::class);
 		Route::apiResource('/role', RoleController::class);
 		Route::apiResource('/position-category', PositionCategoryController::class);
-		Route::apiResource('invoice', InvoiceController::class);
-
-		Route::get('/saving/sub-category', [SubCategoryController::class, 'subCategorySaving']);
 
 		// transaksi
 		Route::apiResource('/purchase', PurchaseController::class);
@@ -49,6 +47,9 @@ Route::middleware('json.response')->group(function () {
 
 		// auth
 		Route::apiResource('/user', UserController::class);
+
+		// saving
+		Route::apiResource('saving', SavingController::class);
 
 		// Invoice
 		Route::apiResource('invoice', InvoiceController::class);

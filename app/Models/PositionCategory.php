@@ -9,5 +9,5 @@ class PositionCategory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['position', 'pokok', 'min_wajib', 'min_wajib_khusus'];
+    protected $fillable = ['position', 'pokok', 'wajib', 'wajib_khusus'];
 }

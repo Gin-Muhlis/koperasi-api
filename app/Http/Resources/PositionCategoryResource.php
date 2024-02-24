@@ -16,7 +16,7 @@ class PositionCategoryResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'position' => $this->position,
+            'name' => $this->position,
             'pokok' => $this->pokok,
             'wajib' => $this->wajib,
             'wajib_khusus' => $this->wajib_khusus

@@ -5,13 +5,10 @@ namespace App\Repositories\PositionCategory;
 use LaravelEasyRepository\Implementations\Eloquent;
 use App\Models\PositionCategory;
 
-class PositionCategoryRepositoryImplement extends Eloquent implements PositionCategoryRepository{
+class PositionCategoryRepositoryImplement extends Eloquent implements PositionCategoryRepository
+{
 
-    /**
-    * Model class to be used in this repository for the common methods inside Eloquent
-    * Don't remove or change $this->model variable name
-    * @property Model|mixed $model;
-    */
+
     protected $model;
 
     public function __construct(PositionCategory $model)
@@ -20,6 +17,21 @@ class PositionCategoryRepositoryImplement extends Eloquent implements PositionCa
     }
     public function getPositionCategories()
     {
-        return $this->all();
+        return $this->model->latest()->get();
+    }
+
+    public function createPositionCategory($data)
+    {
+        $this->create($data);
+    }
+
+    public function updatePositionCategory($id, $data)
+    {
+        $this->update($id, $data);
+    }
+
+    public function deletePositionCategory($id)
+    {
+        $this->delete($id);
     }
 }

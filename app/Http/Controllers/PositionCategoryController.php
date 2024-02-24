@@ -48,7 +48,17 @@ class PositionCategoryController extends Controller
      */
     public function store(StorePositionCategoryRequest $request)
     {
-        //
+        try {
+            $validated = $request->validated();
+
+            $this->positionCategoryRepo->createPositionCategory($validated);
+
+            return response()->json([
+                'message' => 'Golongan anggota berhasil ditambahkan'
+            ]);
+        } catch (Exception $e) {
+            return errorResponse($e->getMessage());
+        }
     }
 
     /**
@@ -72,7 +82,18 @@ class PositionCategoryController extends Controller
      */
     public function update(UpdatePositionCategoryRequest $request, PositionCategory $positionCategory)
     {
-        //
+        try {
+
+            $validated = $request->validated();
+
+            $this->positionCategoryRepo->updatePositionCategory($positionCategory->id, $validated);
+
+            return response()->json([
+                'message' => 'Golongan anggota berhasil diperbarui'
+            ]);
+        } catch (Exception $e) {
+            return errorResponse($e->getMessage());
+        }
     }
 
     /**
@@ -80,6 +101,14 @@ class PositionCategoryController extends Controller
      */
     public function destroy(PositionCategory $positionCategory)
     {
-        //
+        try {
+            $this->positionCategoryRepo->deletePositionCategory($positionCategory->id);
+
+            return response()->json([
+                'message' => 'Golongan anggota berhasil dihapus'
+            ]);
+        } catch (Exception $e) {
+            return errorResponse($e->getMessage());
+        }
     }
 }

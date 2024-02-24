@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StorePaymentRequest extends FormRequest {
 	/**
@@ -27,7 +29,7 @@ class StorePaymentRequest extends FormRequest {
 		];
 	}
 
-	public function message(): array {
+	public function messages(): array {
 		return [
 			'invoice_id.required' => 'Invoice tidak ditemukan.',
 			'invoice_id.exists' => 'Invoice tidak valid.',
@@ -36,5 +38,13 @@ class StorePaymentRequest extends FormRequest {
 			'total_invoice.required' => 'Total Invoice tidak ditemukan.',
 			'total_invoice.numeric' => 'Total Invoice tidak valid.',
 		];
+	}
+
+	public function failedValidation(Validator $validator)
+	{
+		throw new HttpResponseException(response()->json([
+			'message' => 'Validasi data gagal',
+			'errors' => $validator->errors(),
+		], 422));
 	}
 }
