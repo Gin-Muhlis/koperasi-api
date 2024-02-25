@@ -21,6 +21,7 @@ class SpecialMandatoryResource extends JsonResource
 			'name' => $this->name,
 			'position' => $this->position,
 			'payment' => $this->handlePayment($this->savings) ?? $this->positionCategory->wajib_khusus,
+			'month_status' => $this->handleMonthPayed($this->savings)
 		];
 	}
 
@@ -36,5 +37,18 @@ class SpecialMandatoryResource extends JsonResource
 		}
 
 		return null;
+	}
+
+	private function handleMonthPayed($data_savings) {
+		$result = [];
+
+		foreach ($data_savings as $saving) {
+			$result[] = [
+				'month' => $saving->month_year,
+				'status' => $saving->status
+			];
+		}
+
+		return $result;
 	}
 }

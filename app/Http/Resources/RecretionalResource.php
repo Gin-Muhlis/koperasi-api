@@ -26,7 +26,7 @@ class RecretionalResource extends JsonResource
 
 	private function handlePayment($data_savings)
 	{
-		$sub_category = SubCategory::where('name', 'simpanan wajib khusus')->first();
+		$sub_category = SubCategory::where('name', 'tabungan rekreasi')->first();
 		$is_saving = count($data_savings);
 
 		if ($is_saving > 0 && $data_savings->contains('sub_category_id', $sub_category->id)) {
