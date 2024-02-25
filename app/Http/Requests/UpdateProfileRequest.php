@@ -7,11 +7,12 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 
-class UpdateMemberRequest extends FormRequest {
-	/**
-	 * Determine if the user is authorized to make this request.
-	 */
-	public function authorize(): bool {
+class UpdateProfileRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool {
 		return true;
 	}
 
@@ -24,8 +25,9 @@ class UpdateMemberRequest extends FormRequest {
 		return [
 			'email' => [
 				'required',
-				Rule::unique('members', 'email')->ignore($this->member),
 				'email',
+				Rule::unique('members', 'email')->ignore(auth()->id()),
+				Rule::unique('users', 'email')->ignore(auth()->id()),
 			],
 			'name' => ['required', 'max:100', 'string'],
 			'address' => ['required', 'max:255', 'string'],
@@ -36,9 +38,6 @@ class UpdateMemberRequest extends FormRequest {
 			'position' => ['required', 'in:pns,p3k,cpns'],
 			'image' => ['nullable', 'image', 'max:2048'],
 			'username' => ['required', 'max:100', 'string'],
-			'password' => ['nullable'],
-			'active' => ['required', 'boolean'],
-			
 		];
 	}
 
@@ -69,7 +68,7 @@ class UpdateMemberRequest extends FormRequest {
 			'image.nullable' => 'Format gambar tidak valid.',
 			'image.image' => 'Format file harus berupa gambar.',
 			'image.max' => 'Ukuran gambar tidak boleh lebih dari 2MB.',
-			'group_id.required' => 'Golongan member tidak boleh kosong',
+            'group_id.required' => 'Golongan member tidak boleh kosong',
 			'group_id.exists' => 'Golongan Member tidak valid',
 		];
 	}

@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Repositories\Installment\InstallmentRepository;
+use App\Repositories\Saving\SavingRepository;
+use Illuminate\Support\Facades\Auth;
 
 require_once app_path() . '/Helpers/helpers.php';
 
@@ -21,10 +24,14 @@ use Illuminate\Support\Str;
 class MemberController extends Controller {
 	private $memberRepo;
 	private $userRepo;
+	private $savingRepo;
+	private $installmentRepo;
 
-	public function __construct(MemberRepository $member, UserRepository $user) {
+	public function __construct(MemberRepository $member, UserRepository $user, SavingRepository $savingRepository, InstallmentRepository $installmentRepository) {
 		$this->memberRepo = $member;
 		$this->userRepo = $user;
+		$this->savingRepo = $savingRepository;
+		$this->installmentRepo = $installmentRepository;
 	}
 	/**
 	 * Display a listing of the resource.
@@ -60,13 +67,13 @@ class MemberController extends Controller {
 				$validated['image'] = $request->file('image')->store('public/member');
 			}
 
-			$data_member = $this->generateDataMember('store', $validated);
+			$data_member = generateDataMember('store', null, $validated);
 
 			DB::beginTransaction();
 
 			$member = $this->memberRepo->createMember($data_member);
 
-			$data_user = $this->generateDataUser('store', $member, $validated);
+			$data_user =generateDataUser('store', $member, $validated);
 
 			$user = $this->userRepo->createUser($data_user);
 
@@ -114,13 +121,13 @@ class MemberController extends Controller {
 				$validated['image'] = $request->file('image')->store('public/member');
 			}
 
-			$data_member = $this->generateDataMember('update', $validated);
+			$data_member = generateDataMember('update', $member, $validated);
 
 			DB::beginTransaction();
 
 			$this->memberRepo->updateMember($id, $data_member);
 
-			$data_user = $this->generateDataUser('update', $member, $validated);
+			$data_user = generateDataUser('update', $member, $validated);
 
 			$this->userRepo->updateUser($member->id, $data_user);
 
@@ -165,62 +172,48 @@ class MemberController extends Controller {
 		}
 	}
 
-	private function generateDataMember($mode, $validated) {
-		if ($mode == 'store') {
-			$min = 1000000000;
-			$max = 9999999999;
+	public function dashboardMember() {
+		try {
+			$user = Auth::user();
 
-			$random_number = mt_rand($min, $max);
+			$total_mandatory_saving = 0;
+			$total_special_mandatory_saving = 0;
+			$total_voluntary_saving = 0;
+			$total_recretional_saving = 0;
 
-			return [
-				'uuid' => Str::uuid(),
-				'name' => $validated['name'],
-				'email' => $validated['email'],
-				'address' => $validated['address'],
-				'position' => $validated['position'],
-				'group_id' => $validated['group_id'],
-				'phone_number' => $validated['phone_number'],
-				'gender' => $validated['gender'],
-				'identity_number' => str_pad($random_number, 10, '0', STR_PAD_LEFT),
-				'religion' => $validated['religion'],
-				'image' => $validated['image'],
-				'date_activation' => Carbon::now()->format('Y-m-d'),
+			$saving_members = $this->savingRepo->getSavingsMember($user->id);
+
+			foreach ($saving_members as $saving) {
+				if ($saving->subCategory->name = 'simpanan wajib') {
+					$total_mandatory_saving += $saving->amount;
+				} else if ($saving->subCategoryy->name = 'simpanan wajib khusus') {
+					$total_special_mandatory_saving += $saving->amount;
+				} else if ($saving->subCategoryy->name = 'simpanan sukarela') {
+					$total_voluntary_saving += $saving->amount;
+				} else if ($saving->subCategoryy->name = 'tabungan rekreasi') {
+					$total_recretional_saving += $saving->amount;
+				} 
+			}
+
+			$history_savings = $this->savingRepo->getHistorySavingmember($user->id);
+			$history_isntallments = $this->installmentRepo->getHistoryInstallments($user->id);
+			
+			$data = [
+				'total_mandatory_saving'=> $total_mandatory_saving,
+				'total_special_mandatory_saving'=> $total_special_mandatory_saving,
+				'total_voluntary_saving'=> $total_voluntary_saving,
+				'total_recretional_saving'=> $total_recretional_saving,
+				'history_savings' => $history_savings,
+				'history_installments' => $history_isntallments
 			];
-		} else if ($mode == 'update') {
-			return [
-				'name' => $validated['name'],
-				'email' => $validated['email'],
-				'address' => $validated['address'],
-				'position' => $validated['position'],
-				'phone_number' => $validated['phone_number'],
-				'gender' => $validated['gender'],
-				'religion' => $validated['religion'],
-				'image' => $validated['image'] ?? null,
-			];
+
+			return response()->json([
+				'data' => $data
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
 		}
-
-		return true;
 	}
 
-	private function generateDataUser($mode, $member, $validated) {
-		if ($mode == 'store') {
-			return [
-				'username' => $validated['username'],
-				'password' => Hash::make($validated['password']),
-				'email' => $member->email,
-				'uuid' => $member->uuid,
-				'member_id' => $member->id,
-				'active' => 1,
-			];
-		} else if ($mode == 'update') {
-			return [
-				'username' => $validated['username'],
-				'password' => $validated['password'] ? Hash::make($validated['password']) : $member->user->password,
-				'email' => $validated['email'],
-				'active' => $validated['active'],
-			];
-		}
-
-		return true;
-	}
+	
 }

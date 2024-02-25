@@ -12,4 +12,8 @@ interface SavingRepository extends Repository {
 	public function getSavingByInvoiceId($invoice_id);
 
 	public function updateStatusSaving($id);
+
+	public function getHistorySavingmember($id);
+
+	public function getSavingsMember($member_id);
 }

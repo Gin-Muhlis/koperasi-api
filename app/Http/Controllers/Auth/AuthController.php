@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+use App\Http\Requests\UpdateProfileRequest;
+use Illuminate\Support\Facades\Storage;
 
 require_once app_path() . '/Helpers/helpers.php';
 
@@ -36,13 +38,13 @@ class AuthController extends Controller {
 				$validated['image'] = $request->file('image')->store('public/member');
 			}
 
-			$data_member = $this->generateDataMember($validated);
+			$data_member = generateDataMember('store', null, $validated);
 
 			DB::beginTransaction();
 
 			$member = $this->memberRepo->createMember($data_member);
 
-			$data_user = $this->generateDataUser($member, $validated);
+			$data_user = generateDataUser('store', $member, $validated);
 
 			$user = $this->userRepo->createUser($data_user);
 
@@ -112,39 +114,39 @@ class AuthController extends Controller {
 		}
 	}
 
-	private function generateDataMember($validated) {
-		$min = 1000000000;
-		$max = 9999999999;
+	public function updateProfile(UpdateProfileRequest $request, $id) {
+		try {
+			$validated = $request->validated();
+			$validated['password'] = null;
 
-		$random_number = mt_rand($min, $max);
+			$member = $this->memberRepo->showMember($id);
+			$validated['active'] = $member->active;
+			
+			if ($request->hasFile('image')) {
+				if ($member->image) {
+					Storage::delete($member->image);
+				}
 
-		return [
-			'uuid' => Str::uuid(),
-			'name' => $validated['name'],
-			'email' => $validated['email'],
-			'address' => $validated['address'],
-			'phone_number' => $validated['phone_number'],
-			'position' => $validated['position'],
-			'gender' => $validated['gender'],
-			'identity_number' => str_pad($random_number, 10, '0', STR_PAD_LEFT),
-			'religion' => $validated['religion'],
-			'image' => $validated['image'],
-			'date_activation' => Carbon::now()->format('Y-m-d'),
-		];
-	}
+				$validated['image'] = $request->file('image')->store('public/member');
+			}
 
-	private function generateDataUser($member, $validated) {
-		$name_split = explode(' ', $member->name);
-		$first_name = $name_split[0];
-		$second_name = $name_split[1] ? $name_split[1] : '';
-		$name = "{$first_name} {$second_name}";
-		return [
-			'username' => $name,
-			'password' => Hash::make($validated['password']),
-			'email' => $member->email,
-			'uuid' => $member->uuid,
-			'member_id' => $member->id,
-			'active' => 1,
-		];
+			$data_member = generateDataMember('update', $member, $validated);
+
+			DB::beginTransaction();
+
+			$this->memberRepo->updateMember($id, $data_member);
+
+			$data_user = generateDataUser('update', $member, $validated);
+
+			$this->userRepo->updateUser($member->id, $data_user);
+
+			DB::commit();
+
+			return response()->json([
+				'message' => 'Profile berhasil diperbarui',
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
 	}
 }

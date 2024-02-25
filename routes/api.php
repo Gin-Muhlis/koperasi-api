@@ -28,6 +28,8 @@ Route::middleware('json.response')->group(function () {
 		Route::post('/logout', [AuthController::class, 'logout']);
 		// profile
 		Route::get('/profile', [AuthController::class, 'profile']);
+		// update profile
+		Route::put('/profile/{id}', [AuthController::class, 'updateProfile']);
 	});
 
 	Route::middleware('role:super-admin')->group(function () {
@@ -39,7 +41,6 @@ Route::middleware('json.response')->group(function () {
 		Route::apiResource('/product', ProductController::class);
 		Route::apiResource('/stuff', StuffController::class);
 		Route::apiResource('/role', RoleController::class);
-		Route::apiResource('/position-category', PositionCategoryController::class);
 
 		// transaksi
 		Route::apiResource('/purchase', PurchaseController::class);
@@ -76,5 +77,13 @@ Route::middleware('json.response')->group(function () {
 		Route::prefix('report')->group(function () {
 			Route::get('/saving-members', [MemberController::class, 'reportSavingMembers']);
 		});
+	});
+
+	Route:: middleware('role:super-admin|member')->group(function () {
+		Route::apiResource('/position-category', PositionCategoryController::class);
+	});
+
+	Route:: middleware('role:member')->group(function () {
+		Route::get('/dashboard/member', [MemberController::class, 'dashboardMember']);
 	});
 });

@@ -33,4 +33,10 @@ class InstallmentRepositoryImplement extends Eloquent implements InstallmentRepo
 	public function updateStatusIsntallment($id) {
 		$this->model->where('id', $id)->update(['status' => 'dibayar']);
 	}
+
+	public function getHistoryInstallments($id) {
+		return $this->model->whereHas('loan.member', function ($query) use ($id) {
+			$query->where('members.id', $id);
+		})->limit(4)->select('date', 'amount', 'code')->latest()->get();
+	}
 }

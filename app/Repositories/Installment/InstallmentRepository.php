@@ -13,4 +13,7 @@ interface InstallmentRepository extends Repository {
 	public function getInstalmentByInvoiceId($invoice_id);
 
 	public function updateStatusIsntallment($id);
+
+	public function getHistoryInstallments($id);
+
 }

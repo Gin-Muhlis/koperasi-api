@@ -31,4 +31,11 @@ class SavingRepositoryImplement extends Eloquent implements SavingRepository {
 	public function updateStatusSaving($id) {
 		$this->model->where('id', $id)->update(['status' => 'dibayar']);
 	}
+
+	public function getHistorySavingmember($id) {
+		return $this->model->where('member_id', $id)->limit(4)->select('date', 'amount', 'code')->latest()->get();
+	}
+	public function getSavingsMember($member_id) {
+		return $this->model->with('subCategory')->where('member_id', $member_id)->get();
+	}
 }

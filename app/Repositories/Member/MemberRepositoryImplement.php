@@ -50,4 +50,6 @@ class MemberRepositoryImplement extends Eloquent implements MemberRepository {
 			]);
 		})->get();
 	}
+
+	
 }

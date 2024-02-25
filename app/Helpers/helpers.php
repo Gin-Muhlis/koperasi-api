@@ -4,6 +4,7 @@ use App\Models\Stuff;
 use App\Models\Member;
 use App\Models\Product;
 use App\Models\SubCategory;
+use Carbon\Carbon;
 
 /**
  * generate angka random untuk code
@@ -139,4 +140,63 @@ function generateDate($data) {
     $newData = "{$split[2]} {$months[$split[1]]} {$split[0]}";
 
     return $newData;
+}
+
+function generateDataMember($mode, $member, $validated) {
+    if ($mode == 'store') {
+        $min = 1000000000;
+        $max = 9999999999;
+
+        $random_number = mt_rand($min, $max);
+
+        return [
+            'uuid' => Str::uuid(),
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'address' => $validated['address'],
+            'position' => $validated['position'],
+            'group_id' => $validated['group_id'],
+            'phone_number' => $validated['phone_number'],
+            'gender' => $validated['gender'],
+            'identity_number' => str_pad($random_number, 10, '0', STR_PAD_LEFT),
+            'religion' => $validated['religion'],
+            'image' => $validated['image'],
+            'date_activation' => Carbon::now()->format('Y-m-d'),
+        ];
+    } else if ($mode == 'update') {
+        return [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'address' => $validated['address'],
+            'position' => $validated['position'],
+            'phone_number' => $validated['phone_number'],
+            'gender' => $validated['gender'],
+            'religion' => $validated['religion'],
+            'image' => $validated['image'] ?? $member->image,
+        ];
+    }
+
+    return true;
+}
+
+function generateDataUser($mode, $member, $validated) {
+    if ($mode == 'store') {
+        return [
+            'username' => $validated['username'],
+            'password' => Hash::make($validated['password']),
+            'email' => $member->email,
+            'uuid' => $member->uuid,
+            'member_id' => $member->id,
+            'active' => 1,
+        ];
+    } else if ($mode == 'update') {
+        return [
+            'username' => $validated['username'],
+            'password' => $validated['password'] ? Hash::make($validated['password']) : $member->user->password,
+            'email' => $validated['email'],
+            'active' => $validated['active'] ?? $member->user->active,
+        ];
+    }
+
+    return true;
 }

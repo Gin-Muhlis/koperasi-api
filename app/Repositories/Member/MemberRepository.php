@@ -13,4 +13,6 @@ interface MemberRepository extends Repository {
 	public function deleteMember($id);
 	public function getSavingMembers();
 	public function getNotPaidMembers($sub_category);
+
+	
 }

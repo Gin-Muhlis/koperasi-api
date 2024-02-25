@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+require_once app_path() . '/Helpers/helpers.php';
+
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -24,7 +26,7 @@ class MemberResource extends JsonResource {
 			'position_category' => $this->positionCategory->position,
 			'identity_number' => $this->identity_number,
 			'religion' => $this->religion,
-			'date_activation' => $this->date_activation,
+			'date_activation' => generateDate($this->date_activation),
 			'imageProfile' => $this->image ? str_replace('public/', '', url("storage/{$this->image}")) : config('app.url') . '/images/profile-default.png',
 			'username' => $this->user->username,
 			'active' => $this->user->active,
