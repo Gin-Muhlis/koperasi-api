@@ -1,14 +1,16 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Http\Resources\MembersLoanReportResource;
+use App\Http\Resources\MembersReportResource;
+
+require_once app_path() . '/Helpers/helpers.php';
+
 use App\Repositories\Installment\InstallmentRepository;
 use App\Repositories\Invoice\InvoiceRepository;
 use App\Repositories\Loan\LoanRepository;
 use App\Repositories\Saving\SavingRepository;
 use Illuminate\Support\Facades\Auth;
-
-require_once app_path() . '/Helpers/helpers.php';
-
 use App\Http\Requests\StoreMemberRequest;
 use App\Http\Requests\UpdateMemberRequest;
 use App\Http\Resources\MemberResource;
@@ -135,7 +137,7 @@ class MemberController extends Controller {
 
 			$data_user = generateDataUser('update', $member, $validated);
 
-			$this->userRepo->updateUser($member->id, $data_user);
+			$this->userRepo->updateUser($member->user->id, $data_user);
 
 			DB::commit();
 
@@ -162,16 +164,30 @@ class MemberController extends Controller {
 			return errorResponse($e->getMessage());
 		}
 	}
+	
 
-	public function reportSavingMembers() {
+	public function reportmembers() {
 		try {
-			$savingMembers = $this->memberRepo->getSavingMembers();
+			$members = $this->memberRepo->getReportMembers();
 
-			$data = SavingMemberResource::collection($savingMembers);
+			$filtered_member = filterMember($members);
 
 			return response()->json([
-				'success' => true,
-				'data' => $data,
+				'data' => MembersReportResource::collection($filtered_member),
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	public function reportLoanmembers() {
+		try {
+			$members = $this->memberRepo->getReportLoanMembers();
+
+			$filtered_member = filterMember($members);
+
+			return response()->json([
+				'data' => MembersLoanReportResource::collection($filtered_member),
 			]);
 		} catch (Exception $e) {
 			return errorResponse($e->getMessage());

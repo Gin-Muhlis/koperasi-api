@@ -49,7 +49,7 @@ class TabController extends Controller
 			$members = $this->memberRepo->getMembers();
 
 			$member_principaL_saving = [];
-			$filtered_members = $this->filterMember($members);
+			$filtered_members = filterMember($members);
 			foreach ($filtered_members as $member) {
 				$member_savings = $this->savingRepo->getMemberSpesificSavings($member->id, $sub_category->id);
 
@@ -72,7 +72,7 @@ class TabController extends Controller
 
 			$members = $this->memberRepo->getMembers();
 
-			$filtered_members = $this->filterMember($members);
+			$filtered_members = filterMember($members);
 
 			return response()->json([
 				'data' => MandatoryResource::collection($filtered_members),
@@ -87,7 +87,7 @@ class TabController extends Controller
 		try {
 			$members = $this->memberRepo->getMembers();
 
-			$filtered_members = $this->filterMember($members);
+			$filtered_members = filterMember($members);
 
 			return response()->json([
 				'data' => SpecialMandatoryResource::collection($filtered_members),
@@ -102,7 +102,7 @@ class TabController extends Controller
 		try {
 			$members = $this->memberRepo->getMembers();
 
-			$filtered_members = $this->filterMember($members);
+			$filtered_members = filterMember($members);
 
 			return response()->json([
 				'data' => VoluntaryResource::collection($filtered_members),
@@ -117,7 +117,7 @@ class TabController extends Controller
 		try {
 			$members = $this->memberRepo->getMembers();
 
-			$filtered_members = $this->filterMember($members);
+			$filtered_members = filterMember($members);
 
 			return response()->json([
 				'data' => RecretionalResource::collection($filtered_members),
@@ -133,7 +133,7 @@ class TabController extends Controller
 			$sub_category = $this->subCategoryRepo->getByName('piutang s/p');
 			$members = $this->memberRepo->getNotPaidMembers($sub_category->id);
 
-			$filtered_members = $this->filterMember($members);
+			$filtered_members = filterMember($members);
 
 			return response()->json([
 				'data' => ReceivableResource::collection($filtered_members),
@@ -149,7 +149,7 @@ class TabController extends Controller
 			$sub_category = $this->subCategoryRepo->getByName('piutang dagang');
 			$members = $this->memberRepo->getNotPaidMembers($sub_category->id);
 
-			$filtered_members = $this->filterMember($members);
+			$filtered_members = filterMember($members);
 
 			return response()->json([
 				'data' => ReceivableResource::collection($filtered_members),
@@ -159,18 +159,7 @@ class TabController extends Controller
 		}
 	}
 
-	private function filterMember($data)
-	{
-		$filtered_members = [];
-
-		foreach ($data as $member) {
-			if ($member->user->hasRole('member')) {
-				$filtered_members[] = $member;
-			}
-		}
-
-		return $filtered_members;
-	}
+	
 
 	// function untuk menghandle semua jenis simpanan sekaligus
 	public function storeDataInvoice(StoreInvoiceRequest $request)

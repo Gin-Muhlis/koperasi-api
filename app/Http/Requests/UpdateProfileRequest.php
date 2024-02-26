@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class UpdateProfileRequest extends FormRequest
@@ -26,8 +27,7 @@ class UpdateProfileRequest extends FormRequest
 			'email' => [
 				'required',
 				'email',
-				Rule::unique('members', 'email')->ignore(auth()->id()),
-				Rule::unique('users', 'email')->ignore(auth()->id()),
+				Rule::unique('users', 'email')->ignore(Auth::user()->id),
 			],
 			'name' => ['required', 'max:100', 'string'],
 			'address' => ['required', 'max:255', 'string'],

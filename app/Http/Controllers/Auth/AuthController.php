@@ -33,6 +33,7 @@ class AuthController extends Controller {
 		try {
 
 			$validated = $request->validated();
+			$validated['username'] = explode(' ', $validated['name'])[0];
 
 			if ($request->hasFile('image')) {
 				$validated['image'] = $request->file('image')->store('public/member');
@@ -67,7 +68,7 @@ class AuthController extends Controller {
 
 			$isUser = User::with('member')->where('email', $credentials['email'])->first();
 
-			if (!$isUser) {
+			if (!$isUser || !Hash::check($credentials['password'], $isUser->password)) {
 				return response()->json([
 					'message' => 'Email atau Password salah',
 				], 400);
@@ -105,7 +106,6 @@ class AuthController extends Controller {
 	public function profile(Request $request) {
 		try {
 			$data_user = $request->user();
-
 			return response()->json([
 				'data' => new ProfileResource($data_user),
 			]);
@@ -138,7 +138,7 @@ class AuthController extends Controller {
 
 			$data_user = generateDataUser('update', $member, $validated);
 
-			$this->userRepo->updateUser($member->id, $data_user);
+			$this->userRepo->updateUser(Auth::user()->id, $data_user);
 
 			DB::commit();
 

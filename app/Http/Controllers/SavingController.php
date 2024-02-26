@@ -17,89 +17,100 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class SavingController extends Controller
-{
-	private $savingRepository;
-	private $memberRepository;
-	private $subCategoryRepo;
+class SavingController extends Controller {
+    private $savingRepository;
+    private $memberRepository;
+    private $subCategoryRepo;
 
-	public function __construct(SavingRepository $savingRepository, MemberRepository $memberRepository, SubCategoryRepository $subCategoryRepository)
-	{
-		$this->savingRepository = $savingRepository;
-		$this->memberRepository = $memberRepository;
-		$this->subCategoryRepo = $subCategoryRepository;
-	}
-	/**
-	 * Display a listing of the resource.
-	 */
-	public function index()
-	{
-		//
-	}
+    public function __construct( SavingRepository $savingRepository, MemberRepository $memberRepository, SubCategoryRepository $subCategoryRepository )
+    {
+        $this->savingRepository = $savingRepository;
+        $this->memberRepository = $memberRepository;
+        $this->subCategoryRepo = $subCategoryRepository;
+    }
+    /**
+    * Display a listing of the resource.
+    */
 
-	/**
-	 * Store a newly created resource in storage.
-	 */
-	public function store(StoreSavingRequest $request)
-	{
-		try {
-			$user = Auth::user();
-			$validated = $request->validated();
+    public function index()
+    {
+        //
+    }
 
-			DB::beginTransaction();
+    /**
+    * Store a newly created resource in storage.
+    */
 
-			foreach ($validated['members'] as $member) {
+    public function store( StoreSavingRequest $request )
+    {
+        try {
+            $user = Auth::user();
+            $validated = $request->validated();
 
-				$data = [
-					'uuid' => Str::uuid(),
-					'code' => generateCode(),
-					'member_id' => $member['id'],
-					'amount' => $member['payment'],
-					'date' => Carbon::now()->format('Y-m-d'),
-					'sub_category_id' => $validated['sub_category_id'],
-					'month_year' => $validated['month_year'],
-					'user_id' => $user->id,
-					'description' => $validated['description'] ?? '-',
-					'status' => 'dibayar'
-				];
+            DB::beginTransaction();
 
-				$this->savingRepository->makeSavingMembers($data);
-			}
+            foreach ( $validated[ 'members' ] as $member ) {
+                $is_mandatory_saving = $this->savingRepository->getMemberSpesificSavings( $member[ 'id' ],  $validated[ 'sub_category_id' ] );
 
-			DB::commit();
+                if ( count( $is_mandatory_saving ) > 0 && $is_mandatory_saving->contains( 'month_year', $validated[ 'month_year' ] ) ) {
+                    return response()->json( [
+                        'message' => 'Terdapat data member yang sudah membayar simpanan pada bulan yang ditentukan',
+                    ], 400 );
+                }
 
-			return response()->json([
-				'success' => true,
-				'message' => 'Simpanan member berhasil ditambahkan',
-			]);
-		} catch (Exception $e) {
-			DB::rollBack();
+                $data = [
+                    'uuid' => Str::uuid(),
+                    'code' => generateCode(),
+                    'member_id' => $member[ 'id' ],
+                    'amount' => $member[ 'payment' ],
+                    'date' => Carbon::now()->format( 'Y-m-d' ),
+                    'sub_category_id' => $validated[ 'sub_category_id' ],
+                    'month_year' => $validated[ 'month_year' ],
+                    'user_id' => $user->id,
+                    'description' => $validated[ 'description' ] ?? '-',
+                    'status' => 'dibayar'
+                ];
 
-			return errorResponse($e->getMessage());
-		}
-	}
+                $this->savingRepository->makeSavingMembers( $data );
+            }
 
-	/**
-	 * Display the specified resource.
-	 */
-	public function show(Saving $saving)
-	{
-		//
-	}
+            DB::commit();
 
-	/**
-	 * Update the specified resource in storage.
-	 */
-	public function update(UpdateSavingRequest $request, Saving $saving)
-	{
-		//
-	}
+            return response()->json( [
+                'success' => true,
+                'message' => 'Simpanan member berhasil ditambahkan',
+            ] );
+        } catch ( Exception $e ) {
+            DB::rollBack();
 
-	/**
-	 * Remove the specified resource from storage.
-	 */
-	public function destroy(Saving $saving)
-	{
-		//
-	}
+            return errorResponse( $e->getMessage() );
+        }
+    }
+
+    /**
+    * Display the specified resource.
+    */
+
+    public function show( Saving $saving )
+    {
+        //
+    }
+
+    /**
+    * Update the specified resource in storage.
+    */
+
+    public function update( UpdateSavingRequest $request, Saving $saving )
+    {
+        //
+    }
+
+    /**
+    * Remove the specified resource from storage.
+    */
+
+    public function destroy( Saving $saving )
+    {
+        //
+    }
 }

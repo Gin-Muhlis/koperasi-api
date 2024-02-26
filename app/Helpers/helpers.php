@@ -200,3 +200,16 @@ function generateDataUser($mode, $member, $validated) {
 
     return true;
 }
+
+function filterMember($data)
+	{
+		$filtered_members = [];
+
+		foreach ($data as $member) {
+			if ($member->user->hasRole('member')) {
+				$filtered_members[] = $member;
+			}
+		}
+
+		return $filtered_members;
+	}

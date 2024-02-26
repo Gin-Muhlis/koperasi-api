@@ -177,6 +177,8 @@ class InvoiceController extends Controller {
 			// piutang s/p
 			foreach ($validated['receivables'] as $item) {
 				$sub_category = $this->subCategoryRepo->getByName('piutang s/p');
+				$loan_member = $this->loanRepo->findLoan($item['loanId']);
+
 
 				$month = explode('-', $validated['month_year'])[0];
 
@@ -192,7 +194,6 @@ class InvoiceController extends Controller {
 
 				$this->installmentRepo->makeInstallmentMembers($data);
 
-				$loan_member = $this->loanRepo->findLoan($item['loanId']);
 
 				$total_payment_member = $this->installmentRepo->getSumPayment($loan_member->id);
 

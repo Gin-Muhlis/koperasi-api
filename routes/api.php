@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 // login dan register
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register/position-categories', [PositionCategoryController::class,'index']);
 
 Route::middleware('json.response')->group(function () {
 	Route::middleware('auth:api')->group(function () {
@@ -81,7 +82,8 @@ Route::middleware('json.response')->group(function () {
 
 		// laporan
 		Route::prefix('report')->group(function () {
-			Route::get('/saving-members', [MemberController::class, 'reportSavingMembers']);
+			Route::get('/members', [MemberController::class, 'reportmembers']);
+			Route::get('/loan-members', [MemberController::class, 'reportLoanMembers']);
 		});
 
 		// dashboard

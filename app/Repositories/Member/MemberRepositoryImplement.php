@@ -33,8 +33,12 @@ class MemberRepositoryImplement extends Eloquent implements MemberRepository {
 		return $this->delete($id);
 	}
 
-	public function getSavingMembers() {
-		return $this->model->with('savings.subCategory')->get();
+	public function getReportMembers() {
+		return $this->model->with(['savings' => function ($query) {
+			$query->with('subCategory');
+		}, 'loans' => function ($query) {
+			$query->with('subCategory', 'installments');
+		}])->get();
 	}
 
 	public function getNotPaidMembers($sub_category) {
@@ -47,6 +51,18 @@ class MemberRepositoryImplement extends Eloquent implements MemberRepository {
 			$query->where([
 				['status', '!=', 'lunas'],
 				['sub_category_id', $sub_category],
+			]);
+		})->get();
+	}
+
+	public function getReportLoanMembers() {
+		return $this->model->with(['loans' => function ($query) {
+			$query->where([
+				['status', '!=', 'lunas']
+			]);
+		}])->whereHas('loans', function ($query) {
+			$query->where([
+				['status', '!=', 'lunas']
 			]);
 		})->get();
 	}

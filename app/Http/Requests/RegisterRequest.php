@@ -28,6 +28,7 @@ class RegisterRequest extends FormRequest {
 			'gender' => ['required', 'in:L,P'],
 			'religion' => ['required', 'max:20', 'string'],
 			'position' => ['required', 'in:pns,p3k,cpns'],
+			'group_id' => ['required', 'exists:position_categories,id'],
 			'image' => ['nullable', 'image', 'max:2048'],
 			'password' => ['required'],
 		];
