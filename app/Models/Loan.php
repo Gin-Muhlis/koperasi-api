@@ -19,6 +19,7 @@ class Loan extends Model
         'loan_duration',
         'loan_interest',
         'date_completion',
+        'total_payment',
         'member_id',
         'sub_category_id',
         'user_id',

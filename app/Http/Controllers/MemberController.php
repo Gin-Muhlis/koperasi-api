@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 use App\Repositories\Installment\InstallmentRepository;
+use App\Repositories\Invoice\InvoiceRepository;
+use App\Repositories\Loan\LoanRepository;
 use App\Repositories\Saving\SavingRepository;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,12 +28,16 @@ class MemberController extends Controller {
 	private $userRepo;
 	private $savingRepo;
 	private $installmentRepo;
+	private $invoiceRepo;
+	private $loanRepo;
 
-	public function __construct(MemberRepository $member, UserRepository $user, SavingRepository $savingRepository, InstallmentRepository $installmentRepository) {
+	public function __construct(MemberRepository $member, UserRepository $user, SavingRepository $savingRepository, InstallmentRepository $installmentRepository, InvoiceRepository $invoiceRepository, LoanRepository $loanRepository) {
 		$this->memberRepo = $member;
 		$this->userRepo = $user;
 		$this->savingRepo = $savingRepository;
 		$this->installmentRepo = $installmentRepository;
+		$this->invoiceRepo = $invoiceRepository;
+		$this->loanRepo = $loanRepository;
 	}
 	/**
 	 * Display a listing of the resource.
@@ -205,6 +211,32 @@ class MemberController extends Controller {
 				'total_recretional_saving'=> $total_recretional_saving,
 				'history_savings' => $history_savings,
 				'history_installments' => $history_isntallments
+			];
+
+			return response()->json([
+				'data' => $data
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	public function dashboardAdmin() {
+		try {
+			$count_members = $this->memberRepo->getCountMembers();
+			$count_invoices_not_paid = $this->invoiceRepo->getNotPaidInvoices();
+			$count_invoices_paid = $this->invoiceRepo->getPaidInvoices();
+			$total_savings = $this->savingRepo->getTotalSavings();
+			$total_loans = $this->loanRepo->getTotalLoans();
+			$historyInvoices = $this->invoiceRepo->getHistoryInvoices();
+
+			$data = [
+				'count_member'=> $count_members,
+				'count_invoices_not_paid'=> $count_invoices_not_paid,
+				'count_invoices_paid'=> $count_invoices_paid,
+				'total_savings' => $total_savings,
+				'total_loans'=> $total_loans,
+				'history_invoices'=> $historyInvoices
 			];
 
 			return response()->json([

@@ -11,4 +11,9 @@ interface InvoiceRepository extends Repository {
 	public function getMemberInvoice($member_id, $month_year);
 	public function getDetailInvoiceByCode($code);
 	public function updateStatusInvoice($id);
+	public function getNotPaidInvoices();
+	public function getPaidInvoices();
+
+	public function getHistoryInvoices();
 }
+

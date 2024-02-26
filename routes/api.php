@@ -9,6 +9,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PositionCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\ReceivableController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SavingController;
@@ -49,13 +50,18 @@ Route::middleware('json.response')->group(function () {
 		// auth
 		Route::apiResource('/user', UserController::class);
 
-		// saving
-		Route::apiResource('saving', SavingController::class);
+		// simpanan
+		Route::apiResource('/saving', SavingController::class);
+
+		// pinjaman
+		Route::apiResource('/receivable', ReceivableController::class);
 
 		// Invoice
 		Route::apiResource('invoice', InvoiceController::class);
 		Route::post('/invoice-detail', [InvoiceController::class, 'storeDetailInvoice']);
 		Route::get('/invoice-detail/{code}', [InvoiceController::class, 'detailInvoice']);
+
+		// Piutang
 
 		// payment
 		Route::apiResource('payment', PaymentController::class);
@@ -77,13 +83,18 @@ Route::middleware('json.response')->group(function () {
 		Route::prefix('report')->group(function () {
 			Route::get('/saving-members', [MemberController::class, 'reportSavingMembers']);
 		});
+
+		// dashboard
+		Route::get('/dashboard/admin', [MemberController::class, 'dashboardAdmin']);
 	});
 
 	Route:: middleware('role:super-admin|member')->group(function () {
+		// golongan
 		Route::apiResource('/position-category', PositionCategoryController::class);
 	});
 
 	Route:: middleware('role:member')->group(function () {
+		// dashboarad
 		Route::get('/dashboard/member', [MemberController::class, 'dashboardMember']);
 	});
 });

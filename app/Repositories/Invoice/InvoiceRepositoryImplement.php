@@ -37,4 +37,16 @@ class InvoiceRepositoryImplement extends Eloquent implements InvoiceRepository {
 	public function updateStatusInvoice($id) {
 		$this->model->find($id)->update(['status' => 'dibayar']);
 	}
+
+	public function getNotPaidInvoices() {
+		return $this->model->where('status', 'belum bayar')->count();
+	}
+
+	public function getPaidInvoices() {
+		return $this->model->where('status', 'dibayar')->count();
+	}
+
+	public function getHistoryInvoices() {
+		return $this->model->limit(4)->select('invoice_name', 'date', 'status', 'payment_source', 'payment_method')->latest()->get();
+	}
 }

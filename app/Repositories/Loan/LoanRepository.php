@@ -8,4 +8,7 @@ interface LoanRepository extends Repository {
 
 	public function findLoan($id);
 	public function updateStatusLoan($id, $data);
+	public function getTotalLoans();
+
+	public function createLoanMember($data);
 }

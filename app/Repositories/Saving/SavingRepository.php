@@ -16,4 +16,6 @@ interface SavingRepository extends Repository {
 	public function getHistorySavingmember($id);
 
 	public function getSavingsMember($member_id);
+
+	public function getTotalSavings();
 }

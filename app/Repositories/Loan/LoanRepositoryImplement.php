@@ -7,11 +7,6 @@ use LaravelEasyRepository\Implementations\Eloquent;
 
 class LoanRepositoryImplement extends Eloquent implements LoanRepository {
 
-	/**
-	 * Model class to be used in this repository for the common methods inside Eloquent
-	 * Don't remove or change $this->model variable name
-	 * @property Model|mixed $model;
-	 */
 	protected $model;
 
 	public function __construct(Loan $model) {
@@ -24,5 +19,13 @@ class LoanRepositoryImplement extends Eloquent implements LoanRepository {
 
 	public function updateStatusLoan($id, $data) {
 		$this->update($id, $data);
+	}
+
+	public function getTotalLoans() {
+		return $this->model->sum('total_payment');
+	}
+
+	public function createLoanMember($data) {
+		$this->create($data);
 	}
 }

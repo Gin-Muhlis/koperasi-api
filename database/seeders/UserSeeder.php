@@ -17,8 +17,8 @@ class UserSeeder extends Seeder {
 		// membuat akun member untuk admin
 		$member = Member::create([
 			'uuid' => Str::uuid(),
-			'name' => 'Fubuki Shirakami',
-			'email' => 'fubuki@gmail.com',
+			'name' => 'Admin',
+			'email' => 'admin@admin.com',
 			'address' => 'Tokyo, Jepang',
 			'phone_number' => '0895325722289',
 			'gender' => 'P',
@@ -32,9 +32,9 @@ class UserSeeder extends Seeder {
 		// membuat user untuk admin
 		User::create([
 			'uuid' => Str::uuid(),
-			'username' => 'Fubuking',
-			'email' => 'fubuki@gmail.com',
-			'password' => Hash::make('fubuki123'),
+			'username' => 'Admin123',
+			'email' => 'admin@admin.com',
+			'password' => Hash::make('admin123'),
 			'member_id' => $member->id,
 		]);
 
