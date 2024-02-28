@@ -14,9 +14,10 @@ return new class extends Migration {
 			$table->uuid('uuid')->unique();
 			$table->string('code', 10);
 			$table->unsignedBigInteger('loan_id');
+			$table->unsignedBigInteger('member_id');
 			$table->unsignedBigInteger('sub_category_id');
 			$table->unsignedBigInteger('user_id');
-			$table->unsignedBigInteger('invoice_id');
+			$table->unsignedBigInteger('invoice_id')->nullable();
 			$table->double('amount');
 			$table->date('date');
 			$table->enum('status', ['belum bayar', 'dibayar']);

@@ -22,8 +22,7 @@ class SavingController extends Controller {
     private $memberRepository;
     private $subCategoryRepo;
 
-    public function __construct( SavingRepository $savingRepository, MemberRepository $memberRepository, SubCategoryRepository $subCategoryRepository )
-    {
+    public function __construct( SavingRepository $savingRepository, MemberRepository $memberRepository, SubCategoryRepository $subCategoryRepository ) {
         $this->savingRepository = $savingRepository;
         $this->memberRepository = $memberRepository;
         $this->subCategoryRepo = $subCategoryRepository;
@@ -32,8 +31,7 @@ class SavingController extends Controller {
     * Display a listing of the resource.
     */
 
-    public function index()
-    {
+    public function index() {
         //
     }
 
@@ -41,8 +39,7 @@ class SavingController extends Controller {
     * Store a newly created resource in storage.
     */
 
-    public function store( StoreSavingRequest $request )
-    {
+    public function store( StoreSavingRequest $request ) {
         try {
             $user = Auth::user();
             $validated = $request->validated();
@@ -50,12 +47,14 @@ class SavingController extends Controller {
             DB::beginTransaction();
 
             foreach ( $validated[ 'members' ] as $member ) {
-                $is_mandatory_saving = $this->savingRepository->getMemberSpesificSavings( $member[ 'id' ],  $validated[ 'sub_category_id' ] );
+                if ( $validated[ 'type_saving' ] != 'simpanan sukarela' && $validated[ 'type_saving' ] != 'tabungan rekreasi' ) {
+                    $is_mandatory_saving = $this->savingRepository->getMemberSpesificSavings( $member[ 'id' ],  $validated[ 'sub_category_id' ] );
 
-                if ( count( $is_mandatory_saving ) > 0 && $is_mandatory_saving->contains( 'month_year', $validated[ 'month_year' ] ) ) {
-                    return response()->json( [
-                        'message' => 'Terdapat data member yang sudah membayar simpanan pada bulan yang ditentukan',
-                    ], 400 );
+                    if ( count( $is_mandatory_saving ) > 0 && $is_mandatory_saving->contains( 'month_year', $validated[ 'month_year' ] ) ) {
+                        return response()->json( [
+                            'message' => 'Terdapat data member yang sudah membayar simpanan pada bulan yang ditentukan',
+                        ], 400 );
+                    }
                 }
 
                 $data = [
@@ -91,8 +90,7 @@ class SavingController extends Controller {
     * Display the specified resource.
     */
 
-    public function show( Saving $saving )
-    {
+    public function show( Saving $saving ) {
         //
     }
 
@@ -100,8 +98,7 @@ class SavingController extends Controller {
     * Update the specified resource in storage.
     */
 
-    public function update( UpdateSavingRequest $request, Saving $saving )
-    {
+    public function update( UpdateSavingRequest $request, Saving $saving ) {
         //
     }
 
@@ -109,8 +106,7 @@ class SavingController extends Controller {
     * Remove the specified resource from storage.
     */
 
-    public function destroy( Saving $saving )
-    {
+    public function destroy( Saving $saving ) {
         //
     }
 }

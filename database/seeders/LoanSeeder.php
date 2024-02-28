@@ -2,10 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Imports\LoanImport;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Maatwebsite\Excel\Facades\Excel;
 
 class LoanSeeder extends Seeder
 {
@@ -14,10 +11,5 @@ class LoanSeeder extends Seeder
      */
     public function run(): void
     {
-        // Memanggil file dummy data
-        $file = base_path('database/data/demoLoan.xlsx');
-        
-        // memanggil import untuk menjalankan dummy data
-        Excel::import(new LoanImport, $file);
     }
 }

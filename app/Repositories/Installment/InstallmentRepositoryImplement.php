@@ -18,8 +18,8 @@ class InstallmentRepositoryImplement extends Eloquent implements InstallmentRepo
 		return $this->create($data);
 	}
 
-	public function getMemberPaymentMonth($month, $loan_id) {
-		return $this->model->whereMonth('date', $month)->where('loan_id', $loan_id)->get();
+	public function getMemberPaymentMonth($year, $month, $loan_id) {
+		return $this->model->whereYear('date', $year)->whereMonth('date', $month)->where('loan_id', $loan_id)->get();
 	}
 
 	public function getSumPayment($loan_id) {

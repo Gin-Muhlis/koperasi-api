@@ -267,8 +267,9 @@ class TabController extends Controller
 				$invoice = $this->invoiceRepo->getMemberInvoice($item['id'], $validated['month_year']);
 
 				$month = explode('-', $validated['month_year'])[0];
+				$year = explode('-', $validated['month_year'])[1];
 
-				$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($month, $item['loanId']);
+				$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($year, $month, $item['loanId']);
 
 				if (count($is_month_payed) > 0) {
 					return response()->json([
@@ -297,8 +298,9 @@ class TabController extends Controller
 				$invoice = $this->invoiceRepo->getMemberInvoice($item['id'], $validated['month_year']);
 
 				$month = explode('-', $validated['month_year'])[0];
+				$year = explode('-', $validated['month_year'])[1];
 
-				$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($month, $item['loanId']);
+				$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($year, $month, $item['loanId']);
 
 				if (count($is_month_payed) > 0) {
 					return response()->json([

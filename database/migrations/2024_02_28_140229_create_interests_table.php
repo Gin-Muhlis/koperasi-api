@@ -11,16 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('special_savings', function (Blueprint $table) {
+        Schema::create('interests', function (Blueprint $table) {
             $table->id();
-            $table->uuid('uuid');
+            $table->uuid('uuid')->unique();
             $table->unsignedBigInteger('sub_category_id');
-            $table->unsignedBigInteger('member_id');
-            $table->integer('duration');
-            $table->enum('type_duration', ['bulanan', 'tahunan']);
-            $table->date('start_payment');
-            $table->date('end_payment');
-            $table->double('amount');
+            $table->float('interest');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -30,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('special_savings');
+        Schema::dropIfExists('interests');
     }
 };

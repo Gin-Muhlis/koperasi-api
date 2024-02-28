@@ -48,13 +48,7 @@ class MemberController extends Controller {
 		try {
 			$members = $this->memberRepo->getmembers();
 
-			$filtered_members = [];
-
-			foreach ($members as $member) {
-				if ($member->user->hasRole('member')) {
-					$filtered_members[] = $member;
-				}
-			}
+			$filtered_members = filterMember($members);
 
 			return response()->json([
 				'data' => MemberResource::collection($filtered_members),
@@ -219,13 +213,22 @@ class MemberController extends Controller {
 
 			$history_savings = $this->savingRepo->getHistorySavingmember($user->id);
 			$history_isntallments = $this->installmentRepo->getHistoryInstallments($user->id);
+
+			$result_saving = [];
+
+			foreach($history_savings as $saving) {
+				$result_saving[] = [
+					...$saving->toArray(),
+					'date' => $saving->date->toDateString(),
+				];
+			}
 			
 			$data = [
 				'total_mandatory_saving'=> $total_mandatory_saving,
 				'total_special_mandatory_saving'=> $total_special_mandatory_saving,
 				'total_voluntary_saving'=> $total_voluntary_saving,
 				'total_recretional_saving'=> $total_recretional_saving,
-				'history_savings' => $history_savings,
+				'history_savings' => $result_saving,
 				'history_installments' => $history_isntallments
 			];
 

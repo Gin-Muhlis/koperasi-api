@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SpecialSaving;
-use App\Http\Requests\StoreSpecialSavingRequest;
-use App\Http\Requests\UpdateSpecialSavingRequest;
+use App\Models\Interest;
+use App\Http\Requests\StoreInterestRequest;
+use App\Http\Requests\UpdateInterestRequest;
 
-class SpecialSavingController extends Controller
+class InterestController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,7 +19,7 @@ class SpecialSavingController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreSpecialSavingRequest $request)
+    public function store(StoreInterestRequest $request)
     {
         //
     }
@@ -27,7 +27,7 @@ class SpecialSavingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(SpecialSaving $specialSaving)
+    public function show(Interest $interest)
     {
         //
     }
@@ -35,7 +35,7 @@ class SpecialSavingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSpecialSavingRequest $request, SpecialSaving $specialSaving)
+    public function update(UpdateInterestRequest $request, Interest $interest)
     {
         //
     }
@@ -43,7 +43,7 @@ class SpecialSavingController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(SpecialSaving $specialSaving)
+    public function destroy(Interest $interest)
     {
         //
     }

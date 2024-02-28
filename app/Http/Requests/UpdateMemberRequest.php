@@ -38,7 +38,6 @@ class UpdateMemberRequest extends FormRequest {
 			'username' => ['required', 'max:100', 'string'],
 			'password' => ['nullable'],
 			'active' => ['required', 'boolean'],
-			
 		];
 	}
 

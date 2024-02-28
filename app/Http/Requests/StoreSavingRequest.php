@@ -24,11 +24,11 @@ class StoreSavingRequest extends FormRequest
 	public function rules(): array
 	{
 		return [
+			'type_saving' => ['required', 'string'],
 			'members' => ['required', 'array'],
 			'month_year' => ['required', 'string'],
 			'sub_category_id' => ['required', 'exists:sub_categories,id'],
 			'description' => ['nullable', 'string'],
-			'type_saving' => ['required', 'string'],
 		];
 	}
 
@@ -42,8 +42,6 @@ class StoreSavingRequest extends FormRequest
 			'sub_category_id.required' => 'Sub Kategori tidak ditemukan.',
 			'sub_category_id.exists' => 'Sub Kategori tidak valid.',
 			'description.string' => 'Deskripsi tidak valid.',
-			'type_saving.required' => 'Jenis Simpanan tidak boleh kosong.',
-			'type_saving.string' => 'Jenis Simpanan tidak valid.',
 		];
 	}
 

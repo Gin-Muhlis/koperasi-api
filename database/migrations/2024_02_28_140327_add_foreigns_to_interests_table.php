@@ -11,15 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('special_savings', function (Blueprint $table) {
+        Schema::table('interests', function (Blueprint $table) {
             $table
-            ->foreign('member_id')
-            ->references('id')
-            ->on('members')
-            ->onUpdate('CASCADE')
-            ->onDelete('CASCADE');
-
-        $table
             ->foreign('sub_category_id')
             ->references('id')
             ->on('sub_categories')
@@ -33,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('special_savings', function (Blueprint $table) {
+        Schema::table('interests', function (Blueprint $table) {
             //
         });
     }

@@ -181,8 +181,9 @@ class InvoiceController extends Controller {
 
 
 				$month = explode('-', $validated['month_year'])[0];
+				$year = explode('-', $validated['month_year'])[1];
 
-				$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($month, $item['loanId']);
+				$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($year, $month, $item['loanId']);
 
 				if (count($is_month_payed) > 0) {
 					return response()->json([
@@ -209,8 +210,9 @@ class InvoiceController extends Controller {
 				$sub_category = $this->subCategoryRepo->getByName('piutang dagang');
 
 				$month = explode('-', $validated['month_year'])[0];
+				$year = explode('-', $validated['month_year'])[1];
 
-				$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($month, $item['loanId']);
+				$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($year, $month, $item['loanId']);
 
 				if (count($is_month_payed) > 0) {
 					return response()->json([

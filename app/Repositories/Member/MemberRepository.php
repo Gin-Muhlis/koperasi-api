@@ -15,5 +15,8 @@ interface MemberRepository extends Repository {
 	public function getNotPaidMembers($sub_category);
 	public function getCountMembers();
 	public function getReportLoanMembers();
+
+	public function getNotPaidMember($member_id);
+	public function getReportMember($id);
 	
 }

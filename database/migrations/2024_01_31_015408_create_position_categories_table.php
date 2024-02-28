@@ -17,6 +17,7 @@ return new class extends Migration
             $table->double('pokok');
             $table->double('wajib');
             $table->double('wajib_khusus');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -112,7 +112,7 @@ class AuthController extends Controller {
 		} catch (Exception $e) {
 			return errorResponse($e->getMessage());
 		}
-	}
+	}	
 
 	public function updateProfile(UpdateProfileRequest $request, $id) {
 		try {

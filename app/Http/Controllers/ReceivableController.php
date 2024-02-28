@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Repositories\Member\MemberRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -15,9 +16,11 @@ use Illuminate\Support\Str;
 class ReceivableController extends Controller
 {
     private $loanRepo;
+    private $memberRepo;
 
-    public function __construct(LoanRepository $loanRepo) {
+    public function __construct(LoanRepository $loanRepo, MemberRepository $memberRepository) {
         $this->loanRepo = $loanRepo;
+        $this->memberRepo = $memberRepository;
     }
     public function store(StoreReceivableRequest $request) 
     {
@@ -26,6 +29,14 @@ class ReceivableController extends Controller
 
             DB::beginTransaction();
             foreach ($validated['members'] as $member) {
+                $is_loan = $this->memberRepo->getNotPaidMember($member['id']);
+
+                if (count($is_loan) > 0) {
+                    return response()->json([
+                        'message' => 'Terdapat member yang masih mempunyai pinjaman yang belum lunas'
+                    ], 400);
+                }
+
                 $data = [
                     'uuid' => Str::uuid(),
                     'code' => generateCode(),
