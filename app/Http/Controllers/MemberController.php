@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Http\Resources\MembersLoanReportResource;
 use App\Http\Resources\MembersReportResource;
+use App\Repositories\Role\RoleRepository;
 
 require_once app_path() . '/Helpers/helpers.php';
 
@@ -26,245 +27,269 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class MemberController extends Controller {
-	private $memberRepo;
-	private $userRepo;
-	private $savingRepo;
-	private $installmentRepo;
-	private $invoiceRepo;
-	private $loanRepo;
+    private $memberRepo;
+    private $userRepo;
+    private $savingRepo;
+    private $installmentRepo;
+    private $invoiceRepo;
+    private $loanRepo;
+    private $roleRepo;
 
-	public function __construct(MemberRepository $member, UserRepository $user, SavingRepository $savingRepository, InstallmentRepository $installmentRepository, InvoiceRepository $invoiceRepository, LoanRepository $loanRepository) {
-		$this->memberRepo = $member;
-		$this->userRepo = $user;
-		$this->savingRepo = $savingRepository;
-		$this->installmentRepo = $installmentRepository;
-		$this->invoiceRepo = $invoiceRepository;
-		$this->loanRepo = $loanRepository;
-	}
-	/**
-	 * Display a listing of the resource.
-	 */
-	public function index(Request $request) {
-		try {
-			$members = $this->memberRepo->getmembers();
+    public function __construct( MemberRepository $member, UserRepository $user, SavingRepository $savingRepository, InstallmentRepository $installmentRepository, InvoiceRepository $invoiceRepository, LoanRepository $loanRepository, RoleRepository $roleRepository ) {
+        $this->memberRepo = $member;
+        $this->userRepo = $user;
+        $this->savingRepo = $savingRepository;
+        $this->installmentRepo = $installmentRepository;
+        $this->invoiceRepo = $invoiceRepository;
+        $this->loanRepo = $loanRepository;
+        $this->roleRepo = $roleRepository;
+    }
+    /**
+    * Display a listing of the resource.
+    */
 
-			$filtered_members = filterMember($members);
+    public function index( Request $request ) {
+        try {
+            $members = $this->memberRepo->getmembers();
+            return response()->json( [
+                'data' => MemberResource::collection( $members ),
+            ] );
+        } catch ( Exception $e ) {
+            return errorResponse( $e->getMessage() );
+        }
+    }
 
-			return response()->json([
-				'data' => MemberResource::collection($filtered_members),
-			]);
-		} catch (Exception $e) {
-			return errorResponse($e->getMessage());
-		}
-	}
+    /**
+    * Store a newly created resource in storage.
+    */
 
-	/**
-	 * Store a newly created resource in storage.
-	 */
-	public function store(StoreMemberRequest $request) {
-		try {
-			$validated = $request->validated();
+    public function store( StoreMemberRequest $request ) {
+        try {
+            $validated = $request->validated();
 
-			if ($request->hasFile('image')) {
-				$validated['image'] = $request->file('image')->store('public/member');
-			}
+            if ( $request->hasFile( 'image' ) ) {
+                $validated[ 'image' ] = $request->file( 'image' )->store( 'public/member' );
+            }
 
-			$data_member = generateDataMember('store', null, $validated);
+            $data_member = generateDataMember( 'store', null, $validated );
 
-			DB::beginTransaction();
+            DB::beginTransaction();
 
-			$member = $this->memberRepo->createMember($data_member);
+            $member = $this->memberRepo->createMember( $data_member );
 
-			$data_user =generateDataUser('store', $member, $validated);
+            $data_user = generateDataUser( 'store', $member, $validated );
 
-			$user = $this->userRepo->createUser($data_user);
+            $user = $this->userRepo->createUser( $data_user );
 
-			$user->assignRole($validated['role']);
+            $role = $this->roleRepo->searchRole( $validated[ 'role' ] );
 
-			DB::commit();
+            if ( is_null( $role ) ) {
+                return response()->json( [
+                    'message' => "Role {$validated['role']} tidak ditemukan"
+                ], 400 );
+            }
 
-			return response()->json([
-				'message' => 'Data member berhasil ditambahkan',
-			]);
-		} catch (Exception $e) {
-			DB::rollBack();
-			return errorResponse($e->getMessage());
-		}
-	}
+            $user->assignRole( $role->name );
 
-	/**
-	 * Display the specified resource.
-	 */
-	public function show($id) {
-		try {
-			$member = $this->memberRepo->showMember($id);
-			return response()->json([
-				'data' => new MemberResource($member),
-			]);
-		} catch (Exception $e) {
-			return errorResponse($e->getMessage());
-		}
-	}
+            DB::commit();
 
-	/**
-	 * Update the specified resource in storage.
-	 */
-	public function update(UpdateMemberRequest $request, $id) {
-		try {
-			$validated = $request->validated();
+            return response()->json( [
+                'role' => $validated[ 'role' ],
+                'message' => 'Data angggota berhasil ditambahkan',
+            ] );
+        } catch ( Exception $e ) {
+            DB::rollBack();
+            return errorResponse( $e->getMessage() );
+        }
+    }
 
-			$member = $this->memberRepo->showMember($id);
+    /**
+    * Display the specified resource.
+    */
 
-			if ($request->hasFile('image')) {
-				if ($member->image) {
-					Storage::delete($member->image);
-				}
+    public function show( $id ) {
+        try {
+            $member = $this->memberRepo->showMember( $id );
+            return response()->json( [
+                'data' => new MemberResource( $member ),
+            ] );
+        } catch ( Exception $e ) {
+            return errorResponse( $e->getMessage() );
+        }
+    }
 
-				$validated['image'] = $request->file('image')->store('public/member');
-			}
+    /**
+    * Update the specified resource in storage.
+    */
 
-			$data_member = generateDataMember('update', $member, $validated);
+    public function update( UpdateMemberRequest $request, $id ) {
+        try {
+            $validated = $request->validated();
 
-			DB::beginTransaction();
+            $member = $this->memberRepo->showMember( $id );
 
-			$this->memberRepo->updateMember($id, $data_member);
+            if ( $request->hasFile( 'image' ) ) {
+                if ( $member->image ) {
+                    Storage::delete( $member->image );
+                }
 
-			$data_user = generateDataUser('update', $member, $validated);
+                $validated[ 'image' ] = $request->file( 'image' )->store( 'public/member' );
+            }
 
-			$this->userRepo->updateUser($member->user->id, $data_user);
+            $data_member = generateDataMember( 'update', $member, $validated );
 
-			DB::commit();
+            DB::beginTransaction();
 
-			return response()->json([
-				'message' => 'Data member berhasil diperbarui',
-			]);
-		} catch (Exception $e) {
-			DB::rollBack();
-			return errorResponse($e->getMessage());
-		}
-	}
+            $this->memberRepo->updateMember( $id, $data_member );
 
-	/**
-	 * Remove the specified resource from storage.
-	 */
-	public function destroy($id) {
-		try {
-			$this->memberRepo->deleteMember($id);
+            $data_user = generateDataUser( 'update', $member, $validated );
 
-			return response()->json([
-				'message' => 'Data member berhasil dihapus',
-			]);
-		} catch (Exception $e) {
-			return errorResponse($e->getMessage());
-		}
-	}
-	
+            $this->userRepo->updateUser( $member->user->id, $data_user );
 
-	public function reportmembers() {
-		try {
-			$members = $this->memberRepo->getReportMembers();
+			$role = $this->roleRepo->searchRole( $validated[ 'role' ] );
 
-			$filtered_member = filterMember($members);
+            if ( is_null( $role ) ) {
+                return response()->json( [
+                    'message' => "Role {$validated['role']} tidak ditemukan"
+                ], 400 );
+            }
 
-			return response()->json([
-				'data' => MembersReportResource::collection($filtered_member),
-			]);
-		} catch (Exception $e) {
-			return errorResponse($e->getMessage());
-		}
-	}
+            if ( $member->user->getRoleNames()->first() != $validated[ 'role' ] ) {
+                $member->user->syncRoles( [ $validated[ 'role' ] ] );
+            }
 
-	public function reportLoanmembers() {
-		try {
-			$members = $this->memberRepo->getReportLoanMembers();
+            DB::commit();
 
-			$filtered_member = filterMember($members);
+            return response()->json( [
+                'message' => 'Data anggota berhasil diperbarui',
+            ] );
+        } catch ( Exception $e ) {
+            DB::rollBack();
+            return errorResponse( $e->getMessage() );
+        }
+    }
 
-			return response()->json([
-				'data' => MembersLoanReportResource::collection($filtered_member),
-			]);
-		} catch (Exception $e) {
-			return errorResponse($e->getMessage());
-		}
-	}
+    /**
+    * Remove the specified resource from storage.
+    */
 
-	public function dashboardMember() {
-		try {
-			$user = Auth::user();
+    public function destroy( $id ) {
+        try {
+            $this->memberRepo->deleteMember( $id );
 
-			$total_mandatory_saving = 0;
-			$total_special_mandatory_saving = 0;
-			$total_voluntary_saving = 0;
-			$total_recretional_saving = 0;
+            return response()->json( [
+                'message' => 'Data member berhasil dihapus',
+            ] );
+        } catch ( Exception $e ) {
+            return errorResponse( $e->getMessage() );
+        }
+    }
 
-			$saving_members = $this->savingRepo->getSavingsMember($user->id);
+    public function reportmembers() {
+        try {
+            $members = $this->memberRepo->getReportMembers();
 
-			foreach ($saving_members as $saving) {
-				if ($saving->subCategory->name = 'simpanan wajib') {
-					$total_mandatory_saving += $saving->amount;
-				} else if ($saving->subCategoryy->name = 'simpanan wajib khusus') {
-					$total_special_mandatory_saving += $saving->amount;
-				} else if ($saving->subCategoryy->name = 'simpanan sukarela') {
-					$total_voluntary_saving += $saving->amount;
-				} else if ($saving->subCategoryy->name = 'tabungan rekreasi') {
-					$total_recretional_saving += $saving->amount;
-				} 
-			}
+            $filtered_member = filterMember( $members );
 
-			$history_savings = $this->savingRepo->getHistorySavingmember($user->id);
-			$history_isntallments = $this->installmentRepo->getHistoryInstallments($user->id);
+            return response()->json( [
+                'data' => MembersReportResource::collection( $filtered_member ),
+            ] );
+        } catch ( Exception $e ) {
+            return errorResponse( $e->getMessage() );
+        }
+    }
 
-			$result_saving = [];
+    public function reportLoanmembers() {
+        try {
+            $members = $this->memberRepo->getReportLoanMembers();
 
-			foreach($history_savings as $saving) {
-				$result_saving[] = [
-					...$saving->toArray(),
-					'date' => $saving->date->toDateString(),
-				];
-			}
-			
-			$data = [
-				'total_mandatory_saving'=> $total_mandatory_saving,
-				'total_special_mandatory_saving'=> $total_special_mandatory_saving,
-				'total_voluntary_saving'=> $total_voluntary_saving,
-				'total_recretional_saving'=> $total_recretional_saving,
-				'history_savings' => $result_saving,
-				'history_installments' => $history_isntallments
-			];
+            $filtered_member = filterMember( $members );
 
-			return response()->json([
-				'data' => $data
-			]);
-		} catch (Exception $e) {
-			return errorResponse($e->getMessage());
-		}
-	}
+            return response()->json( [
+                'data' => MembersLoanReportResource::collection( $filtered_member ),
+            ] );
+        } catch ( Exception $e ) {
+            return errorResponse( $e->getMessage() );
+        }
+    }
 
-	public function dashboardAdmin() {
-		try {
-			$count_members = $this->memberRepo->getCountMembers();
-			$count_invoices_not_paid = $this->invoiceRepo->getNotPaidInvoices();
-			$count_invoices_paid = $this->invoiceRepo->getPaidInvoices();
-			$total_savings = $this->savingRepo->getTotalSavings();
-			$total_loans = $this->loanRepo->getTotalLoans();
-			$historyInvoices = $this->invoiceRepo->getHistoryInvoices();
+    public function dashboardMember() {
+        try {
+            $user = Auth::user();
 
-			$data = [
-				'count_member'=> $count_members,
-				'count_invoices_not_paid'=> $count_invoices_not_paid,
-				'count_invoices_paid'=> $count_invoices_paid,
-				'total_savings' => $total_savings,
-				'total_loans'=> $total_loans,
-				'history_invoices'=> $historyInvoices
-			];
+            $total_mandatory_saving = 0;
+            $total_special_mandatory_saving = 0;
+            $total_voluntary_saving = 0;
+            $total_recretional_saving = 0;
 
-			return response()->json([
-				'data' => $data
-			]);
-		} catch (Exception $e) {
-			return errorResponse($e->getMessage());
-		}
-	}
+            $saving_members = $this->savingRepo->getSavingsMember( $user->id );
 
-	
+            foreach ( $saving_members as $saving ) {
+                if ( $saving->subCategory->name = 'simpanan wajib' ) {
+                    $total_mandatory_saving += $saving->amount;
+                } else if ( $saving->subCategoryy->name = 'simpanan wajib khusus' ) {
+                    $total_special_mandatory_saving += $saving->amount;
+                } else if ( $saving->subCategoryy->name = 'simpanan sukarela' ) {
+                    $total_voluntary_saving += $saving->amount;
+                } else if ( $saving->subCategoryy->name = 'tabungan rekreasi' ) {
+                    $total_recretional_saving += $saving->amount;
+                }
+
+            }
+
+            $history_savings = $this->savingRepo->getHistorySavingmember( $user->id );
+            $history_isntallments = $this->installmentRepo->getHistoryInstallments( $user->id );
+
+            $result_saving = [];
+
+            foreach ( $history_savings as $saving ) {
+                $result_saving[] = [
+                    ...$saving->toArray(),
+                    'date' => $saving->date->toDateString(),
+                ];
+            }
+
+            $data = [
+                'total_mandatory_saving'=> $total_mandatory_saving,
+                'total_special_mandatory_saving'=> $total_special_mandatory_saving,
+                'total_voluntary_saving'=> $total_voluntary_saving,
+                'total_recretional_saving'=> $total_recretional_saving,
+                'history_savings' => $result_saving,
+                'history_installments' => $history_isntallments
+            ];
+
+            return response()->json( [
+                'data' => $data
+            ] );
+        } catch ( Exception $e ) {
+            return errorResponse( $e->getMessage() );
+        }
+    }
+
+    public function dashboardAdmin() {
+        try {
+            $count_members = $this->memberRepo->getCountMembers();
+            $count_invoices_not_paid = $this->invoiceRepo->getNotPaidInvoices();
+            $count_invoices_paid = $this->invoiceRepo->getPaidInvoices();
+            $total_savings = $this->savingRepo->getTotalSavings();
+            $total_loans = $this->loanRepo->getTotalLoans();
+            $historyInvoices = $this->invoiceRepo->getHistoryInvoices();
+
+            $data = [
+                'count_member'=> $count_members,
+                'count_invoices_not_paid'=> $count_invoices_not_paid,
+                'count_invoices_paid'=> $count_invoices_paid,
+                'total_savings' => $total_savings,
+                'total_loans'=> $total_loans,
+                'history_invoices'=> $historyInvoices
+            ];
+
+            return response()->json( [
+                'data' => $data
+            ] );
+        } catch ( Exception $e ) {
+            return errorResponse( $e->getMessage() );
+        }
+    }
+
 }

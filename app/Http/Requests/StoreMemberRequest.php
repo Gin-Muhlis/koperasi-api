@@ -32,7 +32,7 @@ class StoreMemberRequest extends FormRequest {
 			'image' => ['required', 'image', 'max:2048'],
 			'username' => ['required', 'max:100', 'string'],
 			'password' => ['required'],
-			'role' => ['required', 'string'],
+			'role' => ['required', 'string']
 		];
 	}
 
@@ -65,6 +65,8 @@ class StoreMemberRequest extends FormRequest {
 			'image.max' => 'Ukuran gambar tidak boleh lebih dari 2MB.',
 			'group_id.required' => 'Golongan member tidak boleh kosong',
 			'group_id.exists' => 'Golongan Member tidak valid',
+			'role.required' => 'Role tidak boleh kosong',
+			'role.string' => 'Role tidak valid',
 		];
 	}
 

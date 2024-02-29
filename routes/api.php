@@ -40,10 +40,10 @@ Route::middleware('json.response')->group(function () {
 
 		// data
 		Route::apiResource('/member', MemberController::class);
-		Route::apiResource('/category', CategoryController::class);
 		Route::apiResource('/sub-category', SubCategoryController::class);
 		Route::apiResource('/product', ProductController::class);
 		Route::apiResource('/stuff', StuffController::class);
+		Route::apiResource('/position-category', PositionCategoryController::class);
 		Route::apiResource('/role', RoleController::class);
 
 		// transaksi
@@ -94,7 +94,7 @@ Route::middleware('json.response')->group(function () {
 
 	Route:: middleware('role:super-admin|member')->group(function () {
 		// golongan
-		Route::apiResource('/position-category', PositionCategoryController::class);
+		Route::get('group-member', [PositionCategoryController::class,'index']);
 	});
 
 	Route:: middleware('role:member')->group(function () {

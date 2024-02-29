@@ -16,4 +16,8 @@ class RoleRepositoryImplement extends Eloquent implements RoleRepository {
 	public function getRoles() {
 		return $this->all();
 	}
+
+	public function searchRole($name) {
+		return $this->model->where("name", $name)->first();
+	}
 }

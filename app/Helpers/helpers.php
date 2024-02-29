@@ -206,7 +206,7 @@ function filterMember($data)
 		$filtered_members = [];
 
 		foreach ($data as $member) {
-			if ($member->user->hasRole('member') || $member->user->hasRole('nasabah')) {
+			if (!$member->user->hasRole('super-admin')) {
 				$filtered_members[] = $member;
 			}
 		}
