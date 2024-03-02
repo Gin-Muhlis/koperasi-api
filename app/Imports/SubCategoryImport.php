@@ -30,7 +30,8 @@ class SubCategoryImport implements ToCollection, WithHeadingRow
                 'code' => str_pad($random_number, 10, '0', STR_PAD_LEFT),
                 'type' => $data['type'],
                 'name' => $data['name'],
-                'category_id' => $category->id
+                'category_id' => $category->id,
+                'type_payment' => $data['type_payment'],
             ]);
         }
     }

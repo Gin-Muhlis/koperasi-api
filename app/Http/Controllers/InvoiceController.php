@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Http\Resources\SubCategoryResource;
 
 require_once app_path() . '/Helpers/helpers.php';
 
@@ -52,6 +53,128 @@ class InvoiceController extends Controller {
 			return errorResponse($e->getMessage());
 		}
 	}
+
+	public function getSubCategoriesInvoice() {
+		try {
+			$sub_categories = $this->subCategoryRepo->getSubCategories();
+
+			$filtered_sub_categories = [];
+			foreach ($sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
+					$filtered_sub_categories[] = $sub_category;
+				}
+			}
+
+            return response()->json([
+                'data' => SubCategoryResource::collection($filtered_sub_categories)
+            ]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	public function getMemberInvoice() {
+		try {
+
+			$sub_categories = $this->subCategoryRepo->getSubCategories();
+			$members = $this->memberRepo->getMembers();
+
+			$filtered_sub_categories = [];
+			foreach ($sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
+					$filtered_sub_categories[] = $sub_category;
+				}
+			}
+
+			$members_data = $members->map(function($member) use ($sub_categories, $filtered_sub_categories) {
+				$data_dinamis = [];
+
+				foreach ($filtered_sub_categories as $sub_category) {
+					$detail = [];
+					$months_saving = [];
+					$months_isntallment = [];
+
+					// simpanan
+					foreach ($member->savings as $saving) {
+						if ($sub_category->id == $saving->sub_category_id) {
+							$months_saving[] = [
+								'month_year' => $saving->month_year,
+								'status' => $saving->status,
+							];
+						}
+
+						if ($saving->sub_category_id == $sub_category->id) {
+							$detail = [
+								'amount' => $saving->amount,
+								'sub_category_id' => $sub_category->id,
+								'type_payment' => $saving->SubCategory->type_payment,
+								'months_status' => $months_saving
+							];
+						}
+					}
+
+					// pinjaman
+					foreach ($member->loans as $loan) {
+						if ($loan->status != 'lunas' && $loan->sub_category_id == $sub_category->id) {
+
+							foreach ($loan->installments as $installment) {
+								$months_isntallment[] = [
+									'month_year' => Carbon::parse($installment->date)->format('m-Y'),
+									'status' => $installment->status,
+								];
+							}
+
+							$detail = [
+								'amount' => $loan->amount,
+								'sub_category_id' => $sub_category->id,
+								'loan_id'=> $loan->id,
+								'total_payment' => $loan->total_payment,
+								'paid' => $this->handlePaid($loan->installments),
+								'remain_payment' => $loan->total_payment - $this->handlePaid($loan->installments),
+								'monthly' => ceil($loan->total_payment / $loan->loan_duration / 1000) * 1000,
+								'months_status' => $months_isntallment
+							];
+						}
+					}
+
+					$data_dinamis[$sub_category->name] = $detail;
+				}
+
+				return [
+					'id' => $member->id,
+					'name' => $member->name,
+					'position' => $member->position,
+					'position_category_id' => $member->group_id,
+					'data' => $data_dinamis
+				];
+			});
+
+			return response()->json([
+				'data' => $members_data
+			]);
+
+		}catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	
+	private function handlePaid($data) {
+		if (count($data) < 1) {
+			return 0;
+		}
+
+		$totalPaid = 0;
+		foreach ($data as $item) {
+			$totalPaid += $item->amount;
+		}
+		return $totalPaid;
+	}
+
+
+
+
+
 
 	/**
 	 * Store a newly created resource in storage.
@@ -183,7 +306,7 @@ class InvoiceController extends Controller {
 				$month = explode('-', $validated['month_year'])[0];
 				$year = explode('-', $validated['month_year'])[1];
 
-				$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($year, $month, $item['loanId']);
+				$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($year, $month, $item['	']);
 
 				if (count($is_month_payed) > 0) {
 					return response()->json([

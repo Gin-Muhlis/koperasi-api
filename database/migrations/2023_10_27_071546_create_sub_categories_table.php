@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('type', ['kredit', 'debit']);
             $table->string('name', 50);
             $table->unsignedBigInteger('category_id');
+            $table->enum('type_payment', ['once', 'monthly', 'anytime']);
             $table->softDeletes();
             $table->timestamps();
         });

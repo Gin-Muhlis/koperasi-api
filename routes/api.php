@@ -45,6 +45,7 @@ Route::middleware('json.response')->group(function () {
 		Route::apiResource('/stuff', StuffController::class);
 		Route::apiResource('/position-category', PositionCategoryController::class);
 		Route::apiResource('/role', RoleController::class);
+		Route::get('/category', [CategoryController::class,'index']);
 
 		// transaksi
 		Route::apiResource('/purchase', PurchaseController::class);
@@ -64,6 +65,8 @@ Route::middleware('json.response')->group(function () {
 
 		// Invoice
 		Route::apiResource('invoice', InvoiceController::class);
+		Route::get('/members-invoice', [InvoiceController::class, 'getMemberInvoice']);
+		Route::get('/sub-categories-invoice', [InvoiceController::class, 'getSubCategoriesInvoice']);
 		Route::post('/invoice-detail', [InvoiceController::class, 'storeDetailInvoice']);
 		Route::get('/invoice-detail/{code}', [InvoiceController::class, 'detailInvoice']);
 

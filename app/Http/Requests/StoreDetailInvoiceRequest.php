@@ -28,6 +28,7 @@ class StoreDetailInvoiceRequest extends FormRequest {
 			'recretional_savings' => ['array'],
 			'receivables' => ['array'],
 			'accounts_receivable' => ['array'],
+			
 			'month_year' => ['string'],
 			'description' => ['string'],
 			'invoice_id' => ['exists:invoices,id'],

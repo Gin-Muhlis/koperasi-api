@@ -84,8 +84,6 @@ class MemberRepositoryImplement extends Eloquent implements MemberRepository {
 	}
 
 	public function getCountMembers() {
-		return $this->model->whereHas('user.roles', function ($query) {
-			$query->where('name', 'member');
-		})->count();
+		return $this->model->count();
 	}
 }

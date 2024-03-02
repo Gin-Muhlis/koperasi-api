@@ -17,6 +17,7 @@ class SubCategoryResource extends JsonResource {
 			'uuid' => $this->uuid,
 			'code' => $this->code,
 			'type' => $this->type,
+			'type_payment' => $this->type_payment,
 			'name' => $this->name,
 			'category' => $this->category->name,
 			'category_id' => $this->category->id
