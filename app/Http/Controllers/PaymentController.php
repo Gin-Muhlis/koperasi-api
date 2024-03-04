@@ -74,14 +74,14 @@ class PaymentController extends Controller {
 
 			$installmentsInvoice = $this->installmentRepo->getInstalmentByInvoiceId($validated['invoice_id']);
 			
-			foreach ($installmentsInvoice as $saving) {
-				$this->installmentRepo->updateStatusIsntallment($saving->id);
+			foreach ($installmentsInvoice as $installment) {
+				$this->installmentRepo->updateStatusIsntallment($installment->id);
 			}
 
 			DB::commit();
 
 			return response()->json([
-				'message' => 'Pembayaran berhasil',
+				'message' => 'Pembayaran success',
 			]);
 		} catch (Exception $e) {
 			DB::rollback();

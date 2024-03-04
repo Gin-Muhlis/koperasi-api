@@ -226,147 +226,87 @@ class InvoiceController extends Controller {
 	 * store detial invoice
 	 */
 
-	public function storeDetailInvoice(StoreDetailInvoiceRequest $request) {
+	 public function storeDetailInvoice(StoreDetailInvoiceRequest $request) {
 		try {
 			$validated = $request->validated();
 
+			$sub_categories = $this->subCategoryRepo->getSubCategories();
+
+			$filtered_sub_categories = [];
+			foreach ($sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
+					$filtered_sub_categories[] = $sub_category;
+				}
+			}
+
 			DB::beginTransaction();
 
-			// simpanan pokok
-			foreach ($validated['principal_savings'] as $item) {
-				$sub_category = $this->subCategoryRepo->getByName('simpanan pokok');
-				$is_principal_saving = $this->savingRepo->getMemberSpesificSavings($item['id'], $sub_category->id);
+			foreach ($validated['members'] as $member) {
+				foreach ($filtered_sub_categories as $sub_category) {
+					$time = $validated['month_year'];
 
-				if (count($is_principal_saving) > 0) {
-					return response()->json([
-						'message' => 'Terdapat data member yang sudah membayar simpanan pokok',
-					], 400);
-				}
+					if ($sub_category->category->name == 'simpanan') {
 
-				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year'], $validated['invoice_id']);
+						if (array_key_exists($sub_category->name, $member)) {
+							$sub_category_data = $member[$sub_category->name];
+								// cek apakah ada anggota yang sudah membayar simpanan pada bulan yang ditentukan
+								if ($sub_category->type_payment == 'monthly') {
+									$is_already_saving = $this->savingRepo->getMemberSpesificSavings($member['id'], $sub_category->id);
 
-				$this->savingRepo->makeSavingMembers($data);
-			}
+									if (count($is_already_saving) > 0 && $is_already_saving->contains('month_year', $time)) {
+										return response()->json([
+											'message' => "Terdapat anggota yang sudah membayar {$sub_category->name} pada bulan yang ditentukan",
+										], 400);
+									}
+								}
 
-			// simpanan wajib
-			foreach ($validated['mandatory_savings'] as $item) {
-				$sub_category = $this->subCategoryRepo->getByName('simpanan wajib');
-				$is_mandatory_saving = $this->savingRepo->getMemberSpesificSavings($item['id'], $sub_category->id);
+								$data = $this->generateSavingData($member['id'], $sub_category_data['amount'], $sub_category->id, $validated['description'], $time, $validated['invoice_id']);
 
-				if (count($is_mandatory_saving) > 0 && $is_mandatory_saving->contains('month_year', $validated['month_year'])) {
-					return response()->json([
-						'message' => 'Terdapat data member yang sudah membayar simpanan wajib pada bulan yang ditentukan',
-					], 400);
-				}
+								$this->savingRepo->makeSavingMembers($data);
+						}
+						
+					}
 
-				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year'], $validated['invoice_id']);
+					if ($sub_category->category->name == 'piutang') {
+						if (array_key_exists($sub_category->name, $member)) {
+							$sub_category_data = $member[$sub_category->name];
+							$loan_id = $sub_category_data['loanId'];
+							// cek apakah ada anggota yang sudah membayar piutang pada bulan yang ditentukan
+							if ($sub_category->type_payment == 'monthly') {
+								$is_already_payed_isntallment = $this->installmentRepo->getMemberPaymentMonth($time[1], $time[0], $loan_id);
+								if (count($is_already_payed_isntallment) > 0) {
+									return response()->json([
+										'message' => "Terdapat anggota yang sudah membayar {$sub_category->name} pada bulan yang ditentukan",
+									], 400);
+								}
+							}
+							$data = $this->generateInstallmentData($member['id'], $loan_id, $sub_category_data['amount'] , $sub_category->id, $validated['invoice_id']);
 
-				$this->savingRepo->makeSavingMembers($data);
-			}
+							$this->installmentRepo->makeInstallmentMembers($data);
+							$loan_member = $this->loanRepo->findLoan($loan_id);
 
-			// simpanan wajib khusus
-			foreach ($validated['special_mandatory_savings'] as $item) {
-				$sub_category = $this->subCategoryRepo->getByName('simpanan wajib khusus');
+							$total_payment_member = $this->installmentRepo->getSumPayment($loan_member->id);
 
-				$is_mandatory_saving = $this->savingRepo->getMemberSpesificSavings($item['id'], $sub_category->id);
-
-				if (count($is_mandatory_saving) > 0 && $is_mandatory_saving->contains('month_year', $validated['month_year'])) {
-					return response()->json([
-						'message' => 'Terdapat data member yang sudah membayar simpanan wajib khusus pada bulan yang ditentukan',
-					], 400);
-				}
-
-				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year'], $validated['invoice_id']);
-
-				$this->savingRepo->makeSavingMembers($data);
-			}
-
-			// simpanan sukarela
-			foreach ($validated['voluntary_savings'] as $item) {
-				$sub_category = $this->subCategoryRepo->getByName('simpanan sukarela');
-
-				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year'], $validated['invoice_id']);
-				$this->savingRepo->makeSavingMembers($data);
-			}
-
-			// tabungan rekreasi
-			foreach ($validated['recretional_savings'] as $item) {
-				$sub_category = $this->subCategoryRepo->getByName('tabungan rekreasi');
-
-				$data = $this->generateSavingData($item, $sub_category->id, $validated['description'], $validated['month_year'], $validated['invoice_id']);
-				$this->savingRepo->makeSavingMembers($data);
-			}
-
-			// piutang s/p
-			foreach ($validated['receivables'] as $item) {
-				$sub_category = $this->subCategoryRepo->getByName('piutang s/p');
-				$loan_member = $this->loanRepo->findLoan($item['loanId']);
-
-
-				$month = explode('-', $validated['month_year'])[0];
-				$year = explode('-', $validated['month_year'])[1];
-
-				$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($year, $month, $item['	']);
-
-				if (count($is_month_payed) > 0) {
-					return response()->json([
-						'message' => 'Terdapat data member yang sudah membayar piutang s/p pada bulan yang ditentukan',
-					], 400);
-				}
-
-				$data = $this->generateInstallmentData($item, $sub_category->id, $validated['invoice_id']);
-
-				$this->installmentRepo->makeInstallmentMembers($data);
-
-
-				$total_payment_member = $this->installmentRepo->getSumPayment($loan_member->id);
-
-				if ($total_payment_member >= $loan_member->total_payment) {
-					$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'lunas']);
-				} else {
-					$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'berjalan']);
-				}
-			}
-
-			// piutang dagang
-			foreach ($validated['accounts_receivable'] as $item) {
-				$sub_category = $this->subCategoryRepo->getByName('piutang dagang');
-
-				$month = explode('-', $validated['month_year'])[0];
-				$year = explode('-', $validated['month_year'])[1];
-
-				$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($year, $month, $item['loanId']);
-
-				if (count($is_month_payed) > 0) {
-					return response()->json([
-						'message' => 'Terdapat data member yang sudah membayar piutang dagang pada bulan yang ditentukan',
-					], 400);
-				}
-
-				$data = $this->generateInstallmentData($item, $sub_category->id, $validated['invoice_id']);
-
-				$this->installmentRepo->makeInstallmentMembers($data);
-
-				$loan_member = $this->loanRepo->findLoan($item['loanId']);
-
-				$total_payment_member = $this->installmentRepo->getSumPayment($loan_member->id);
-
-				if ($total_payment_member >= $loan_member->total_payment) {
-					$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'lunas']);
-				} else {
-					$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'berjalan']);
+							if ($total_payment_member >= $loan_member->total_payment) {
+								$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'lunas']);
+							} else {
+								$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'berjalan']);
+							}
+						}
+					}
 				}
 			}
 
 			DB::commit();
+
 			return response()->json([
-				'message' => 'Data berhasil ditambahkan',
+				'message' => 'Data Invoice berhasil ditambahkan'
 			]);
 		} catch (Exception $e) {
 			DB::rollback();
 			return errorResponse($e->getMessage());
 		}
-	}
+	 }
 
 	/**
 	 * Display the specified resource.
@@ -389,12 +329,12 @@ class InvoiceController extends Controller {
 		//
 	}
 
-	private function generateSavingData($data, $sub_category, $description, $month_year, $invoice_id) {
+	private function generateSavingData($member_id, $amount, $sub_category, $description, $month_year, $invoice_id) {
 		return [
 			'uuid' => Str::uuid(),
 			'code' => generateCode(),
-			'member_id' => $data['id'],
-			'amount' => $data['amount'],
+			'member_id' => $member_id,
+			'amount' => $amount,
 			'date' => Carbon::now()->format('Y-m-d'),
 			'sub_category_id' => $sub_category,
 			'month_year' => $month_year,
@@ -404,12 +344,13 @@ class InvoiceController extends Controller {
 		];
 	}
 
-	private function generateInstallmentData($data, $sub_category, $invoice_id) {
+	private function generateInstallmentData($member_id, $loan_id, $amount, $sub_category, $invoice_id) {
 		return [
 			'uuid' => Str::uuid(),
 			'code' => generateCode(),
-			'loan_id' => $data['loanId'],
-			'amount' => $data['amount'],
+			'loan_id' => $loan_id,
+			'member_id' => $member_id,
+			'amount' => $amount,
 			'date' => Carbon::now()->format('Y-m-d'),
 			'sub_category_id' => $sub_category,
 			'user_id' => Auth::user()->id,

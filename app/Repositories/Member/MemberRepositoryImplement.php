@@ -86,4 +86,5 @@ class MemberRepositoryImplement extends Eloquent implements MemberRepository {
 	public function getCountMembers() {
 		return $this->model->count();
 	}
+
 }
