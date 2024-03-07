@@ -123,7 +123,7 @@ function generateDate($data) {
     $months = [
         '01' => 'Januari',
         '02' => 'Februari',
-        '03' => 'Mei',
+        '03' => 'Maret',
         '04' => 'April',
         '05' => 'Mei',
         '06' => 'Juni',
@@ -202,14 +202,14 @@ function generateDataUser($mode, $member, $validated) {
 }
 
 function filterMember($data)
-	{
-		$filtered_members = [];
+{
+    $filtered_members = [];
 
-		foreach ($data as $member) {
-			if (!$member->user->hasRole('super-admin')) {
-				$filtered_members[] = $member;
-			}
-		}
+    foreach ($data as $member) {
+        if (!$member->user->hasRole('super-admin')) {
+            $filtered_members[] = $member;
+        }
+    }
 
-		return $filtered_members;
-	}
+    return $filtered_members;
+}

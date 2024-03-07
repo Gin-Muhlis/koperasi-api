@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use Illuminate\Support\Facades\Storage;
 
@@ -144,6 +145,28 @@ class AuthController extends Controller {
 
 			return response()->json([
 				'message' => 'Profile berhasil diperbarui',
+			]);
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	public function changePassword(ChangePasswordRequest $request, $id) {
+		try {
+			$validated = $request->validated();
+			$validated['password'] = Hash::make($validated['password']);
+
+			$user = $this->userRepo->getUserByMemberId($id);
+
+			$data = [
+				...$user->toArray(),
+				'password' => $validated['password'],
+			];
+
+			$this->userRepo->changePassword($data, $id);
+			
+			return response()->json([
+				'message' => 'Password berhasil diperbarui'
 			]);
 		} catch (Exception $e) {
 			return errorResponse($e->getMessage());

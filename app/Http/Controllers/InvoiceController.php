@@ -65,6 +65,10 @@ class InvoiceController extends Controller {
 				}
 			}
 
+			usort($filtered_sub_categories, function ($a, $b) {
+				return $a['id'] - $b['id'];
+			});
+
             return response()->json([
                 'data' => SubCategoryResource::collection($filtered_sub_categories)
             ]);
@@ -171,11 +175,6 @@ class InvoiceController extends Controller {
 		return $totalPaid;
 	}
 
-
-
-
-
-
 	/**
 	 * Store a newly created resource in storage.
 	 */
@@ -209,8 +208,8 @@ class InvoiceController extends Controller {
 	}
 
 	// get detail invoice
-	public function detailInvoice($code) {
-
+	public function detailInvoice($code) 
+	{
 		try {
 			$detailInvoice = $this->invoiceRepo->getDetailInvoiceByCode($code);
 

@@ -17,7 +17,6 @@ return new class extends Migration {
 			$table->date('due_date');
 			$table->enum('payment_source', ['gaji pns', 'gaji p3k', 'komite', 'TPP']);
 			$table->enum('status', ['belum bayar', 'dibayar']);
-			$table->enum('payment_method', ['cash', 'transfer']);
 			$table->date('payment_date')->nullable();
 			$table->unsignedBigInteger('user_id');
 			$table->softDeletes();

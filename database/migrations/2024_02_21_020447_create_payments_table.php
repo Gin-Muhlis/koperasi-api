@@ -17,7 +17,8 @@ return new class extends Migration {
 			$table->date('date_payment');
 			$table->string('image');
 			$table->string('no_rek')->nullable();
-			$table->string('transfer_name')->nullable();
+			$table->string('payer')->nullable();
+			$table->enum('payment_method', ['cash', 'transfer']);
 			$table->timestamps();
 		});
 	}

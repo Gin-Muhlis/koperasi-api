@@ -1,43 +1,32 @@
-<table>
+<table cellpadding="0" cellspacing="0">
 	<thead>
 		<tr>
 			<th>No</th>
 			<th>Nama</th>
-			<th>Simpanan Pokok</th>
-			<th>Simpanan Wajib</th>
-			<th>Simpanan Wajib Khusus</th>
-			<th>Simpanan Sukarela</th>
-			<th>Tabungan Rekreasi</th>
-			<th>Piutang S/P</th>
-			<th>Piutang Dagang</th>
+			@foreach ($data['sub_categories'] as $item)
+				<th>{{ $item->name }}</th>
+			@endforeach
 			<th>Jumlah</th>
 		</tr>
 	</thead>
 	<tbody>
-		@foreach ($row_data as $data)
+		@foreach ($data['rows'] as $invoice)
 			<tr>
-				<td>{{ $loop->index + 1 }}</td>
-				<td>{{ $data['name'] }}</td>
-				<td>{{ $data['principalSaving'] }}</td>
-				<td>{{ $data['mandatorySaving'] }}</td>
-				<td>{{ $data['specialMandatorySaving'] }}</td>
-				<td>{{ $data['voluntarySaving'] }}</td>
-				<td>{{ $data['recretionalSaving'] }}</td>
-				<td>{{ $data['receivable'] }}</td>
-				<td>{{ $data['accountReceivable'] }}</td>
-				<td>{{ $data['totalRow'] }}</td>
+				<th>{{ $loop->index + 1 }}</th>
+				<td>{{ $invoice['member_name'] }}</td>
+				@foreach ($data['sub_categories'] as $item)
+					<td class="center">{{ $invoice[$item->name] }}</td>
+				@endforeach
+				<td>{{ $invoice['total_row'] }}</td>
 			</tr>
 		@endforeach
 		<tr>
-			<td colspan="2">Jumlah</td>
-			<td>{{ $total_principal_saving }}</td>
-			<td>{{ $total_mandatory_saving }}</td>
-			<td>{{ $total_special_mandatory_saving }}</td>
-			<td>{{ $total_voluntary_saving }}</td>
-			<td>{{ $total_recretional_saving }}</td>
-			<td>{{ $total_receivable }}</td>
-			<td>{{ $total_account_receivable }}</td>
-			<td>{{ $total_invoice }}</td>
+			<td class="center" colspan="2">Jumlah</td>
+			@foreach ($data['sub_categories'] as $item)
+				<td class="center">{{ $data['total_cols'][$item->name] }}</td>
+			@endforeach
+
+			<td class="center">{{ $data['total_invoice'] }}</td>
 		</tr>
 	</tbody>
 </table>

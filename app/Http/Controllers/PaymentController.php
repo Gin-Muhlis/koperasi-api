@@ -4,16 +4,17 @@ namespace App\Http\Controllers;
 
 require_once app_path() . '/Helpers/helpers.php';
 
+use Exception;
+use Carbon\Carbon;
+use App\Models\Payment;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StorePaymentRequest;
 use App\Http\Requests\UpdatePaymentRequest;
-use App\Models\Payment;
-use App\Repositories\Installment\InstallmentRepository;
+use App\Repositories\Saving\SavingRepository;
 use App\Repositories\Invoice\InvoiceRepository;
 use App\Repositories\Payment\PaymentRepository;
-use App\Repositories\Saving\SavingRepository;
-use Carbon\Carbon;
-use Exception;
-use Illuminate\Support\Facades\DB;
+use App\Repositories\Installment\InstallmentRepository;
 
 class PaymentController extends Controller {
 	private $paymentRepo;
@@ -55,10 +56,15 @@ class PaymentController extends Controller {
 				], 400);
 			}
 
+			if ( $request->hasFile( 'image' ) ) {
+                $validated[ 'image' ] = $request->file( 'image' )->store( 'public/payments' );
+            }
+
 			DB::beginTransaction();
 
 			$data = [
 				...$validated,
+				'uuid' => Str::uuid(),
 				'date_payment' => Carbon::now()->format('Y-m-d'),
 			];
 
@@ -81,7 +87,7 @@ class PaymentController extends Controller {
 			DB::commit();
 
 			return response()->json([
-				'message' => 'Pembayaran success',
+				'message' => 'Pembayaran invoice berhasil ditambahkan.',
 			]);
 		} catch (Exception $e) {
 			DB::rollback();

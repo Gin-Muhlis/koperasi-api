@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Invoice extends Model {
 	use HasFactory;
 
-	protected $fillable = ['invoice_code', 'invoice_name', 'date', 'due_date', 'payment_source', 'status', 'payment_date', 'payment_method', 'user_id'];
+	protected $fillable = ['invoice_code', 'invoice_name', 'date', 'due_date', 'payment_source', 'status', 'user_id'];
 
 	public function savings() {
 		return $this->hasMany(Saving::class);

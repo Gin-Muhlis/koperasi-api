@@ -34,4 +34,12 @@ class UserRepositoryImplement extends Eloquent implements UserRepository{
     public function deleteUser($id) {
         return $this->delete($id);
     }
+
+    public function getUserByMemberId($member_id) {
+        return $this->model->where('member_id', $member_id)->first();
+    }
+
+    public function changePassword($data, $user_id) {
+        return $this->update($user_id, $data);
+    }
 }

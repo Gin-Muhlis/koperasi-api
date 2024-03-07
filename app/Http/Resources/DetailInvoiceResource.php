@@ -6,6 +6,7 @@ use App\Models\Installment;
 use App\Models\Loan;
 use App\Models\Member;
 use App\Models\Saving;
+use App\Models\SubCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -26,11 +27,20 @@ class DetailInvoiceResource extends JsonResource {
 			'due_date' => $this->due_date,
 			'payment_method' => $this->payment_method,
 			'payment_date' => $this->payment_date,
-			'details' => $this->handleSavings($this->savings, $this->installments, $this->id),
+			'details' => $this->handleData($this->savings, $this->installments),
 		];
 	}
 
-	private function handleSavings($savings, $installments, $invoice_id) {
+	private function handleData($savings, $installments) {
+		
+		$sub_categories = SubCategory::all();
+		$filtered_sub_categories = [];
+			foreach ($sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
+					$filtered_sub_categories[] = $sub_category;
+				}
+			}
+
 		$result = [];
 		$members_id = [];
 
@@ -41,77 +51,40 @@ class DetailInvoiceResource extends JsonResource {
 		}
 
 		foreach ($installments as $installment) {
-			if (!in_array($installment->loan->member_id, $members_id)) {
+			if (!in_array($installment->member_id, $members_id)) {
 				$members_id[] = $installment->loan->member_id;
 			}
 		}
 
 		foreach ($members_id as $id) {
 			$member = Member::findOrFail($id);
-			$savings_member = Saving::with('subCategory')->where([
-				['member_id', $id],
-				['invoice_id', $invoice_id],
-			])->get();
+			$data_dinamis = [];
+			foreach ($filtered_sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'simpanan') {
+					// saving
+				$saving_member = collect($savings)->where('sub_category_id', $sub_category->id)->where('member_id', $id)->first();
 
-			$principal_saving = $savings_member->filter(function ($saving) {
-				return $saving->subCategory->name === 'simpanan pokok';
-			})->first();
+				// $sub_category_name = str_replace(' ', '_', $sub_category->name);
 
-			$mandatory_saving = $savings_member->filter(function ($saving) {
-				return $saving->subCategory->name === 'simpanan wajib';
-			})->first();
+				$data_dinamis[$sub_category->name] = $saving_member?->amount ?? 0;
+				} else {
+					// installment
+				$installment_member = collect($installments)->where('sub_category_id', $sub_category->id)->where('member_id', $id)->first();
 
-			$special_mandatory_saving = $savings_member->filter(function ($saving) {
-				return $saving->subCategory->name === 'simpanan wajib khusus';
-			})->first();
-
-			$voluntary_saving = $savings_member->filter(function ($saving) {
-				return $saving->subCategory->name === 'simpanan sukarela';
-			})->first();
-
-			$recretional_saving = $savings_member->filter(function ($saving) {
-				return $saving->subCategory->name === 'tabungan rekreasi';
-			})->first();
-
-			$loan_member = Loan::where([
-				['member_id', $id],
-				['status', '!=', 'lunas'],
-			])->latest()->first();
-
-			$receivable = null;
-			$account_receivable = null;
-
-			if ($loan_member) {
-
-				$installments_member = Installment::with('subCategory')->where([
-					['loan_id', $loan_member->id],
-					['invoice_id', $invoice_id],
-				])->get();
-
-				$receivable = $installments_member->filter(function ($installment) {
-					return $installment->subCategory->name = 'piutang s/p';
-				})->first();
-
-				$account_receivable = $installments_member->filter(function ($installment) {
-					return $installment->subCategory->name = 'piutang dagang';
-				})->first();
+				$data_dinamis[$sub_category->name] = $installment_member	?->amount ?? 0;
+				}
+				
 			}
 
 			$result[] = [
-				'memberId' => $id,
-				'memberName' => $member->name,
-				'principalSaving' => $principal_saving?->amount ?? 0,
-				'mandatorySaving' => $mandatory_saving?->amount ?? 0,
-				'specialMandatorySaving' => $special_mandatory_saving?->amount ?? 0,
-				'voluntarySaving' => $voluntary_saving?->amount ?? 0,
-				'recretionalSaving' => $recretional_saving?->amount ?? 0,
-				'receivable' => $receivable?->amount ?? 0,
-				'accountReceivable' => $account_receivable?->amount ?? 0,
+				'member_id' => $id,
+				'member_name' => $member->name,
+				...$data_dinamis
 			];
 		}
 
 		usort($result, function ($a, $b) {
-			return $a['memberId'] - $b['memberId'];
+			return $a['member_id'] - $b['member_id'];
 		});
 
 		return $result;

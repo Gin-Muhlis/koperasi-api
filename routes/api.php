@@ -10,6 +10,7 @@ use App\Http\Controllers\NasabahController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PositionCategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileAppController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReceivableController;
 use App\Http\Controllers\RoleController;
@@ -45,7 +46,11 @@ Route::middleware('json.response')->group(function () {
 		Route::apiResource('/stuff', StuffController::class);
 		Route::apiResource('/position-category', PositionCategoryController::class);
 		Route::apiResource('/role', RoleController::class);
+		Route::apiResource('/profile-app', ProfileAppController::class);
 		Route::get('/category', [CategoryController::class,'index']);
+
+		// reset password
+		Route::put('/change-password/{id}', [AuthController::class,'changePassword']);
 
 		// transaksi
 		Route::apiResource('/purchase', PurchaseController::class);
@@ -69,6 +74,7 @@ Route::middleware('json.response')->group(function () {
 		Route::get('/sub-categories-invoice', [InvoiceController::class, 'getSubCategoriesInvoice']);
 		Route::post('/invoice-detail', [InvoiceController::class, 'storeDetailInvoice']);
 		Route::get('/invoice-detail/{code}', [InvoiceController::class, 'detailInvoice']);
+		
 
 		// payment
 		Route::apiResource('payment', PaymentController::class);
@@ -82,8 +88,9 @@ Route::middleware('json.response')->group(function () {
 		Route::get('member-account-receivable', [TabController::class, 'memberAccountReceivable']);
 
 		// Export
-		Route::post('/export/invoice-excel', [ExportController::class, 'detailInvoiceExportExcel']);
-		Route::post('/export/invoice-pdf', [ExportController::class, 'detailInvoiceExportPdf']);
+		Route::get('/export/invoice-excel/{invoice_code}', [ExportController::class, 'detailInvoiceExportExcel']);
+		Route::get('/export/invoice-pdf/{invoice_code}', [ExportController::class, 'detailInvoiceExportPdf']);
+		Route::post('/export/invoice-member', [ExportController::class, 'invoiceMember']);
 
 		// laporan
 		Route::prefix('report')->group(function () {

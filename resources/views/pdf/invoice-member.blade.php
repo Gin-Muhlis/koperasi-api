@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -32,8 +33,14 @@
             margin-bottom: 10px;
         }
 
+        p { 
+            margin-top: 10px;
+            text-align: center;
+        }
+
         .content {
-            width: 100%;
+            width: 50%;
+            transform: translateX(50%);
             color: #000;
         }
 
@@ -49,8 +56,8 @@
         table tr td,
         table tr th {
             border: 1px solid #000;
-            padding: 5px;
-            font-size: .7rem;
+            padding: 7px;
+            font-size: .9rem;
         }
 
         .center {
@@ -62,43 +69,30 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Zie Koperasi Invoice {{ $data['time_invoice'] }}</h1>
+            <h1>ZIE KOPERASI</h1>
+            <h3>Nama: {{ $result['member_name'] }}</h3>
+            <h3>Bulan: {{ $result['invoice_month'] }}</h3>
         </div>
         <div class="content">
             <table cellpadding="0" cellspacing="0">
                 <thead>
                     <tr>
-                        <th>No</th>
-                        <th>Nama</th>
-                        @foreach ($data['sub_categories'] as $item)
-                            <th>{{ $item->name }}</th>
-                        @endforeach
-                        <th>Jumlah</th>
+                        <th>Keterangan</th>
+                        <th>Potongan</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($data['rows'] as $invoice)
+                    @foreach ($result['sub_categories'] as $item)
                         <tr>
-                            <th>{{ $loop->index + 1 }}</th>
-                            <td>{{ $invoice['member_name'] }}</td>
-                            @foreach ($data['sub_categories'] as $item)
-                                <td class="center">{{ number_format($invoice[$item->name], 0, ',', '.') }}</td>
-                            @endforeach
-                            <td>{{ $invoice['total_row'] }}</td>
+                            <td>{{ $item->name }}</td>
+                            <td class="center">{{ number_format($result[$item->name], 0, ',', '.') }}</td>
                         </tr>
                     @endforeach
-                    <tr>
-                        <td class="center" colspan="2">Jumlah</td>
-                        @foreach ($data['sub_categories'] as $item)
-                            <td class="center">{{ number_format($data['total_cols'][$item->name], 0, ',', '.') }}</td>
-                        @endforeach
-
-                        <td class="center">{{ number_format($data['total_invoice'], 0, ',', '.') }}</td>
-                    </tr>
                 </tbody>
             </table>
         </div>
+        <p>Cianjur {{ $result['now'] }}</p>
     </div>
 </body>
 
-</html>
+</html>x
