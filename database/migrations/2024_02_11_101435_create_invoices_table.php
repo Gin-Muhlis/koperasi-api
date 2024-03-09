@@ -11,7 +11,7 @@ return new class extends Migration {
 	public function up(): void {
 		Schema::create('invoices', function (Blueprint $table) {
 			$table->id();
-			$table->string('invoice_code', 10);
+			$table->string('invoice_code', 50);
 			$table->string('invoice_name', 100);
 			$table->date('date');
 			$table->date('due_date');

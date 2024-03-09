@@ -182,9 +182,25 @@ class InvoiceController extends Controller {
 		try {
 			$validated = $request->validated();
 
+			$year_now = Carbon::now()->format('Y');
+
+			$last_invoice = $this->invoiceRepo->getLastInvoice($year_now);
+
+			$code = '';
+
+			if (is_null($last_invoice)) {
+				$code = Carbon::now()->format('Y') . '0001';
+			} else {
+				$last_code = $last_invoice->invoice_code;
+				$date_part = substr($last_code,0,4);
+				$number_part = intval(substr($last_code,4)) + 1;
+
+				$code = $date_part . str_pad($number_part,4,'0', STR_PAD_LEFT);
+			}
+
 			$data = [
 				...$validated,
-				'invoice_code' => Str::random(10),
+				'invoice_code' => $code,
 				'date' => Carbon::now()->format('Y-m-d'),
 				'status' => 'belum bayar',
 				'user_id' => Auth::user()->id,
@@ -193,7 +209,6 @@ class InvoiceController extends Controller {
 			DB::beginTransaction();
 
 			$invoice = $this->invoiceRepo->createInvoice($data);
-			
 
 			DB::commit();
 

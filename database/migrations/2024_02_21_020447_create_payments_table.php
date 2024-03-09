@@ -15,7 +15,6 @@ return new class extends Migration {
 			$table->unsignedBigInteger('invoice_id');
 			$table->double('amount');
 			$table->date('date_payment');
-			$table->string('image');
 			$table->string('no_rek')->nullable();
 			$table->string('payer')->nullable();
 			$table->enum('payment_method', ['cash', 'transfer']);

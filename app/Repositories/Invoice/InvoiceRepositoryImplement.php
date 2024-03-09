@@ -49,4 +49,9 @@ class InvoiceRepositoryImplement extends Eloquent implements InvoiceRepository {
 	public function getHistoryInvoices() {
 		return $this->model->limit(4)->select('invoice_name', 'date', 'status', 'payment_source')->latest()->get();
 	}
+
+	public function getLastInvoice($year) {
+
+		return $this->model->whereYear('date', '=', $year)->latest()->first();
+	}
 }

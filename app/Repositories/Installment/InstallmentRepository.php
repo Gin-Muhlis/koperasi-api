@@ -15,5 +15,6 @@ interface InstallmentRepository extends Repository {
 	public function updateStatusIsntallment($id);
 
 	public function getHistoryInstallments($id);
+	
 
 }

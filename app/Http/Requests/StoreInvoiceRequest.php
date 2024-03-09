@@ -24,7 +24,6 @@ class StoreInvoiceRequest extends FormRequest {
 			'invoice_name' => ['string', 'required', 'max:100'],
 			'due_date' => ['required', 'date'],
 			'payment_source' => ['required', 'in:gaji pns,gaji p3k,komite,TPP'],
-			'payment_method' => ['required', 'in:cash,transfer'],
 		];
 	}
 
@@ -37,8 +36,6 @@ class StoreInvoiceRequest extends FormRequest {
 			'due_date.date' => 'Tanggal jatuh tempo harus dalam format tanggal yang valid.',
 			'payment_source.required' => 'Sumber pembayaran harus dipilih.',
 			'payment_source.in' => 'Sumber pembayaran yang dipilih tidak valid.',
-			'payment_method.required' => 'Metode pembayaran harus dipilih.',
-			'payment_method.in' => 'Metode pembayaran yang dipilih tidak valid.',
 		];
 	}
 

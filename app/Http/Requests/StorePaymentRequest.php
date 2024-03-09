@@ -24,9 +24,8 @@ class StorePaymentRequest extends FormRequest {
 			'invoice_id' => ['required', 'exists:invoices,id'],
 			'amount' => ['required', 'numeric'],
 			'no_rek' => ['nullable'],
-			'transfer_name' => ['nullable', 'string'],
+			'payer' => ['required', 'string'],
 			'total_invoice' => ['required', 'numeric'],
-			'image' => ['required', 'image', 'max:2046', 'mimes:jpg,jpeg,png']
 		];
 	}
 
@@ -38,10 +37,7 @@ class StorePaymentRequest extends FormRequest {
 			'amount.numeric' => 'Jumlah Pembayaran tidak valid.',
 			'total_invoice.required' => 'Total Invoice tidak ditemukan.',
 			'total_invoice.numeric' => 'Total Invoice tidak valid.',
-			'image.required' => 'Gambar wajib diunggah.',
-			'image.image' => 'Berkas yang diunggah harus berupa gambar.',
-			'image.max' => 'Ukuran gambar tidak boleh melebihi 2MB.',
-			'image.mimes' => 'Format gambar yang diterima adalah JPG, JPEG, atau PNG.'
+			'payer.string' => 'Total Invoice tidak valid.',
 		];
 	}
 

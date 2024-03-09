@@ -15,5 +15,6 @@ interface InvoiceRepository extends Repository {
 	public function getPaidInvoices();
 
 	public function getHistoryInvoices();
+	public function getLastInvoice($year);
 }
 

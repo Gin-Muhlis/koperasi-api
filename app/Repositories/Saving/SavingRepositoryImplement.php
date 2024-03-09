@@ -42,4 +42,11 @@ class SavingRepositoryImplement extends Eloquent implements SavingRepository {
 	public function getTotalSavings() {
 		return $this->model->sum('amount');
 	}
+
+	public function getTotalSavingBySubCategory($sub_category_id, $member_id) {
+		return $this->model->where([
+			['sub_category_id', $sub_category_id],
+			['member_id', $member_id]
+		])->sum('amount');
+	}
 }

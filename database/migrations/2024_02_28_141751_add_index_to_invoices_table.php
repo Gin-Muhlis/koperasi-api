@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('invoices', function (Blueprint $table) {
-            $table->index(['id','status', 'user_id']);
+            $table->index(['invoice_code','status', 'date']);
         });
     }
 

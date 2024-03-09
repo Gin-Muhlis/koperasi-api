@@ -11,10 +11,16 @@ class UpdateProfileAppRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
+    public function authorize(): bool {
+		return true;
+	}
+    
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
+            'app_name' => ['required', 'string'],
+            'chairmans_name' => ['required', 'string'],
+            'treasurer_name' => ['required', 'string'],
             'icon' => ['nullable', 'image', 'max:2024'],
             'address' => ['required', 'string'],
             'phone_number' => ['required', 'numeric']
@@ -24,8 +30,12 @@ class UpdateProfileAppRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'Nama diperlukan.',
-            'name.string' => 'Nama harus berupa teks.',
+            'app_name.required' => 'Nama diperlukan.',
+            'app_name.string' => 'Nama harus berupa teks.',
+            'chairmans_name.required' => 'Nama diperlukan.',
+            'chairmans_name.string' => 'Nama harus berupa teks.',
+            'treasurer_name.required' => 'Nama diperlukan.',
+            'treasurer_name.string' => 'Nama harus berupa teks.',
             'icon.required' => 'Icon diperlukan.',
             'icon.image' => 'Icon harus berupa file gambar.',
             'icon.max' => 'Ukuran icon tidak boleh melebihi 2024 kilobita.',

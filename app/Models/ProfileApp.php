@@ -9,5 +9,5 @@ class ProfileApp extends Model
 {
     use HasFactory;
 
-   protected $fillable = ['name', 'icon', 'address', 'phone_number', 'uuid', 'about'] ;
+   protected $fillable = ['app_name', 'chairmans_name', 'treasurer_name', 'icon', 'address', 'phone_number', 'uuid', 'about'] ;
 }

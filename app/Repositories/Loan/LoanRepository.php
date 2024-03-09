@@ -11,4 +11,6 @@ interface LoanRepository extends Repository {
 	public function getTotalLoans();
 
 	public function createLoanMember($data);
+
+	public function getTotalLoanBySubcategory($sub_category_id, $member_id);
 }

@@ -21,11 +21,14 @@ class StoreProfileAppRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
+    
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
-            'icon' => ['required', 'image', 'max:2024'],
+            'app_name' => ['required', 'string'],
+            'chairmans_name' => ['required', 'string'],
+            'treasurer_name' => ['required', 'string'],
+            'icon' => ['nullable', 'image', 'max:2024'],
             'address' => ['required', 'string'],
             'phone_number' => ['required', 'numeric']
         ];
@@ -34,8 +37,12 @@ class StoreProfileAppRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'Nama diperlukan.',
-            'name.string' => 'Nama harus berupa teks.',
+            'app_name.required' => 'Nama diperlukan.',
+            'app_name.string' => 'Nama harus berupa teks.',
+            'chairmans_name.required' => 'Nama diperlukan.',
+            'chairmans_name.string' => 'Nama harus berupa teks.',
+            'treasurer_name.required' => 'Nama diperlukan.',
+            'treasurer_name.string' => 'Nama harus berupa teks.',
             'icon.required' => 'Icon diperlukan.',
             'icon.image' => 'Icon harus berupa file gambar.',
             'icon.max' => 'Ukuran icon tidak boleh melebihi 2024 kilobita.',

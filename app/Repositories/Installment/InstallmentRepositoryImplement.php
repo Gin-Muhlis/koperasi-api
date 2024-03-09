@@ -39,4 +39,5 @@ class InstallmentRepositoryImplement extends Eloquent implements InstallmentRepo
 			$query->where('members.id', $id);
 		})->limit(4)->select('date', 'amount', 'code')->latest()->get();
 	}
+
 }

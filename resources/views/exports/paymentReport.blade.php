@@ -15,18 +15,18 @@
 				<th>{{ $loop->index + 1 }}</th>
 				<td>{{ $invoice['member_name'] }}</td>
 				@foreach ($data['sub_categories'] as $item)
-					<td class="center">{{ $invoice[$item->name] }}</td>
+					<td class="center">Rp. {{ number_format($invoice[$item->name], 0, ',', '.') }}</td>
 				@endforeach
-				<td>{{ $invoice['total_row'] }}</td>
+				<td>Rp. {{ number_format($invoice['total_row'], 0, ',', '.') }}</td>
 			</tr>
 		@endforeach
 		<tr>
 			<td class="center" colspan="2">Jumlah</td>
 			@foreach ($data['sub_categories'] as $item)
-				<td class="center">{{ $data['total_cols'][$item->name] }}</td>
+				<td class="center">Rp. {{ number_format($data['total_cols'][$item->name], 0, ',', '.') }}</td>
 			@endforeach
 
-			<td class="center">{{ $data['total_invoice'] }}</td>
+			<td class="center">Rp. {{ number_format($data['total_invoice'], 0, ',', '.') }}</td>
 		</tr>
 	</tbody>
 </table>
