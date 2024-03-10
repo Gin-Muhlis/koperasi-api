@@ -61,6 +61,7 @@ Route::middleware('json.response')->group(function () {
 
 		// simpanan
 		Route::apiResource('/saving', SavingController::class);
+		Route::get('/sub-categories-saving', [SavingController::class,'getSubCategories']);
 
 		// pinjaman
 		Route::apiResource('/receivable', ReceivableController::class);
@@ -68,7 +69,7 @@ Route::middleware('json.response')->group(function () {
 		// pinjaman
 		Route::apiResource('/installment', InstallmentController::class);
 
-		// Invoice
+		// Invoicep
 		Route::apiResource('invoice', InvoiceController::class);
 		Route::get('/members-invoice', [InvoiceController::class, 'getMemberInvoice']);
 		Route::get('/sub-categories-invoice', [InvoiceController::class, 'getSubCategoriesInvoice']);
