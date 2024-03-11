@@ -90,7 +90,7 @@ class InvoiceController extends Controller {
 				}
 			}
 
-			$members_data = $members->map(function($member) use ($sub_categories, $filtered_sub_categories) {
+			$members_data = $members->map(function($member) use ($filtered_sub_categories) {
 				$data_dinamis = [];
 
 				foreach ($filtered_sub_categories as $sub_category) {

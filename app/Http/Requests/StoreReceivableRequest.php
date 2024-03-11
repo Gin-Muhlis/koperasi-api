@@ -24,24 +24,38 @@ class StoreReceivableRequest extends FormRequest
 	public function rules(): array
 	{
 		return [
-			'members' => ['required', 'array'],
+			'member_id' => ['required', 'exists:members,id'],
+			'amount' => ['required', 'numeric'],
 			'sub_category_id' => ['required', 'exists:sub_categories,id'],
+			'duration' => ['required', 'numeric'],
+			'date' => ['required', 'date'],
+			'total' => ['required', 'numeric'],
+			'deadline' => ['required', 'date'],
 			'description' => ['nullable', 'string'],
 		];
 	}
 
 	public function messages(): array
-	{
-		return [
-			'members_id.required' => 'Data member tidak boleh kosong.',
-			'members_id.array' => 'Data member tidak valid.',
-			'month_year.required' => 'Waktu simpanan tidak boleh kosong.',
-			'month_year.string' => 'Waktu simpanan tidak valid.',
-			'sub_category_id.required' => 'Sub Kategori tidak ditemukan.',
-			'sub_category_id.exists' => 'Sub Kategori tidak valid.',
-			'description.string' => 'Deskripsi tidak valid.',
-		];
-	}
+{
+    return [
+        'member_id.required' => 'Member tidak valid.',
+        'member_id.exists' => 'Member tidak valid.',
+        'amount.required' => 'Jumlah Peminjaman harus diisi.',
+        'amount.numeric' => 'Jumlah Peminjaman harus berupa angka.',
+        'sub_category_id.required' => 'Jenis pinjaman tidak valid.',
+        'sub_category_id.exists' => 'Jenis pinjaman tidak valid.',
+        'duration.required' => 'Durasi harus diisi.',
+        'duration.numeric' => 'Duration tidak valid.',
+        'date.required' => 'Tanggal peminjaman harus diisi.',
+        'date.date' => 'Tanggal peminjaman harus dalam format tanggal yang valid.',
+        'total.required' => 'Total pinjaman harus diisi.',
+        'total.numeric' => 'Total pinjaman tidak valid.',
+        'deadline.required' => 'Tenggat bayar harus diisi.',
+        'deadline.date' => 'Tenggat bayar harus dalam format tanggal yang valid.',
+        'description.string' => 'Deskripsi tidak valid.',
+    ];
+}
+
 
 	public function failedValidation(Validator $validator)
 	{

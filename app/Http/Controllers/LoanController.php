@@ -2,12 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\SubCategoryResource;
 use App\Models\Loan;
 use App\Http\Requests\StoreLoanRequest;
 use App\Http\Requests\UpdateLoanRequest;
+use App\Repositories\SubCategory\SubCategoryRepository;
+use Exception;
 
 class LoanController extends Controller
 {
+    private $subCategoryRepo;
+
+    public function __construct(SubCategoryRepository $subCategoryRepository)
+    {
+        $this->subCategoryRepo = $subCategoryRepository;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -15,6 +24,7 @@ class LoanController extends Controller
     {
         //
     }
+
 
     /**
      * Store a newly created resource in storage.

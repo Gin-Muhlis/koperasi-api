@@ -6,7 +6,6 @@ use App\Http\Controllers\ExportController;
 use App\Http\Controllers\InstallmentController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MemberController;
-use App\Http\Controllers\NasabahController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PositionCategoryController;
 use App\Http\Controllers\ProductController;
@@ -62,9 +61,11 @@ Route::middleware('json.response')->group(function () {
 		// simpanan
 		Route::apiResource('/saving', SavingController::class);
 		Route::get('/sub-categories-saving', [SavingController::class,'getSubCategories']);
+		Route::get('/member-saving', [SavingController::class,'memberSaving']);
 
 		// pinjaman
 		Route::apiResource('/receivable', ReceivableController::class);
+		Route::get('/sub-categories-receivable', [ReceivableController::class,'getSubCategories']);
 
 		// pinjaman
 		Route::apiResource('/installment', InstallmentController::class);
@@ -79,14 +80,6 @@ Route::middleware('json.response')->group(function () {
 
 		// payment
 		Route::apiResource('payment', PaymentController::class);
-
-		// sub kategori invoice
-		Route::get('member-principal', [TabController::class, 'memberPrincipal']);
-		Route::get('member-mandatory', [TabController::class, 'memberMandatory']);
-		Route::get('member-voluntary', [TabController::class, 'memberVoluntary']);
-		Route::get('member-recretional', [TabController::class, 'memberRecretional']);
-		Route::get('member-receivable', [TabController::class, 'memberReceivable']);
-		Route::get('member-account-receivable', [TabController::class, 'memberAccountReceivable']);
 
 		// Export
 		Route::get('/export/invoice-excel/{invoice_code}', [ExportController::class, 'detailInvoiceExportExcel']);

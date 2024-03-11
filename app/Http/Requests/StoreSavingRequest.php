@@ -21,35 +21,32 @@ class StoreSavingRequest extends FormRequest
 	 *
 	 * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
 	 */
-	public function rules(): array
-	{
+	public function rules(): array {
 		return [
-			'type_saving' => ['required', 'string'],
 			'members' => ['required', 'array'],
-			'month_year' => ['required', 'string'],
-			'sub_category_id' => ['required', 'exists:sub_categories,id'],
-			'description' => ['nullable', 'string'],
+			'month_year' => ['string'],
+			'description' => ['string'],
+			'sub_category_id' => ['required', 'exists:sub_categories,id']
 		];
 	}
 
-	public function messages(): array
-	{
+	public function messages(): array {
 		return [
-			'members_id.required' => 'Data member tidak boleh kosong.',
-			'members_id.array' => 'Data member tidak valid.',
-			'month_year.required' => 'Waktu simpanan tidak boleh kosong.',
-			'month_year.string' => 'Waktu simpanan tidak valid.',
-			'sub_category_id.required' => 'Sub Kategori tidak ditemukan.',
-			'sub_category_id.exists' => 'Sub Kategori tidak valid.',
-			'description.string' => 'Deskripsi tidak valid.',
+			'members.required' => 'Data anggota tidak valid',
+			'members.array' => 'Data anggota tidak valid',
+			'month_year.required' => 'Data waktu tidak valid',
+			'month_year.string' => 'Data waktu tidak valid',
+			'description.required' => 'Deskripsi tidak valid',
+			'description.string' => 'Deskripsi tidak valid',
+			'sub_category_id.required' => 'Jenis simpanan tidak valid',
+			'sub_category_id.exists' => 'Jenis simpanan tidak valid',
 		];
 	}
 
-	public function failedValidation(Validator $validator)
-	{
+	public function failedValidation(Validator $validator) {
 		throw new HttpResponseException(response()->json([
-			'message' => 'Validasi gagal',
-			'errors' => $validator->errors()
-		]));
+			'message' => 'Validasi data gagal',
+			'errors' => $validator->errors(),
+		], 422));
 	}
 }

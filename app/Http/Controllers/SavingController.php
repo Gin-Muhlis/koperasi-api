@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Http\Resources\SubCategoryResource;
 
 require_once app_path() . '/Helpers/helpers.php';
@@ -38,17 +39,17 @@ class SavingController extends Controller
     {
         try {
             $sub_categories = $this->subCategoryRepo->getSubCategories();
-			$members = $this->memberRepo->getMembers();
+            $members = $this->memberRepo->getMembers();
 
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'simpanan') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
+            $filtered_sub_categories = [];
+            foreach ($sub_categories as $sub_category) {
+                if ($sub_category->category->name == 'simpanan') {
+                    $filtered_sub_categories[] = $sub_category;
+                }
+            }
 
-			$members_data = $members->map(function($member) use ($filtered_sub_categories) {
-				$detail_savings = [];
+            $members_data = $members->map(function ($member) use ($filtered_sub_categories) {
+                $detail_savings = [];
                 $history_savings = [];
                 $total_saving = 0;
 
@@ -63,32 +64,95 @@ class SavingController extends Controller
                     ];
                 }
 
-				foreach ($filtered_sub_categories as $sub_category) {
+                foreach ($filtered_sub_categories as $sub_category) {
 
-					// simpanan
+                    // simpanan
                     $total = 0;
-					foreach ($member->savings as $saving) {
-						if ($saving->sub_category_id == $sub_category->id) {
-							$total += $saving->amount;
-						}
-					}
+                    foreach ($member->savings as $saving) {
+                        if ($saving->sub_category_id == $sub_category->id) {
+                            $total += $saving->amount;
+                        }
+                    }
 
-					$detail_savings[$sub_category->name] = $total;
-				}
-                
-				return [
-					'id' => $member->id,
-					'name' => $member->name,
-					'position' => $member->position,
+                    $detail_savings[$sub_category->name] = $total;
+                }
+
+                $sorted_history = collect($history_savings)->sortByDesc('date')->values()->all();
+
+                return [
+                    'id' => $member->id,
+                    'name' => $member->name,
+                    'position' => $member->position,
                     'total_saving' => $total_saving,
-					'detail_savings' => $detail_savings,
-                    'history_savings' => $history_savings
-				];
-			});
+                    'detail_savings' => $detail_savings,
+                    'history_savings' => $sorted_history
+                ];
+            });
 
             return response()->json([
-				'data' => $members_data
-			]);
+                'data' => $members_data
+            ]);
+        } catch (Exception $e) {
+            return errorResponse($e->getMessage());
+        }
+    }
+
+    public function memberSaving()
+    {
+        try {
+
+            $sub_categories = $this->subCategoryRepo->getSubCategories();
+            $members = $this->memberRepo->getMembers();
+
+            $filtered_sub_categories = [];
+            foreach ($sub_categories as $sub_category) {
+                if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
+                    $filtered_sub_categories[] = $sub_category;
+                }
+            }
+
+            $members_data = $members->map(function ($member) use ($filtered_sub_categories) {
+                $data_dinamis = [];
+
+                foreach ($filtered_sub_categories as $sub_category) {
+                    $detail = [];
+                    $months_saving = [];
+
+                    // simpanan
+                    foreach ($member->savings as $saving) {
+                        if ($sub_category->id == $saving->sub_category_id) {
+                            $months_saving[] = [
+                                'month_year' => $saving->month_year,
+                                'status' => $saving->status,
+                            ];
+                        }
+
+                        if ($saving->sub_category_id == $sub_category->id) {
+                            $detail = [
+                                'amount' => $saving->amount,
+                                'sub_category_id' => $sub_category->id,
+                                'type_payment' => $saving->SubCategory->type_payment,
+                                'months_status' => $months_saving
+                            ];
+                        }
+                    }
+
+                    $data_dinamis[$sub_category->name] = $detail;
+                }
+
+                return [
+                    'id' => $member->id,
+                    'name' => $member->name,
+                    'position' => $member->position,
+                    'position_category_id' => $member->group_id,
+                    'data' => $data_dinamis
+                ];
+            });
+
+            return response()->json([
+                'data' => $members_data
+            ]);
+
         } catch (Exception $e) {
             return errorResponse($e->getMessage());
         }
@@ -99,16 +163,16 @@ class SavingController extends Controller
         try {
             $sub_categories = $this->subCategoryRepo->getSubCategories();
 
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'simpanan') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
+            $filtered_sub_categories = [];
+            foreach ($sub_categories as $sub_category) {
+                if ($sub_category->category->name == 'simpanan') {
+                    $filtered_sub_categories[] = $sub_category;
+                }
+            }
 
-			usort($filtered_sub_categories, function ($a, $b) {
-				return $a['id'] - $b['id'];
-			});
+            usort($filtered_sub_categories, function ($a, $b) {
+                return $a['id'] - $b['id'];
+            });
 
             return response()->json([
                 'data' => SubCategoryResource::collection($filtered_sub_categories)
@@ -124,34 +188,26 @@ class SavingController extends Controller
     public function store(StoreSavingRequest $request)
     {
         try {
-            $user = Auth::user();
             $validated = $request->validated();
+            $sub_category = $this->subCategoryRepo->showSubCategory($validated['sub_category_id']);
 
             DB::beginTransaction();
 
             foreach ($validated['members'] as $member) {
-                if ($validated['type_saving'] != 'simpanan sukarela' && $validated['type_saving'] != 'tabungan rekreasi') {
-                    $is_mandatory_saving = $this->savingRepo->getMemberSpesificSavings($member['id'], $validated['sub_category_id']);
+                $time = $validated['month_year'];
 
-                    if (count($is_mandatory_saving) > 0 && $is_mandatory_saving->contains('month_year', $validated['month_year'])) {
+                // cek apakah ada anggota yang sudah membayar simpanan pada bulan yang ditentukan
+                if ($sub_category->type_payment == 'monthly') {
+                    $is_already_saving = $this->savingRepo->getMemberSpesificSavings($member['id'], $sub_category->id);
+
+                    if (count($is_already_saving) > 0 && $is_already_saving->contains('month_year', $time)) {
                         return response()->json([
-                            'message' => 'Terdapat data member yang sudah membayar simpanan pada bulan yang ditentukan',
+                            'message' => "Terdapat anggota yang sudah membayar {$sub_category->name} pada bulan yang ditentukan",
                         ], 400);
                     }
                 }
 
-                $data = [
-                    'uuid' => Str::uuid(),
-                    'code' => generateCode(),
-                    'member_id' => $member['id'],
-                    'amount' => $member['payment'],
-                    'date' => Carbon::now()->format('Y-m-d'),
-                    'sub_category_id' => $validated['sub_category_id'],
-                    'month_year' => $validated['month_year'],
-                    'user_id' => $user->id,
-                    'description' => $validated['description'] ?? '-',
-                    'status' => 'dibayar'
-                ];
+                $data = $this->generateSavingData($member['id'], $member['amount'], $sub_category->id, $validated['description'], $time);
 
                 $this->savingRepo->makeSavingMembers($data);
             }
@@ -159,8 +215,7 @@ class SavingController extends Controller
             DB::commit();
 
             return response()->json([
-                'success' => true,
-                'message' => 'Simpanan member berhasil ditambahkan',
+                'message' => 'Data simpanan anggota berhasil ditambahkan'
             ]);
         } catch (Exception $e) {
             DB::rollBack();
@@ -195,4 +250,19 @@ class SavingController extends Controller
     {
         //
     }
+
+    private function generateSavingData($member_id, $amount, $sub_category_id, $description, $month_year) {
+		return [
+			'uuid' => Str::uuid(),
+			'code' => generateCode(),
+			'member_id' => $member_id,
+			'amount' => $amount,
+			'date' => Carbon::now()->format('Y-m-d'),
+			'sub_category_id' => $sub_category_id,
+			'month_year' => $month_year,
+			'user_id' => Auth::user()->id,
+			'description' => $description,
+            'status' => 'dibayar',
+		];
+	}
 }

@@ -21,14 +21,6 @@ class StoreDetailInvoiceRequest extends FormRequest {
 	 */
 	public function rules(): array {
 		return [
-			// 'principal_savings' => ['array'],
-			// 'mandatory_savings' => ['array'],
-			// 'special_mandatory_savings' => ['array'],
-			// 'voluntary_savings' => ['array'],
-			// 'recretional_savings' => ['array'],
-			// 'receivables' => ['array'],
-			// 'accounts_receivable' => ['array'],
-			
 			'members' => ['required', 'array'],
 			'month_year' => ['string'],
 			'description' => ['string'],
@@ -38,14 +30,6 @@ class StoreDetailInvoiceRequest extends FormRequest {
 
 	public function messages(): array {
 		return [
-			// 'principal_savings.required' => 'Data tidak valid',
-			// 'mandatory_savings.required' => 'Data tidak valid',
-			// 'special_mandatory_savings.required' => 'Data tidak valid',
-			// 'voluntary_savings.required' => 'Data tidak valid',
-			// 'recretional_savings.required' => 'Data tidak valid',
-			// 'receivables.required' => 'Data tidak valid',
-			// 'accounts_receivable.required' => 'Data tidak valid',
-
 			'members.required' => 'Data anggota tidak valid',
 			'members.array' => 'Data anggota tidak valid',
 			'month_year.required' => 'Data waktu tidak valid',

@@ -11,5 +11,6 @@ class LoanSeeder extends Seeder
      */
     public function run(): void
     {
+        
     }
 }
