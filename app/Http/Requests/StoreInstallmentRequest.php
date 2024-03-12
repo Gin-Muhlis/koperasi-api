@@ -22,20 +22,23 @@ class StoreInstallmentRequest extends FormRequest
 	 */
 	public function rules(): array {
 		return [
-			'members' => ['required', 'array'],
-			'month_year' => ['string'],
-			'description' => ['string'],
+			'member_id' => ['required', 'exists:members,id'],
+			'loan_id' => ['required', 'exists:loans,id'],
+			'amount' => ['required', 'numeric'],
+			'sub_category_id' => ['required', 'exists:sub_categories,id'],
 		];
 	}
 
 	public function messages(): array {
 		return [
-			'members.required' => 'Data Anggota tidak valid',
-			'members.array' => 'Data Anggota tidak valid',
-			'month_year.required' => 'Data waktu tidak valid',
-			'month_year.string' => 'Data waktu tidak valid',
-			'description.required' => 'Deskripsi tidak valid',
-			'description.string' => 'Deskripsi tidak valid',
+			'member_id.required' => 'Data Anggota tidak valid',
+			'member_id.exists' => 'Data Anggota tidak valid',
+			'loan_id.required' => 'Pinjaman Anggota tidak valid',
+			'loan_id.exists' => 'Pinjaman Anggota tidak valid',
+			'sub_categori_id.required' => 'Jenis Pinjaman tidak valid',
+			'sub_categori_id.exists' => 'Jenis Pinjaman tidak valid',
+			'amount.string' => 'Jumlah pembayaran tidak valid',
+			'amount.required' => 'Jumlah pembayaran tidak valid',
 		];
 	}
 

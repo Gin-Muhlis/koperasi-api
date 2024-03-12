@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ReportMembersExport;
 use App\Http\Requests\ExportInvoiceMemberRequest;
 use App\Repositories\Installment\InstallmentRepository;
 use App\Repositories\Invoice\InvoiceRepository;
@@ -151,6 +152,76 @@ class ExportController extends Controller
 			$pdf = Pdf::loadView('pdf.invoice-member', compact('result'))->setPaper('a4');
 			return $pdf->download("zie_koperasi.pdf");
 
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	// Laporan Anggota
+	public function ReportMembers() {
+		try {
+			$members = $this->memberRepo->getMembers();
+			
+			$sub_categories = $this->subCategoryRepo->getSubCategories();
+			$profile = $this->profileRepo->getProfile();
+
+			$filtered_sub_categories = [];
+			foreach ($sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
+					$filtered_sub_categories[] = $sub_category;
+				}
+			}
+
+			$data = $members->map(function($member) use ($filtered_sub_categories) {
+				$data_dinamis = [];
+				$total_saving_member = 0;
+				$total_loan_member = 0;
+
+				foreach ($member->savings as $saving) {
+					$total_saving_member += $saving->amount;
+				}
+
+				// pinjaman
+				foreach ($member->loans as $loan) {
+					$total_loan_member += $loan->total_payment;
+				}
+				
+				foreach ($filtered_sub_categories as $sub_category) {
+					$detail = 0;
+
+                    $total_saving = 0;
+					// simpanan
+					foreach ($member->savings as $saving) {
+                        if ($saving->sub_category_id == $sub_category->id) {
+                            $total_saving += $saving->amount;
+							$detail = $total_saving;
+						}
+					}
+
+                    $total_loan = 0;
+					// pinjaman
+					foreach ($member->loans as $loan) {
+						if ($loan->sub_category_id == $sub_category->id) {
+                            $total_loan += $loan->total_payment;
+							$detail = $total_loan;
+						}
+					}
+
+					$data_dinamis[$sub_category->name] = $detail;
+				}
+
+				return [
+					'id' => $member->id,
+					'name' => $member->name,
+					...$data_dinamis,
+					'total_saving' => $total_saving_member,
+					'total_loan' => $total_loan_member
+				];
+			});
+
+		
+			return Excel::download(new ReportMembersExport($data, $filtered_sub_categories, $profile), "Koperasi.xlsx");
+			
 		} catch (Exception $e) {
 			return errorResponse($e->getMessage());
 		}

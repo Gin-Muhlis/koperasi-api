@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Repositories\Installment\InstallmentRepository;
 use App\Repositories\Loan\LoanRepository;
+use App\Repositories\Member\MemberRepository;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -19,19 +20,69 @@ class InstallmentController extends Controller
 {
     private $installmentRepo;
 	private $loanRepo;
-	private $subCategoryRepo;
 	private $memberRepo;
 
-	public function __construct(InstallmentRepository $installmentRepository, LoanRepository $loanRepository) {
+	public function __construct(InstallmentRepository $installmentRepository, LoanRepository $loanRepository, MemberRepository $memberRepository) {
 		$this->installmentRepo = $installmentRepository;
 		$this->loanRepo = $loanRepository;
+        $this->memberRepo = $memberRepository;
 	}
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        try {
+            $members = $this->memberRepo->getNotPaidMembers();
+
+			$members_data = $members->map(function($member) {
+					$detail = [];
+					$months_isntallment = [];
+
+					
+
+					// pinjaman
+					foreach ($member->loans as $loan) {
+						if ($loan->status != 'lunas') {
+
+							foreach ($loan->installments as $installment) {
+								$months_isntallment[] = [
+									'month_year' => Carbon::parse($installment->date)->format('m-Y'),
+									'status' => $installment->status,
+								];
+							}
+
+							$detail = [
+								'sub_category_id' => $loan->subCategory->id,
+								'loan_id'=> $loan->id,
+                                'loan_date' => $loan->date,
+								'total_payment' => $loan->total_payment,
+								'paid' => $this->handlePaid($loan->installments),
+								'remain_payment' => $loan->total_payment - $this->handlePaid($loan->installments),
+								'monthly' => ceil($loan->total_payment / $loan->loan_duration / 1000) * 1000,
+                                'duration' => $loan->loan_duration,
+                                'remain_duration' => $loan->loan_duration - count($months_isntallment),
+								'months_status' => $months_isntallment
+							];
+						}
+					}
+
+                    
+
+				return [
+					'id' => $member->id,
+					'name' => $member->name,
+					...$detail
+				];
+			});
+
+			return response()->json([
+				'data' => $members_data
+			]);
+
+        } catch (Exception $e) {
+            return errorResponse($e->getMessage());
+        }
     }
 
     /**
@@ -44,24 +95,11 @@ class InstallmentController extends Controller
 
             DB::beginTransaction();
 
-			foreach ($validated['members'] as $item) {
-
-				$month = explode('-', $validated['month_year'])[0];
-				$year = explode('-', $validated['month_year'])[1];
-
-				$is_month_payed = $this->installmentRepo->getMemberPaymentMonth($year, $month, $item['loanId']);
-
-				if (count($is_month_payed) > 0) {
-					return response()->json([
-						'message' => 'Terdapat data member yang sudah membayar angsuran pada bulan yang ditentukan',
-					], 400);
-				}
-
-				$data = $this->generateInstallmentData($item);
+				$data = $this->generateInstallmentData($validated);
 
 				$this->installmentRepo->makeInstallmentMembers($data);
 
-				$loan_member = $this->loanRepo->findLoan($item['loanId']);
+				$loan_member = $this->loanRepo->findLoan($validated['loan_id']);
 
 				$total_payment_member = $this->installmentRepo->getSumPayment($loan_member->id);
 
@@ -70,11 +108,11 @@ class InstallmentController extends Controller
 				} else {
 					$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'berjalan']);
 				}
-			}
+			
 
 			DB::commit();
 			return response()->json([
-				'message' => 'Data berhasil ditambahkan',
+				'message' => 'Pembayaran berhasil ditambahkan',
 			]);
         } catch (Exception $e) {
             return errorResponse($e->getMessage());
@@ -108,11 +146,25 @@ class InstallmentController extends Controller
 		return [
 			'uuid' => Str::uuid(),
 			'code' => generateCode(),
-			'loan_id' => $data['loanId'],
+            'member_id' => $data['member_id'],
+			'loan_id' => $data['loan_id'],
 			'amount' => $data['amount'],
 			'date' => Carbon::now()->format('Y-m-d'),
 			'sub_category_id' => $data['sub_category_id'],
 			'user_id' => Auth::user()->id,
 		];
 	}
+
+    private function handlePaid($data) {
+		if (count($data) < 1) {
+			return 0;
+		}
+
+		$totalPaid = 0;
+		foreach ($data as $item) {
+			$totalPaid += $item->amount;
+		}
+		return $totalPaid;
+	}
+
 }

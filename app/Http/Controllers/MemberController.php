@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\MembersLoanReportResource;
 use App\Http\Resources\MembersReportResource;
 use App\Repositories\Role\RoleRepository;
+use App\Repositories\SubCategory\SubCategoryRepository;
 
 require_once app_path() . '/Helpers/helpers.php';
 
@@ -34,8 +35,9 @@ class MemberController extends Controller {
     private $invoiceRepo;
     private $loanRepo;
     private $roleRepo;
+    private $subCategoryRepo;
 
-    public function __construct( MemberRepository $member, UserRepository $user, SavingRepository $savingRepository, InstallmentRepository $installmentRepository, InvoiceRepository $invoiceRepository, LoanRepository $loanRepository, RoleRepository $roleRepository ) {
+    public function __construct( MemberRepository $member, UserRepository $user, SavingRepository $savingRepository, InstallmentRepository $installmentRepository, InvoiceRepository $invoiceRepository, LoanRepository $loanRepository, RoleRepository $roleRepository, SubCategoryRepository $subCategoryRepository ) {
         $this->memberRepo = $member;
         $this->userRepo = $user;
         $this->savingRepo = $savingRepository;
@@ -43,6 +45,7 @@ class MemberController extends Controller {
         $this->invoiceRepo = $invoiceRepository;
         $this->loanRepo = $loanRepository;
         $this->roleRepo = $roleRepository;
+        $this->subCategoryRepo = $subCategoryRepository;
     }
     /**
     * Display a listing of the resource.
@@ -187,13 +190,58 @@ class MemberController extends Controller {
 
     public function reportmembers() {
         try {
-            $members = $this->memberRepo->getReportMembers();
+            $sub_categories = $this->subCategoryRepo->getSubCategories();
+			$members = $this->memberRepo->getMembers();
 
-            $filtered_member = filterMember( $members );
+			$filtered_sub_categories = [];
+			foreach ($sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
+					$filtered_sub_categories[] = $sub_category;
+				}
+			}
 
-            return response()->json( [
-                'data' => MembersReportResource::collection( $filtered_member ),
-            ] );
+			$members_data = $members->map(function($member) use ($filtered_sub_categories) {
+				$data_dinamis = [];
+
+				foreach ($filtered_sub_categories as $sub_category) {
+					$detail = 0;
+
+                    $total_saving = 0;
+					// simpanan
+					foreach ($member->savings as $saving) {
+                        if ($saving->sub_category_id == $sub_category->id) {
+                            $total_saving += $saving->amount;
+                            $date = $saving->date;
+                            $date_split = explode('-', $date);
+							$detail = $total_saving;
+						}
+					}
+
+                    $total_loan = 0;
+					// pinjaman
+					foreach ($member->loans as $loan) {
+						if ($loan->sub_category_id == $sub_category->id) {
+                            $total_loan += $loan->total_payment;
+                            $date = $saving->date;
+                            $date_split = explode('-', $date);
+							$detail = $total_loan;
+						}
+					}
+
+					$data_dinamis[$sub_category->name] = $detail;
+				}
+
+				return [
+					'id' => $member->id,
+					'name' => $member->name,
+					'list' => $data_dinamis
+				];
+			});
+
+			return response()->json([
+				'data' => $members_data
+			]);
+
         } catch ( Exception $e ) {
             return errorResponse( $e->getMessage() );
         }

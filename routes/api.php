@@ -90,6 +90,8 @@ Route::middleware('json.response')->group(function () {
 		Route::prefix('report')->group(function () {
 			Route::get('/members', [MemberController::class, 'reportmembers']);
 			Route::get('/loan-members', [MemberController::class, 'reportLoanMembers']);
+
+			Route::get('export/report-members', [ExportController::class,'ReportMembers']);;
 		});
 
 		// dashboard

@@ -49,16 +49,14 @@ class MemberRepositoryImplement extends Eloquent implements MemberRepository {
 		}])->where('id', $id)->first();
 	}
 
-	public function getNotPaidMembers($sub_category) {
-		return $this->model->with(['loans' => function ($query) use ($sub_category) {
+	public function getNotPaidMembers() {
+		return $this->model->with(['loans' => function ($query) {
 			$query->where([
-				['status', '!=', 'lunas'],
-				['sub_category_id', $sub_category],
+				['status', '!=', 'lunas']
 			]);
-		}])->whereHas('loans', function ($query) use ($sub_category) {
+		}])->whereHas('loans', function ($query)  {
 			$query->where([
-				['status', '!=', 'lunas'],
-				['sub_category_id', $sub_category],
+				['status', '!=', 'lunas']
 			]);
 		})->get();
 	}

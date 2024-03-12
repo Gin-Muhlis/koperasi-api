@@ -12,7 +12,7 @@ interface MemberRepository extends Repository {
 	public function updateMember($id, $request);
 	public function deleteMember($id);
 	public function getReportMembers();
-	public function getNotPaidMembers($sub_category);
+	public function getNotPaidMembers();
 	public function getCountMembers();
 	public function getReportLoanMembers();
 
