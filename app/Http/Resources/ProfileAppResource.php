@@ -18,6 +18,7 @@ class ProfileAppResource extends JsonResource
             'id' => $this->id,
             'app_name'=> $this->app_name, 
             'chairmans_name'=> $this->chairmans_name, 
+            'secretary_name'=> $this->secretary_name, 
             'treasurer_name'=> $this->treasurer_name, 
             'icon' => $this->icon ? str_replace('public/', '', url("storage/{$this->icon}")) : config('app.url') . '/images/profile-default.png',
             'address' => $this->address,

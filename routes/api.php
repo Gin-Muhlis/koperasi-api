@@ -51,6 +51,7 @@ Route::middleware('json.response')->group(function () {
 
 		// reset password
 		Route::put('/change-password/{id}', [AuthController::class,'changePassword']);
+		
 
 		// transaksi
 		Route::apiResource('/purchase', PurchaseController::class);
@@ -96,7 +97,7 @@ Route::middleware('json.response')->group(function () {
 			Route::get('/saving-members', [MemberController::class, 'reportSavingMembers']);
 			Route::get('export/report-saving-members', [ExportController::class,'ReportSavingMembers']);
 			Route::get('export/report-saving-member/{id}', [ExportController::class,'ReportSavingMember']);
-
+			
 			Route::get('/loan-members', [MemberController::class, 'reportLoanMembers']);
 			Route::get('export/report-loan-members', [ExportController::class,'ReportLoanMembers']);
 			Route::get('export/report-loan-member/{id}', [ExportController::class,'ReportLoanMember']);
@@ -113,7 +114,8 @@ Route::middleware('json.response')->group(function () {
 	});
 
 	Route:: middleware('role:member')->group(function () {
-		// dashboarad
+		// dashboard
 		Route::get('/dashboard/member', [MemberController::class, 'dashboardMember']);
+		Route::put('/change-password-member', [AuthController::class,'changePasswordMember']);
 	});
 });

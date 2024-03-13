@@ -20,6 +20,7 @@ class ProfileAppImport implements ToCollection, WithHeadingRow
                 'uuid' => Str::uuid(),
                 'app_name' => $data['app_name'],
                 'chairmans_name' => $data['chairman_name'],
+                'secretary_name' => $data['secretary_name'],
                 'treasurer_name' => $data['treasurer_name'],
                 'address' => $data['address'],
                 'phone_number' => $data['phone_number'],
