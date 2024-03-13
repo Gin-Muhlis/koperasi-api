@@ -40,6 +40,26 @@ class SubCategoryController extends Controller
         }
     }
 
+    public function getSubCategoriesSaving() {
+        try {
+            $sub_categories = $this->subCategoryRepo->getSubCategories();
+
+			$filtered_sub_categories = [];
+			foreach ($sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'simpanan') {
+					$filtered_sub_categories[] = $sub_category;
+				}
+			}
+
+            
+            return response()->json([
+                'data' => SubCategoryResource::collection($filtered_sub_categories)
+            ]);
+        } catch (Exception $e) {
+            return errorResponse($e->getMessage());
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      */

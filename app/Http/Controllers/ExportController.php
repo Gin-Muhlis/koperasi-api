@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\ReportMembersExport;
+use App\Exports\ReportSavingMembersExport;
 use App\Http\Requests\ExportInvoiceMemberRequest;
 use App\Repositories\Installment\InstallmentRepository;
 use App\Repositories\Invoice\InvoiceRepository;
@@ -398,6 +399,59 @@ class ExportController extends Controller
 
 			$pdf = Pdf::loadView('pdf.report-member', compact('data', 'profile', 'sub_categories_saving', 'sub_categories_loan', 'year_now', 'months'))->setPaper('a4', 'landscape');
 			return $pdf->download("zie_koperasi.pdf");
+
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	public function reportSavingMembers() {
+		try {
+			$members = $this->memberRepo->getMembers();
+
+			$sub_categories = $this->subCategoryRepo->getSubCategories();
+			$profile = $this->profileRepo->getProfile();
+
+			$filtered_sub_categories = [];
+			foreach ($sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'simpanan') {
+					$filtered_sub_categories[] = $sub_category;
+				}
+			}
+
+			$data = $members->map(function ($member) use ($filtered_sub_categories) {
+				$data_dinamis = [];
+				$total_saving_member = 0;
+
+				foreach ($member->savings as $saving) {
+					$total_saving_member += $saving->amount;
+				}
+
+
+				foreach ($filtered_sub_categories as $sub_category) {
+					$detail = 0;
+
+					$total_saving = 0;
+					// simpanan
+					foreach ($member->savings as $saving) {
+						if ($saving->sub_category_id == $sub_category->id) {
+							$total_saving += $saving->amount;
+							$detail = $total_saving;
+						}
+					}
+					$data_dinamis[$sub_category->name] = $detail;
+				}
+
+				return [
+					'id' => $member->id,
+					'name' => $member->name,
+					...$data_dinamis,
+					'total_saving' => $total_saving_member,
+				];
+			});
+
+
+			return Excel::download(new ReportSavingMembersExport($data, $filtered_sub_categories, $profile), "Koperasi.xlsx");
 
 		} catch (Exception $e) {
 			return errorResponse($e->getMessage());

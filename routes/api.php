@@ -48,6 +48,7 @@ Route::middleware('json.response')->group(function () {
 		Route::apiResource('/profile-app', ProfileAppController::class);
 		Route::get('/category', [CategoryController::class,'index']);
 
+
 		// reset password
 		Route::put('/change-password/{id}', [AuthController::class,'changePassword']);
 
@@ -88,11 +89,15 @@ Route::middleware('json.response')->group(function () {
 
 		// laporan
 		Route::prefix('report')->group(function () {
-			Route::get('/members', [MemberController::class, 'reportmembers']);
+			Route::get('/members', [MemberController::class, 'reportMembers']);
+			Route::get('/saving-members', [MemberController::class, 'reportSavingMembers']);
+
 			Route::get('/loan-members', [MemberController::class, 'reportLoanMembers']);
 
-			Route::get('export/report-members', [ExportController::class,'ReportMembers']);;
-			Route::get('export/report-member/{id}', [ExportController::class,'ReportMember']);;
+			Route::get('export/report-members', [ExportController::class,'ReportMembers']);
+			Route::get('export/report-member/{id}', [ExportController::class,'ReportMember']);
+
+			Route::get('export/report-saving-members', [ExportController::class,'ReportSavingMembers']);
 		});
 
 		// dashboard

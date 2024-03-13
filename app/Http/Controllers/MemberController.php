@@ -188,7 +188,7 @@ class MemberController extends Controller {
         }
     }
 
-    public function reportmembers() {
+    public function reportMembers() {
         try {
             $sub_categories = $this->subCategoryRepo->getSubCategories();
 			$members = $this->memberRepo->getMembers();
@@ -247,6 +247,52 @@ class MemberController extends Controller {
         }
     }
 
+    public function reportSavingMembers() {
+        try {
+            $sub_categories = $this->subCategoryRepo->getSubCategories();
+			$members = $this->memberRepo->getMembers();
+
+			$filtered_sub_categories = [];
+			foreach ($sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'simpanan') {
+					$filtered_sub_categories[] = $sub_category;
+				}
+			}
+
+			$members_data = $members->map(function($member) use ($filtered_sub_categories) {
+				$data_dinamis = [];
+
+				foreach ($filtered_sub_categories as $sub_category) {
+					$detail = 0;
+
+                    $total_saving = 0;
+					// simpanan
+					foreach ($member->savings as $saving) {
+                        if ($saving->sub_category_id == $sub_category->id) {
+                            $total_saving += $saving->amount;
+							$detail = $total_saving;
+						}
+					}
+
+					$data_dinamis[$sub_category->name] = $detail;
+				}
+
+				return [
+					'id' => $member->id,
+					'name' => $member->name,
+					'list' => $data_dinamis
+				];
+			});
+
+			return response()->json([
+				'data' => $members_data
+			]);
+
+        } catch ( Exception $e ) {
+            return errorResponse( $e->getMessage() );
+        }
+    }
+
     public function reportLoanmembers() {
         try {
             $members = $this->memberRepo->getReportLoanMembers();
@@ -260,6 +306,8 @@ class MemberController extends Controller {
             return errorResponse( $e->getMessage() );
         }
     }
+
+    
 
     public function dashboardMember() {
         try {
