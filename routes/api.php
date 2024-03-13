@@ -90,14 +90,17 @@ Route::middleware('json.response')->group(function () {
 		// laporan
 		Route::prefix('report')->group(function () {
 			Route::get('/members', [MemberController::class, 'reportMembers']);
-			Route::get('/saving-members', [MemberController::class, 'reportSavingMembers']);
-
-			Route::get('/loan-members', [MemberController::class, 'reportLoanMembers']);
-
 			Route::get('export/report-members', [ExportController::class,'ReportMembers']);
 			Route::get('export/report-member/{id}', [ExportController::class,'ReportMember']);
 
+			Route::get('/saving-members', [MemberController::class, 'reportSavingMembers']);
 			Route::get('export/report-saving-members', [ExportController::class,'ReportSavingMembers']);
+			Route::get('export/report-saving-member/{id}', [ExportController::class,'ReportSavingMember']);
+
+			Route::get('/loan-members', [MemberController::class, 'reportLoanMembers']);
+			Route::get('export/report-loan-members', [ExportController::class,'ReportLoanMembers']);
+			Route::get('export/report-loan-member/{id}', [ExportController::class,'ReportLoanMember']);
+
 		});
 
 		// dashboard

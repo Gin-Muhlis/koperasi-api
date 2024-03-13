@@ -211,8 +211,6 @@ class MemberController extends Controller {
 					foreach ($member->savings as $saving) {
                         if ($saving->sub_category_id == $sub_category->id) {
                             $total_saving += $saving->amount;
-                            $date = $saving->date;
-                            $date_split = explode('-', $date);
 							$detail = $total_saving;
 						}
 					}
@@ -222,8 +220,6 @@ class MemberController extends Controller {
 					foreach ($member->loans as $loan) {
 						if ($loan->sub_category_id == $sub_category->id) {
                             $total_loan += $loan->total_payment;
-                            $date = $saving->date;
-                            $date_split = explode('-', $date);
 							$detail = $total_loan;
 						}
 					}
@@ -293,15 +289,48 @@ class MemberController extends Controller {
         }
     }
 
-    public function reportLoanmembers() {
+    public function reportLoanMembers() {
         try {
-            $members = $this->memberRepo->getReportLoanMembers();
+            $sub_categories = $this->subCategoryRepo->getSubCategories();
+			$members = $this->memberRepo->getMembers();
 
-            $filtered_member = filterMember( $members );
+			$filtered_sub_categories = [];
+			foreach ($sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'piutang') {
+					$filtered_sub_categories[] = $sub_category;
+				}
+			}
 
-            return response()->json( [
-                'data' => MembersLoanReportResource::collection( $filtered_member ),
-            ] );
+			$members_data = $members->map(function($member) use ($filtered_sub_categories) {
+				$data_dinamis = [];
+
+				foreach ($filtered_sub_categories as $sub_category) {
+					$detail = 0;
+
+                    
+                    $total_loan = 0;
+					// pinjaman
+					foreach ($member->loans as $loan) {
+						if ($loan->sub_category_id == $sub_category->id) {
+                            $total_loan += $loan->total_payment;
+							$detail = $total_loan;
+						}
+					}
+
+					$data_dinamis[$sub_category->name] = $detail;
+				}
+
+				return [
+					'id' => $member->id,
+					'name' => $member->name,
+					'list' => $data_dinamis
+				];
+			});
+
+			return response()->json([
+				'data' => $members_data
+			]);
+
         } catch ( Exception $e ) {
             return errorResponse( $e->getMessage() );
         }

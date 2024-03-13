@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ReportLoanMembersExport;
 use App\Exports\ReportMembersExport;
 use App\Exports\ReportSavingMembersExport;
 use App\Http\Requests\ExportInvoiceMemberRequest;
@@ -309,7 +310,7 @@ class ExportController extends Controller
 			foreach ($months as $key => $value) {
 				$data_sub = [];
 				$data_total_sub = [];
-				
+
 				$total_per_month_saving = 0;
 				$total_per_month_loan = 0;
 
@@ -405,7 +406,8 @@ class ExportController extends Controller
 		}
 	}
 
-	public function reportSavingMembers() {
+	public function reportSavingMembers()
+	{
 		try {
 			$members = $this->memberRepo->getMembers();
 
@@ -453,6 +455,260 @@ class ExportController extends Controller
 
 			return Excel::download(new ReportSavingMembersExport($data, $filtered_sub_categories, $profile), "Koperasi.xlsx");
 
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	public function reportSavingMember($id)
+	{
+		try {
+			$months = [
+				'01' => 'Januari',
+				'02' => 'Februari',
+				'03' => 'Maret',
+				'04' => 'April',
+				'05' => 'Mei',
+				'06' => 'Juni',
+				'07' => 'Juli',
+				'08' => 'Agustus',
+				'09' => 'September',
+				'10' => 'Oktober',
+				'11' => 'November',
+				'12' => 'Desember',
+			];
+
+			$member = $this->memberRepo->showMember($id);
+
+			$sub_categories = $this->subCategoryRepo->getSubCategories();
+			$profile = $this->profileRepo->getProfile();
+
+			$filtered_sub_categories = [];
+			foreach ($sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'simpanan') {
+					$filtered_sub_categories[] = $sub_category;
+				}
+			}
+
+
+			$total_saving_member = 0;
+			foreach ($member->savings as $saving) {
+				$total_saving_member += $saving->amount;
+			}
+
+
+			foreach ($filtered_sub_categories as $sub_category) {
+				$detail = [];
+
+				// simpanan
+				foreach ($member->savings as $saving) {
+					if ($saving->sub_category_id == $sub_category->id) {
+						$month_year = explode('-', $saving->month_year);
+						$detail[] = [
+							'sub_category_id' => $sub_category->id,
+							'month' => $month_year[0],
+							'amount' => $saving->amount
+						];
+					}
+				}
+
+				$data_dinamis[$sub_category->name] = $detail;
+			}
+
+			$result_amount = [];
+			$result_total = [];
+
+			foreach ($months as $key => $value) {
+				$data_sub = [];
+				$data_total_sub = [];
+
+				$total_per_month_saving = 0;
+
+				$total_col_per_month_saving = 0;
+
+				foreach ($filtered_sub_categories as $sub_category) {
+					$amount = 0;
+					$total_sub = 0;
+					$list_data = $data_dinamis[$sub_category->name];
+					foreach ($list_data as $data) {
+						// simpanan
+						if ($sub_category->category->name == 'simpanan') {
+							if ($data['month'] == $key) {
+								$total_per_month_saving += $data['amount'];
+							}
+						}
+						if ($data['month'] == $key) {
+							$amount += $data['amount'];
+						}
+
+
+						// pinjaman
+						if ($sub_category->category->name == 'simpanan') {
+							if ($data['month'] <= $key) {
+								$total_col_per_month_saving += $data['amount'];
+							}
+						}
+						if ($data['month'] <= $key) {
+							$total_sub += $data['amount'];
+						}
+					}
+
+					$data_sub[$sub_category->name] = [
+						'amount' => $amount
+					];
+
+					$data_total_sub[$sub_category->name] = [
+						'amount' => $total_sub
+					];
+				}
+
+				$result_amount[$key] = [
+					'total_per_month_saving' => $total_per_month_saving,
+					...$data_sub
+				];
+
+				$result_total[$key] = [
+					'total_col_per_month_saving' => $total_col_per_month_saving,
+					...$data_total_sub
+				];
+			}
+
+			$sub_categories_saving = [];
+			$sub_categories_loan = [];
+			foreach ($filtered_sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'simpanan') {
+					$sub_categories_saving[] = $sub_category;
+				} else {
+					$sub_categories_loan[] = $sub_category;
+				}
+			}
+
+			$year_now = Carbon::now()->year;
+
+			$data = [
+				'id' => $member->id,
+				'name' => $member->name,
+				'position' => $member->position,
+				'total_saving' => $total_saving_member,
+				'result_amount' => $result_amount,
+				'result_total' => $result_total,
+			];
+
+			$pdf = Pdf::loadView('pdf.report-saving-member', compact('data', 'profile', 'sub_categories_saving', 'year_now', 'months'))->setPaper('a4', 'landscape');
+			return $pdf->download("zie_koperasi.pdf");
+
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	public function ReportLoanMembers()
+	{
+		try {
+			$members = $this->memberRepo->getMembers();
+
+			$sub_categories = $this->subCategoryRepo->getSubCategories();
+			$profile = $this->profileRepo->getProfile();
+
+			$filtered_sub_categories = [];
+			foreach ($sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'piutang') {
+					$filtered_sub_categories[] = $sub_category;
+				}
+			}
+
+			$data = $members->map(function ($member) use ($filtered_sub_categories) {
+				$data_dinamis = [];
+				$total_loan_member = 0;
+
+				// pinjaman
+				foreach ($member->loans as $loan) {
+					$total_loan_member += $loan->total_payment;
+				}
+
+				foreach ($filtered_sub_categories as $sub_category) {
+					$detail = 0;
+
+					$total_loan = 0;
+					// pinjaman
+					foreach ($member->loans as $loan) {
+						if ($loan->sub_category_id == $sub_category->id) {
+							$total_loan += $loan->total_payment;
+							$detail = $total_loan;
+						}
+					}
+
+					$data_dinamis[$sub_category->name] = $detail;
+				}
+
+				return [
+					'id' => $member->id,
+					'name' => $member->name,
+					...$data_dinamis,
+					'total_loan' => $total_loan_member
+				];
+			});
+
+
+			return Excel::download(new ReportLoanMembersExport($data, $filtered_sub_categories, $profile), "Koperasi.xlsx");
+
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	public function ReportLoanMember($id)
+	{
+		try {
+			$member = $this->memberRepo->showMember($id);
+
+			$sub_categories = $this->subCategoryRepo->getSubCategories();
+			$profile = $this->profileRepo->getProfile();
+
+			$filtered_sub_categories = [];
+			foreach ($sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'piutang') {
+					$filtered_sub_categories[] = $sub_category;
+				}
+			}
+
+			$data_dinamis = [];
+			$total_loan_member = 0;
+
+			// pinjaman
+			foreach ($member->loans as $loan) {
+				$total_loan_member += $loan->total_payment;
+			}
+
+			foreach ($filtered_sub_categories as $sub_category) {
+				$detail = 0;
+
+				$total_loan = 0;
+				// pinjaman
+				foreach ($member->loans as $loan) {
+					if ($loan->sub_category_id == $sub_category->id) {
+						$total_loan += $loan->total_payment;
+						$detail = $total_loan;
+					}
+				}
+
+				$data_dinamis[$sub_category->name] = $detail;
+			}
+
+			$year_now = Carbon::now()->year;
+
+			$data = [
+				'id' => $member->id,
+				'name' => $member->name,
+				'position' => $member->position,
+				...$data_dinamis,
+				'total_loan' => $total_loan_member
+			];
+
+
+			$pdf = Pdf::loadView('pdf.report-loan-member', compact('data', 'profile', 'filtered_sub_categories', 'year_now'))->setPaper('a4');
+
+			return $pdf->download("zie_koperasi.pdf");
 		} catch (Exception $e) {
 			return errorResponse($e->getMessage());
 		}

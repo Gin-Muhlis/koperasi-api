@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
-class ReportSavingMembersExport implements FromView, WithTitle, WithEvents
+class ReportLoanMembersExport implements FromView, WithTitle, WithEvents
 {
     private $dataExport;
 	private $sub_categories;
@@ -32,8 +32,7 @@ class ReportSavingMembersExport implements FromView, WithTitle, WithEvents
 	{
 
 		$data = $this->dataExport;
-        $sub_categories_saving = $this->sub_categories;
-		
+        $sub_categories_loan = $this->sub_categories;
 
         $total_cols = [];
 
@@ -46,16 +45,17 @@ class ReportSavingMembersExport implements FromView, WithTitle, WithEvents
 			}
 		}
 
-        $total_col_saving = 0;
-        foreach ($sub_categories_saving as $sub_category) {
+        $total_col_loan = 0;
+        foreach ($sub_categories_loan as $sub_category) {
 			foreach ($data as $row) {
-				$total_cols['total_col_saving'] = $total_col_saving += $row[$sub_category->name];
+				$total_cols['total_col_loan'] = $total_col_loan += $row[$sub_category->name];
 
 			}
 		}
 
 
-    return View('exports.reportSavingMembers', compact('data', 'sub_categories_saving', 'total_cols'));
+
+        return View('exports.reportLoanMembers', compact('data', 'sub_categories_loan', 'total_cols'));
 	}
 
 	public function title(): string
@@ -103,7 +103,7 @@ class ReportSavingMembersExport implements FromView, WithTitle, WithEvents
 		return [
 			AfterSheet::class => function (AfterSheet $event) use ($alphabets, $highest_col, $now_string) {
 				$event->sheet->getColumnDimension('A')->setWidth(5);
-				$event->sheet->getColumnDimension('B')->setWidth(40);
+				$event->sheet->getColumnDimension('B')->setWidth(35);
 
 				for ($i = 1; $i <= $this->total_column_data; $i++) {
 					$alphabet = $alphabets[$i + 2];
@@ -114,7 +114,7 @@ class ReportSavingMembersExport implements FromView, WithTitle, WithEvents
 
 				$event->sheet->mergeCells("A1:{$highest_col}1");
 				$event->sheet->mergeCells("A2:{$highest_col}2");
-				$event->sheet->setCellValue('A1', strtoupper('Laporan Simpanan Anggota Koperasi'));
+				$event->sheet->setCellValue('A1', strtoupper('Daftar Simpanan, Pinjaman Anggota Koperasi'));
 
 				$event->sheet->getStyle('A1:A2')->getFont()->setSize(16);
 
