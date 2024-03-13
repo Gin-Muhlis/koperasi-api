@@ -25,7 +25,7 @@
         .header {
             text-align: center;
             /* font-weight: bold; */
-            
+
         }
 
         .header .address {
@@ -84,8 +84,6 @@
         .sign .sign-treasurer {
             margin-bottom: 50px;
         }
-
-        
     </style>
 </head>
 
@@ -122,7 +120,8 @@
                     <tr>
                         <td class="center" colspan="2">Jumlah</td>
                         @foreach ($data['sub_categories'] as $item)
-                            <td class="center">Rp. {{ number_format($data['total_cols'][$item->name], 0, ',', '.') }}</td>
+                            <td class="center">Rp. {{ number_format($data['total_cols'][$item->name], 0, ',', '.') }}
+                            </td>
                         @endforeach
 
                         <td class="center">Rp. {{ number_format($data['total_invoice'], 0, ',', '.') }}</td>
@@ -142,3 +141,5 @@
 </body>
 
 </html>
+
+

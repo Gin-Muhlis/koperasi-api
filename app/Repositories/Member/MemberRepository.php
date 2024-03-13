@@ -18,5 +18,4 @@ interface MemberRepository extends Repository {
 
 	public function getNotPaidMember($member_id);
 	public function getReportMember($id);
-	
 }

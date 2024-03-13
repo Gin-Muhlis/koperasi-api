@@ -64,7 +64,7 @@ class ExportController extends Controller
 		try {
 
 			$data = $this->generateDataExport($invoice_code);
-			
+
 
 			$pdf = Pdf::loadView('pdf.invoice', compact('data'))->setPaper('a4', 'landscape');
 
@@ -123,11 +123,11 @@ class ExportController extends Controller
 			$total = 0;
 			$total_balance = 0;
 
-			foreach($data_dinamis as $data => $value) {
+			foreach ($data_dinamis as $data => $value) {
 				$total += $value;
 			}
 
-			foreach($total_sub_categories as $data => $value) {
+			foreach ($total_sub_categories as $data => $value) {
 				$total_balance += $value;
 			}
 
@@ -147,7 +147,7 @@ class ExportController extends Controller
 				'total_balance' => $total_balance
 			];
 
-			
+
 
 			$pdf = Pdf::loadView('pdf.invoice-member', compact('result'))->setPaper('a4');
 			return $pdf->download("zie_koperasi.pdf");
@@ -158,10 +158,11 @@ class ExportController extends Controller
 	}
 
 	// Laporan Anggota
-	public function ReportMembers() {
+	public function ReportMembers()
+	{
 		try {
 			$members = $this->memberRepo->getMembers();
-			
+
 			$sub_categories = $this->subCategoryRepo->getSubCategories();
 			$profile = $this->profileRepo->getProfile();
 
@@ -172,7 +173,7 @@ class ExportController extends Controller
 				}
 			}
 
-			$data = $members->map(function($member) use ($filtered_sub_categories) {
+			$data = $members->map(function ($member) use ($filtered_sub_categories) {
 				$data_dinamis = [];
 				$total_saving_member = 0;
 				$total_loan_member = 0;
@@ -185,24 +186,24 @@ class ExportController extends Controller
 				foreach ($member->loans as $loan) {
 					$total_loan_member += $loan->total_payment;
 				}
-				
+
 				foreach ($filtered_sub_categories as $sub_category) {
 					$detail = 0;
 
-                    $total_saving = 0;
+					$total_saving = 0;
 					// simpanan
 					foreach ($member->savings as $saving) {
-                        if ($saving->sub_category_id == $sub_category->id) {
-                            $total_saving += $saving->amount;
+						if ($saving->sub_category_id == $sub_category->id) {
+							$total_saving += $saving->amount;
 							$detail = $total_saving;
 						}
 					}
 
-                    $total_loan = 0;
+					$total_loan = 0;
 					// pinjaman
 					foreach ($member->loans as $loan) {
 						if ($loan->sub_category_id == $sub_category->id) {
-                            $total_loan += $loan->total_payment;
+							$total_loan += $loan->total_payment;
 							$detail = $total_loan;
 						}
 					}
@@ -219,15 +220,192 @@ class ExportController extends Controller
 				];
 			});
 
-		
+
 			return Excel::download(new ReportMembersExport($data, $filtered_sub_categories, $profile), "Koperasi.xlsx");
-			
+
 		} catch (Exception $e) {
 			return errorResponse($e->getMessage());
 		}
 	}
 
-	private function generateDataExport($invoice_code) {
+	public function reportMember($id)
+	{
+		try {
+			$months = [
+				'01' => 'Januari',
+				'02' => 'Februari',
+				'03' => 'Maret',
+				'04' => 'April',
+				'05' => 'Mei',
+				'06' => 'Juni',
+				'07' => 'Juli',
+				'08' => 'Agustus',
+				'09' => 'September',
+				'10' => 'Oktober',
+				'11' => 'November',
+				'12' => 'Desember',
+			];
+
+			$member = $this->memberRepo->showMember($id);
+
+			$sub_categories = $this->subCategoryRepo->getSubCategories();
+			$profile = $this->profileRepo->getProfile();
+
+			$filtered_sub_categories = [];
+			foreach ($sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
+					$filtered_sub_categories[] = $sub_category;
+				}
+			}
+
+
+			$total_saving_member = 0;
+			$total_loan_member = 0;
+
+			foreach ($member->savings as $saving) {
+				$total_saving_member += $saving->amount;
+			}
+
+			// pinjaman
+			foreach ($member->loans as $loan) {
+				$total_loan_member += $loan->total_payment;
+			}
+
+			foreach ($filtered_sub_categories as $sub_category) {
+				$detail = [];
+
+				// simpanan
+				foreach ($member->savings as $saving) {
+					if ($saving->sub_category_id == $sub_category->id) {
+						$month_year = explode('-', $saving->month_year);
+						$detail[] = [
+							'sub_category_id' => $sub_category->id,
+							'month' => $month_year[0],
+							'amount' => $saving->amount
+						];
+					}
+				}
+
+				// pinjaman
+				foreach ($member->loans as $loan) {
+
+					if ($loan->sub_category_id == $sub_category->id) {
+						$date = explode('-', $loan->date);
+						$detail[] = [
+							'sub_category_id' => $sub_category->id,
+							'month' => $date[1],
+							'amount' => $loan->total_payment
+						];
+					}
+				}
+
+				$data_dinamis[$sub_category->name] = $detail;
+			}
+
+			$result_amount = [];
+			$result_total = [];
+
+			foreach ($months as $key => $value) {
+				$data_sub = [];
+				$data_total_sub = [];
+				
+				$total_per_month_saving = 0;
+				$total_per_month_loan = 0;
+
+				$total_col_per_month_saving = 0;
+				$total_col_per_month_loan = 0;
+
+				foreach ($filtered_sub_categories as $sub_category) {
+					$amount = 0;
+					$total_sub = 0;
+					$list_data = $data_dinamis[$sub_category->name];
+					foreach ($list_data as $data) {
+						// simpanan
+						if ($sub_category->category->name == 'simpanan') {
+							if ($data['month'] == $key) {
+								$total_per_month_saving += $data['amount'];
+							}
+						}
+						if ($sub_category->category->name == 'piutang') {
+							if ($data['month'] == $key) {
+								$total_per_month_loan += $data['amount'];
+							}
+						}
+						if ($data['month'] == $key) {
+							$amount += $data['amount'];
+						}
+
+
+						// pinjaman
+						if ($sub_category->category->name == 'simpanan') {
+							if ($data['month'] <= $key) {
+								$total_col_per_month_saving += $data['amount'];
+							}
+						}
+						if ($sub_category->category->name == 'piutang') {
+							if ($data['month'] <= $key) {
+								$total_col_per_month_loan += $data['amount'];
+							}
+						}
+						if ($data['month'] <= $key) {
+							$total_sub += $data['amount'];
+						}
+					}
+
+					$data_sub[$sub_category->name] = [
+						'amount' => $amount
+					];
+
+					$data_total_sub[$sub_category->name] = [
+						'amount' => $total_sub
+					];
+				}
+
+				$result_amount[$key] = [
+					'total_per_month_saving' => $total_per_month_saving,
+					'total_per_month_loan' => $total_per_month_loan,
+					...$data_sub
+				];
+
+				$result_total[$key] = [
+					'total_col_per_month_saving' => $total_col_per_month_saving,
+					'total_col_per_month_loan' => $total_col_per_month_loan,
+					...$data_total_sub
+				];
+			}
+
+			$sub_categories_saving = [];
+			$sub_categories_loan = [];
+			foreach ($filtered_sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'simpanan') {
+					$sub_categories_saving[] = $sub_category;
+				} else {
+					$sub_categories_loan[] = $sub_category;
+				}
+			}
+
+			$year_now = Carbon::now()->year;
+
+			$data = [
+				'id' => $member->id,
+				'name' => $member->name,
+				'position' => $member->position,
+				'total_saving' => $total_saving_member,
+				'total_loan' => $total_loan_member,
+				'result_amount' => $result_amount,
+				'result_total' => $result_total,
+			];
+
+			$pdf = Pdf::loadView('pdf.report-member', compact('data', 'profile', 'sub_categories_saving', 'sub_categories_loan', 'year_now', 'months'))->setPaper('a4', 'landscape');
+			return $pdf->download("zie_koperasi.pdf");
+
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	private function generateDataExport($invoice_code)
+	{
 		$sub_categories = $this->subCategoryRepo->getSubCategories();
 		$detail_invoice = $this->invoiceRepo->getDetailInvoiceByCode($invoice_code);
 		$profile_app = $this->profileRepo->getProfile();
@@ -280,7 +458,7 @@ class ExportController extends Controller
 				'member_id' => $member->id,
 				'member_name' => $member->name,
 				'total_row' => array_sum($data_dinamis),
-				
+
 				...$data_dinamis
 			];
 		}

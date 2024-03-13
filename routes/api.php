@@ -92,6 +92,7 @@ Route::middleware('json.response')->group(function () {
 			Route::get('/loan-members', [MemberController::class, 'reportLoanMembers']);
 
 			Route::get('export/report-members', [ExportController::class,'ReportMembers']);;
+			Route::get('export/report-member/{id}', [ExportController::class,'ReportMember']);;
 		});
 
 		// dashboard
