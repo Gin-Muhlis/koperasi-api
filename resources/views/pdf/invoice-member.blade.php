@@ -4,7 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $result['profile']->name }}</title>
+    <title>Zie Koperasi</title>
     <style>
         * {
             margin: 0;
@@ -82,7 +82,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>{{ $result['profile']->app_name }}</h2>
+            <h2>Zie Koperasi</h2>
             <p>{{ $result['profile']->address }}</p>
             <p>Potongan Bulan: {{ $result['invoice_month'] }}</p>
         </div>

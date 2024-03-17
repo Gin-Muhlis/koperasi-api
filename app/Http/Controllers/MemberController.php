@@ -342,25 +342,32 @@ class MemberController extends Controller {
         try {
             $user = Auth::user();
 
-            $total_mandatory_saving = 0;
-            $total_special_mandatory_saving = 0;
-            $total_voluntary_saving = 0;
-            $total_recretional_saving = 0;
+            $data_saving = [];
 
             $saving_members = $this->savingRepo->getSavingsMember( $user->id );
+            $sub_categories = $this->subCategoryRepo->getSubCategories();
 
-            foreach ( $saving_members as $saving ) {
-                if ( $saving->subCategory->name = 'simpanan wajib' ) {
-                    $total_mandatory_saving += $saving->amount;
-                } else if ( $saving->subCategoryy->name = 'simpanan wajib khusus' ) {
-                    $total_special_mandatory_saving += $saving->amount;
-                } else if ( $saving->subCategoryy->name = 'simpanan sukarela' ) {
-                    $total_voluntary_saving += $saving->amount;
-                } else if ( $saving->subCategoryy->name = 'tabungan rekreasi' ) {
-                    $total_recretional_saving += $saving->amount;
+			$filtered_sub_categories = [];
+			foreach ($sub_categories as $sub_category) {
+				if ($sub_category->category->name == 'simpanan') {
+					$filtered_sub_categories[] = $sub_category;
+				}
+			}
+
+            foreach ($filtered_sub_categories as $sub_category) {
+
+                // simpanan
+                $total = 0;
+                foreach ($saving_members as $saving) {
+                    if ($saving->sub_category_id == $sub_category->id) {
+                        $total += $saving->amount;
+                    }
                 }
 
+                $data_saving[$sub_category->name] = $total;
             }
+
+            
 
             $history_savings = $this->savingRepo->getHistorySavingmember( $user->id );
             $history_isntallments = $this->installmentRepo->getHistoryInstallments( $user->id );
@@ -375,10 +382,7 @@ class MemberController extends Controller {
             }
 
             $data = [
-                'total_mandatory_saving'=> $total_mandatory_saving,
-                'total_special_mandatory_saving'=> $total_special_mandatory_saving,
-                'total_voluntary_saving'=> $total_voluntary_saving,
-                'total_recretional_saving'=> $total_recretional_saving,
+                'data_saving' => $data_saving,
                 'history_savings' => $result_saving,
                 'history_installments' => $history_isntallments
             ];

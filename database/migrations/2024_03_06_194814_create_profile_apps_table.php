@@ -14,14 +14,10 @@ return new class extends Migration
         Schema::create('profile_apps', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->string('app_name');
             $table->string('chairmans_name');
             $table->string('secretary_name');
             $table->string('treasurer_name');
-            $table->string('icon')->nullable();
-            $table->string('phone_number', 20);
             $table->text('address');
-            $table->text('about');
             $table->timestamps();
         });
     }

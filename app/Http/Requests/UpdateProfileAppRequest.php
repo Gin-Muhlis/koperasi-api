@@ -18,34 +18,24 @@ class UpdateProfileAppRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'app_name' => ['required', 'string'],
             'chairmans_name' => ['required', 'string'],
             'secretary_name' => ['required', 'string'],
             'treasurer_name' => ['required', 'string'],
-            'icon' => ['nullable', 'image', 'max:2024'],
             'address' => ['required', 'string'],
-            'phone_number' => ['required', 'numeric']
         ];
     }
 
     public function messages()
     {
         return [
-            'app_name.required' => 'Nama Aplikasi diperlukan.',
-            'app_name.string' => 'Nama Aplikasi harus berupa teks.',
             'chairmans_name.required' => 'Nama Ketua diperlukan.',
             'chairmans_name.string' => 'Nama Ketua harus berupa teks.',
             'secretary_name.required' => 'Nama Sekretaris diperlukan.',
             'secretary_name.string' => 'Nama Sekretaris harus berupa teks.',
             'treasurer_name.required' => 'Nama Bendahara diperlukan.',
             'treasurer_name.string' => 'Nama Bendahara harus berupa teks.',
-            'icon.required' => 'Icon diperlukan.',
-            'icon.image' => 'Icon harus berupa file gambar.',
-            'icon.max' => 'Ukuran icon tidak boleh melebihi 2024 kilobita.',
             'address.required' => 'Alamat diperlukan.',
             'address.string' => 'Alamat harus berupa teks.',
-            'phone_number.required' => 'Nomor telepon diperlukan.',
-            'phone_number.numeric' => 'Nomor telepon harus berupa angka.'
         ];
     }
 

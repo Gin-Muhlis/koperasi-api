@@ -80,7 +80,7 @@ class ReportMembersExport implements FromView, WithTitle, WithEvents
 	public function title(): string
 	{
 
-		return $this->profile->app_name;
+		return 'Zie Koperasi';
 	}
 
 	public function registerEvents(): array

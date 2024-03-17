@@ -96,7 +96,7 @@ class ReportPaymentExport implements FromView, WithTitle, WithEvents
 
 	public function title(): string
 	{
-		return 'Data Koperasi';
+		return 'Data Invoice Koperasi';
 	}
 
 	public function registerEvents(): array
@@ -115,7 +115,7 @@ class ReportPaymentExport implements FromView, WithTitle, WithEvents
 				$event->sheet->insertNewRowBefore(1, 3);
 				$event->sheet->mergeCells('A1:H1');
 				$event->sheet->mergeCells('A2:H2');
-				$event->sheet->setCellValue('A1', 'DATA TAGIHAN GABUNGAN');
+				$event->sheet->setCellValue('A1', 'DATA PEMBAYARAN KOPERASI');
 
 				$event->sheet->getStyle('A')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 				$event->sheet->getStyle('A1:H2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);

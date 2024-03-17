@@ -4,7 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZIE KOPERASI</title>
+    <title>Zie Koperasi</title>
     <style>
         * {
             margin: 0;
@@ -90,7 +90,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>{{ $data['profile']->app_name }}</h2>
+            <h2>Zie Koperasi</h2>
             <p class="address">{{ $data['profile']->address }}</p>
             <p class="title">Daftar Potongan Bulan {{ $data['time'] }}</p>
         </div>

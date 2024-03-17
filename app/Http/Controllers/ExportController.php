@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\MembersDataExport;
 use App\Exports\ReportLoanMembersExport;
 use App\Exports\ReportMembersExport;
 use App\Exports\ReportSavingMembersExport;
@@ -709,6 +710,16 @@ class ExportController extends Controller
 			$pdf = Pdf::loadView('pdf.report-loan-member', compact('data', 'profile', 'filtered_sub_categories', 'year_now'))->setPaper('a4');
 
 			return $pdf->download("zie_koperasi.pdf");
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	public function exportMembers() {
+		try {
+			$members = $this->memberRepo->all();
+
+			return Excel::download(new MembersDataExport($members), "Koperasi.xlsx");			
 		} catch (Exception $e) {
 			return errorResponse($e->getMessage());
 		}

@@ -62,7 +62,6 @@ Route::middleware('json.response')->group(function () {
 
 		// simpanan
 		Route::apiResource('/saving', SavingController::class);
-		Route::get('/sub-categories-saving', [SavingController::class,'getSubCategories']);
 		Route::get('/member-saving', [SavingController::class,'memberSaving']);
 
 		// pinjaman
@@ -88,6 +87,8 @@ Route::middleware('json.response')->group(function () {
 		Route::get('/export/invoice-pdf/{invoice_code}', [ExportController::class, 'detailInvoiceExportPdf']);
 		Route::post('/export/invoice-member', [ExportController::class, 'invoiceMember']);
 
+		Route::get('/export/members', [ExportController::class,'exportMembers']);
+
 		// laporan
 		Route::prefix('report')->group(function () {
 			Route::get('/members', [MemberController::class, 'reportMembers']);
@@ -111,6 +112,9 @@ Route::middleware('json.response')->group(function () {
 	Route:: middleware('role:super-admin|member')->group(function () {
 		// golongan
 		Route::get('group-member', [PositionCategoryController::class,'index']);
+
+		// sub kategori
+		Route::get('/sub-categories-saving', [SavingController::class,'getSubCategories']);
 	});
 
 	Route:: middleware('role:member')->group(function () {

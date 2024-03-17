@@ -75,7 +75,7 @@ class SavingController extends Controller
                     }
 
                     $detail_savings[$sub_category->name] = $total;
-                }
+                }   
 
                 $sorted_history = collect($history_savings)->sortByDesc('date')->values()->all();
 

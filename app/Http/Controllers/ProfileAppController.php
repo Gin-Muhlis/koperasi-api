@@ -58,10 +58,6 @@ class ProfileAppController extends Controller
     {
         try {
             $validated = $request->validated();
-            if ( $request->hasFile( 'icon' ) ) {
-                $validated[ 'icon' ] = $request->file( 'icon' )->store( 'public/profile' );
-            }
-
             $this->profileRepo->updateProfile($id, $validated);
 
             return response()->json([

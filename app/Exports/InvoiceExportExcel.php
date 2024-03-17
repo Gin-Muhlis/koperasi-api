@@ -41,7 +41,7 @@ class InvoiceExportExcel implements FromView, WithTitle, WithEvents
 	public function title(): string
 	{
 
-		return $this->profile->app_name;
+		return 'Zie Koperasi';
 	}
 
 	public function registerEvents(): array
@@ -92,7 +92,7 @@ class InvoiceExportExcel implements FromView, WithTitle, WithEvents
 
 				$event->sheet->mergeCells("A1:{$highest_col}1");
 				$event->sheet->mergeCells("A2:{$highest_col}2");
-				$event->sheet->setCellValue('A1', strtoupper($this->profile->app_name));
+				$event->sheet->setCellValue('A1', strtoupper('Zie Koperasi'));
 
 				$event->sheet->getStyle('A1:A2')->getFont()->setSize(16);
 

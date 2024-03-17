@@ -88,7 +88,7 @@
     <div class="container">
         <div class="header">
             <div class="profile-app">
-                <h2>{{ $profile->app_name }}</h2>
+                <h2>Zie Koperasi</h2>
                 <p class="address">{{ $profile->address }}</p>
             </div>
             <div class="profile-member">
