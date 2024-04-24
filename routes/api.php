@@ -21,24 +21,24 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::middleware('json.response')->group(function () {
-	// login dan register (used)
+	// login dan register
 	Route::post('/register', [AuthController::class, 'register'])->middleware('guest');
 	Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
 	Route::get('/register/position-categories', [PositionCategoryController::class, 'index'])->middleware('guest');
 
 	Route::middleware('auth:api')->group(function () {
-		// logout (used)
+		// logout
 		Route::post('/logout', [AuthController::class, 'logout']);
-		// profile (used)
+		// profile
 		Route::get('/profile', [AuthController::class, 'profile']);
-		// update profile (used)
+		// update profile
 		Route::put('/profile/{id}', [AuthController::class, 'updateProfile']);
 	});
 
 	// Hanya dapat diakses admin
 	Route::middleware('role:super-admin')->group(function () {
 
-		// Data master (used)
+		// Data master
 		Route::apiResource('/member', MemberController::class);
 		Route::apiResource('/sub-category', SubCategoryController::class);
 		Route::apiResource('/product', ProductController::class);
@@ -48,52 +48,52 @@ Route::middleware('json.response')->group(function () {
 		Route::apiResource('/profile-app', ProfileAppController::class);
 		Route::get('/category', [CategoryController::class, 'index']);
 
-		// Reset password member (used)
+		// Reset password member
 		Route::put('/change-password/{id}', [AuthController::class, 'changePassword']);
 
 		// Transaksi
 		// Route::apiResource('/purchase', PurchaseController::class);
 		// Route::apiResource('/sale', SaleController::class);
 
-		// Simpanan (used)
+		// Simpanan
 		Route::apiResource('/saving', SavingController::class);
 		Route::get('/member-saving', [SavingController::class, 'memberSaving']);
 
-		// Pinjaman (used)
+		// Pinjaman
 		Route::apiResource('/receivable', ReceivableController::class);
 
-		// Angsuran (used)
+		// Angsuran
 		Route::apiResource('/installment', InstallmentController::class);
 
-		// Invoice (used)
+		// Invoice
 		Route::apiResource('/invoice', InvoiceController::class);
 		Route::get('/members-invoice', [InvoiceController::class, 'getMemberInvoice']);
 		Route::get('/sub-categories-invoice', [InvoiceController::class, 'getSubCategoriesInvoice']);
 		Route::post('/invoice-detail', [InvoiceController::class, 'storeDetailInvoice']);
 		Route::get('/invoice-detail/{code}', [InvoiceController::class, 'detailInvoice']);
 
-		// Payment invoice (used)
+		// Payment invoice
 		Route::apiResource('payment', PaymentController::class);
 
-		// Export (used)
+		// Export
 		Route::get('/export/invoice-excel/{invoice_code}', [ExportController::class, 'detailInvoiceExportExcel']);
 		Route::get('/export/invoice-pdf/{invoice_code}', [ExportController::class, 'detailInvoiceExportPdf']);
 		Route::post('/export/invoice-member', [ExportController::class, 'invoiceMember']);
 		Route::get('/export/members', [ExportController::class, 'exportMembers']);
 
-		// laporan (used)
+		// laporan
 		Route::prefix('report')->group(function () {
-			// Laporan anggota (used)
+			// Laporan anggota
 			Route::get('/members', [MemberController::class, 'reportMembers']);
 			Route::get('/export/report-members', [ExportController::class, 'ReportMembers']);
 			Route::get('/export/report-member/{id}', [ExportController::class, 'ReportMember']);
 
-			// Laporan simpanan (used)
+			// Laporan simpanan
 			Route::get('/saving-members', [MemberController::class, 'reportSavingMembers']);
 			Route::get('/export/report-saving-members', [ExportController::class, 'ReportSavingMembers']);
 			Route::get('/export/report-saving-member/{id}', [ExportController::class, 'ReportSavingMember']);
 
-			// Laporan pinjaman (used)
+			// Laporan pinjaman
 			Route::get('/loan-members', [MemberController::class, 'reportLoanMembers']);
 			Route::get('/export/report-loan-members', [ExportController::class, 'ReportLoanMembers']);
 			Route::get('/export/report-loan-member/{id}', [ExportController::class, 'ReportLoanMember']);

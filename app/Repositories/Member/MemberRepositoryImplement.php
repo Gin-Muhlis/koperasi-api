@@ -41,52 +41,7 @@ class MemberRepositoryImplement extends Eloquent implements MemberRepository
 		return $this->delete($id);
 	}
 
-	public function getReportMembers()
-	{
-		return $this->model->with([
-			'savings' => function ($query) {
-				$query->with('subCategory');
-			},
-			'loans' => function ($query) {
-				$query->with('subCategory', 'installments');
-			}
-		])->get();
-	}
-
-	public function getReportMember($id)
-	{
-		return DB::table('savings')
-			->select(DB::raw('MONTH(date) as month'), 'member_id', 'sub_category_id', DB::raw('SUM(amount) as total_amount'))
-			->where('member_id', $id)
-			->groupBy('month', 'member_id', 'sub_category_id')
-			->get();
-	}
-
 	public function getNotPaidMembers()
-	{
-		return $this->model->with([
-			'loans' => function ($query) {
-				$query->where([
-					['status', '!=', 'lunas']
-				]);
-			}
-		])->whereHas('loans', function ($query) {
-			$query->where([
-				['status', '!=', 'lunas']
-			]);
-		})->get();
-	}
-
-	public function getNotPaidMember($member_id)
-	{
-		return $this->model->whereHas('loans', function ($query) {
-			$query->where([
-				['status', '!=', 'lunas'],
-			]);
-		})->where('id', $member_id)->get();
-	}
-
-	public function getReportLoanMembers()
 	{
 		return $this->model->with([
 			'loans' => function ($query) {

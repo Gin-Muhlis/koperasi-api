@@ -2,19 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\SubCategoryResource;
-use App\Repositories\Member\MemberRepository;
-use App\Repositories\SubCategory\SubCategoryRepository;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-
 require_once app_path() . '/Helpers/helpers.php';
 
+use App\Repositories\Member\MemberRepository;
+use App\Repositories\SubCategory\SubCategoryRepository;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreReceivableRequest;
 use App\Repositories\Loan\LoanRepository;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class ReceivableController extends Controller
@@ -37,12 +33,7 @@ class ReceivableController extends Controller
             $sub_categories = $this->subCategoryRepo->getSubCategories();
             $members = $this->memberRepo->getMembers();
 
-            $filtered_sub_categories = [];
-            foreach ($sub_categories as $sub_category) {
-                if ($sub_category->category->name == 'piutang') {
-                    $filtered_sub_categories[] = $sub_category;
-                }
-            }
+            $filtered_sub_categories = filterLoanCategories($sub_categories);
 
             $members_data = $members->map(function ($member) use ($filtered_sub_categories) {
                 $data_dinamis = [];
@@ -61,8 +52,8 @@ class ReceivableController extends Controller
                     $detail = [
                         'code' => $loan->code,
                         'total_loan' => $loan->total_payment,
-                        'paid' => $this->handlePaid($loan->installments),
-                        'remain_payment' => $loan->total_payment - $this->handlePaid($loan->installments),
+                        'paid' => handlePaid($loan->installments),
+                        'remain_payment' => $loan->total_payment - handlePaid($loan->installments),
                         'deadline' => $loan->deadline->toDateString(),
                         'date_completion' => $loan->date_completion,
                         'status' => $loan->status,
@@ -128,16 +119,4 @@ class ReceivableController extends Controller
 
     }
 
-    private function handlePaid($data)
-    {
-        if (count($data) < 1) {
-            return 0;
-        }
-
-        $totalPaid = 0;
-        foreach ($data as $item) {
-            $totalPaid += $item->amount;
-        }
-        return $totalPaid;
-    }
 }

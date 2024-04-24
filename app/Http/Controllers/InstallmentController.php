@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+
+require_once app_path() . '/Helpers/helpers.php';
+
 use App\Repositories\Installment\InstallmentRepository;
 use App\Repositories\Loan\LoanRepository;
 use App\Repositories\Member\MemberRepository;
@@ -9,12 +12,7 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-
-require_once app_path() . '/Helpers/helpers.php';
-
-use App\Models\Installment;
 use App\Http\Requests\StoreInstallmentRequest;
-use App\Http\Requests\UpdateInstallmentRequest;
 
 class InstallmentController extends Controller
 {
@@ -27,9 +25,7 @@ class InstallmentController extends Controller
 		$this->loanRepo = $loanRepository;
         $this->memberRepo = $memberRepository;
 	}
-    /**
-     * Display a listing of the resource.
-     */
+	
     public function index()
     {
         try {
@@ -38,8 +34,6 @@ class InstallmentController extends Controller
 			$members_data = $members->map(function($member) {
 					$detail = [];
 					$months_isntallment = [];
-
-					
 
 					// pinjaman
 					foreach ($member->loans as $loan) {
@@ -57,8 +51,8 @@ class InstallmentController extends Controller
 								'loan_id'=> $loan->id,
                                 'loan_date' => $loan->date,
 								'total_payment' => $loan->total_payment,
-								'paid' => $this->handlePaid($loan->installments),
-								'remain_payment' => $loan->total_payment - $this->handlePaid($loan->installments),
+								'paid' => handlePaid($loan->installments),
+								'remain_payment' => $loan->total_payment - handlePaid($loan->installments),
 								'monthly' => ceil($loan->total_payment / $loan->loan_duration / 1000) * 1000,
                                 'duration' => $loan->loan_duration,
                                 'remain_duration' => $loan->loan_duration - count($months_isntallment),
@@ -66,8 +60,6 @@ class InstallmentController extends Controller
 							];
 						}
 					}
-
-                    
 
 				return [
 					'id' => $member->id,
@@ -85,9 +77,6 @@ class InstallmentController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreInstallmentRequest $request)
     {
         try {
@@ -119,29 +108,6 @@ class InstallmentController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Installment $installment)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateInstallmentRequest $request, Installment $installment)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Installment $installment)
-    {
-        //
-    }
     private function generateInstallmentData($data) {
 		return [
 			'uuid' => Str::uuid(),
@@ -155,16 +121,6 @@ class InstallmentController extends Controller
 		];
 	}
 
-    private function handlePaid($data) {
-		if (count($data) < 1) {
-			return 0;
-		}
 
-		$totalPaid = 0;
-		foreach ($data as $item) {
-			$totalPaid += $item->amount;
-		}
-		return $totalPaid;
-	}
 
 }

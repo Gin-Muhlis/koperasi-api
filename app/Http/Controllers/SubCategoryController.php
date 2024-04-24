@@ -24,9 +24,7 @@ class SubCategoryController extends Controller
         $this->subCategoryRepo = $subCategoryRepository;
         $this->categoryRepo = $categoryRepository;
     }
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         try {
@@ -40,29 +38,6 @@ class SubCategoryController extends Controller
         }
     }
 
-    public function getSubCategoriesSaving() {
-        try {
-            $sub_categories = $this->subCategoryRepo->getSubCategories();
-
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'simpanan') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
-
-            
-            return response()->json([
-                'data' => SubCategoryResource::collection($filtered_sub_categories)
-            ]);
-        } catch (Exception $e) {
-            return errorResponse($e->getMessage());
-        }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreSubCategoryRequest $request)
     {
         try {
@@ -85,9 +60,6 @@ class SubCategoryController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         try {
@@ -101,9 +73,6 @@ class SubCategoryController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateSubCategoryRequest $request, $id)
     {
         try {
@@ -124,9 +93,6 @@ class SubCategoryController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         try {
@@ -145,16 +111,4 @@ class SubCategoryController extends Controller
         }
     }
 
-    public function subCategorySaving()
-    {
-        try {
-            $savingCategory = $this->categoryRepo->getByName('simpanan');
-            $sub_categories = $this->subCategoryRepo->getByCategory($savingCategory->id);
-            return response()->json([
-                'data' => SubCategoryResource::collection($sub_categories)
-            ]);
-        } catch (Exception $e) {
-            return errorResponse($e->getMessage());
-        }
-    }
 }

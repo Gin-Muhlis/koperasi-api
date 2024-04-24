@@ -1,13 +1,13 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+
+require_once app_path() . '/Helpers/helpers.php';
+
 use App\Http\Requests\ChangePasswordMemberRequest;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use Illuminate\Support\Facades\Storage;
-
-require_once app_path() . '/Helpers/helpers.php';
-
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
@@ -15,13 +15,11 @@ use App\Http\Resources\ProfileResource;
 use App\Models\User;
 use App\Repositories\Member\MemberRepository;
 use App\Repositories\User\UserRepository;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class AuthController extends Controller {
 	private $memberRepo;

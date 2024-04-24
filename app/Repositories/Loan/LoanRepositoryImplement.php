@@ -28,6 +28,7 @@ class LoanRepositoryImplement extends Eloquent implements LoanRepository {
 	public function createLoanMember($data) {
 		$this->create($data);
 	}
+	
 	public function getTotalLoanBySubcategory($sub_category_id, $member_id) {
 		return $this->model->where([
 			['sub_category_id', $sub_category_id],

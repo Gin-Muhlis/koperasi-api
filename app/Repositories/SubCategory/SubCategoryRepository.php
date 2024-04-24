@@ -11,6 +11,4 @@ interface SubCategoryRepository extends Repository {
 	public function showSubCategory($id);
 	public function updateSubCategory($id, $request);
 	public function deleteSubCategory($id);
-	public function getByCategory($category);
-	public function getByName($name);
 }

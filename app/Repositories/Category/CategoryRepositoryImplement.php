@@ -33,7 +33,4 @@ class CategoryRepositoryImplement extends Eloquent implements CategoryRepository
 		return $this->delete($id);
 	}
 
-	public function getByName($name) {
-		return $this->model->where('name', $name)->first();
-	}
 }

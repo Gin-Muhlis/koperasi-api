@@ -1,13 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Http\Resources\MembersLoanReportResource;
-use App\Http\Resources\MembersReportResource;
-use App\Repositories\Role\RoleRepository;
-use App\Repositories\SubCategory\SubCategoryRepository;
 
 require_once app_path() . '/Helpers/helpers.php';
 
+use App\Repositories\Role\RoleRepository;
+use App\Repositories\SubCategory\SubCategoryRepository;
 use App\Repositories\Installment\InstallmentRepository;
 use App\Repositories\Invoice\InvoiceRepository;
 use App\Repositories\Loan\LoanRepository;
@@ -16,16 +14,12 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreMemberRequest;
 use App\Http\Requests\UpdateMemberRequest;
 use App\Http\Resources\MemberResource;
-use App\Http\Resources\SavingMemberResource;
 use App\Repositories\Member\MemberRepository;
 use App\Repositories\User\UserRepository;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class MemberController extends Controller {
     private $memberRepo;
@@ -47,9 +41,6 @@ class MemberController extends Controller {
         $this->roleRepo = $roleRepository;
         $this->subCategoryRepo = $subCategoryRepository;
     }
-    /**
-    * Display a listing of the resource.
-    */
 
     public function index( Request $request ) {
         try {
@@ -61,10 +52,6 @@ class MemberController extends Controller {
             return errorResponse( $e->getMessage() );
         }
     }
-
-    /**
-    * Store a newly created resource in storage.
-    */
 
     public function store( StoreMemberRequest $request ) {
         try {
@@ -106,10 +93,6 @@ class MemberController extends Controller {
         }
     }
 
-    /**
-    * Display the specified resource.
-    */
-
     public function show( $id ) {
         try {
             $member = $this->memberRepo->showMember( $id );
@@ -120,10 +103,6 @@ class MemberController extends Controller {
             return errorResponse( $e->getMessage() );
         }
     }
-
-    /**
-    * Update the specified resource in storage.
-    */
 
     public function update( UpdateMemberRequest $request, $id ) {
         try {
@@ -172,10 +151,6 @@ class MemberController extends Controller {
         }
     }
 
-    /**
-    * Remove the specified resource from storage.
-    */
-
     public function destroy( $id ) {
         try {
             $this->memberRepo->deleteMember( $id );
@@ -193,12 +168,7 @@ class MemberController extends Controller {
             $sub_categories = $this->subCategoryRepo->getSubCategories();
 			$members = $this->memberRepo->getMembers();
 
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
+			$filtered_sub_categories = filterSavingLoanCategories($sub_categories);
 
 			$members_data = $members->map(function($member) use ($filtered_sub_categories) {
 				$data_dinamis = [];
@@ -248,13 +218,7 @@ class MemberController extends Controller {
             $sub_categories = $this->subCategoryRepo->getSubCategories();
 			$members = $this->memberRepo->getMembers();
 
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'simpanan') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
-
+			$filtered_sub_categories = filterSavingCategories($sub_categories);
 			$members_data = $members->map(function($member) use ($filtered_sub_categories) {
 				$data_dinamis = [];
 
@@ -294,20 +258,13 @@ class MemberController extends Controller {
             $sub_categories = $this->subCategoryRepo->getSubCategories();
 			$members = $this->memberRepo->getMembers();
 
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'piutang') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
+			$filtered_sub_categories = filterLoanCategories($sub_categories);
 
 			$members_data = $members->map(function($member) use ($filtered_sub_categories) {
 				$data_dinamis = [];
 
 				foreach ($filtered_sub_categories as $sub_category) {
 					$detail = 0;
-
-                    
                     $total_loan = 0;
 					// pinjaman
 					foreach ($member->loans as $loan) {
@@ -335,9 +292,6 @@ class MemberController extends Controller {
             return errorResponse( $e->getMessage() );
         }
     }
-
-    
-
     public function dashboardMember() {
         try {
             $user = Auth::user();
@@ -347,12 +301,7 @@ class MemberController extends Controller {
             $saving_members = $this->savingRepo->getSavingsMember( $user->id );
             $sub_categories = $this->subCategoryRepo->getSubCategories();
 
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'simpanan') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
+			$filtered_sub_categories = filterSavingCategories($sub_categories);
 
             foreach ($filtered_sub_categories as $sub_category) {
 
@@ -366,8 +315,6 @@ class MemberController extends Controller {
 
                 $data_saving[$sub_category->name] = $total;
             }
-
-            
 
             $history_savings = $this->savingRepo->getHistorySavingmember( $user->id );
             $history_isntallments = $this->installmentRepo->getHistoryInstallments( $user->id );

@@ -213,3 +213,49 @@ function filterMember($data)
 
     return $filtered_members;
 }
+
+function filterSavingLoanCategories($sub_categories) {
+    $filtered_sub_categories = [];
+    foreach ($sub_categories as $sub_category) {
+        if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
+            $filtered_sub_categories[] = $sub_category;
+        }
+    }
+
+    return $filtered_sub_categories;
+}
+
+function filterSavingCategories($sub_categories) {
+    $filtered_sub_categories = [];
+    foreach ($sub_categories as $sub_category) {
+        if ($sub_category->category->name == 'simpanan') {
+            $filtered_sub_categories[] = $sub_category;
+        }
+    }
+
+    return $filtered_sub_categories;
+}
+
+function filterLoanCategories($sub_categories) {
+    $filtered_sub_categories = [];
+    foreach ($sub_categories as $sub_category) {
+        if ($sub_category->category->name == 'piutang') {
+            $filtered_sub_categories[] = $sub_category;
+        }
+    }
+
+    return $filtered_sub_categories;
+}
+
+function handlePaid($data)
+    {
+        if (count($data) < 1) {
+            return 0;
+        }
+
+        $totalPaid = 0;
+        foreach ($data as $item) {
+            $totalPaid += $item->amount;
+        }
+        return $totalPaid;
+    }

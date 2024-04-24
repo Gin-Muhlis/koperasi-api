@@ -39,9 +39,7 @@ class InvoiceController extends Controller {
 		$this->loanRepo = $loanRepository;
 		$this->invoiceRepo = $invoiceRepository;
 	}
-	/**
-	 * Display a listing of the resource.
-	 */
+
 	public function index() {
 		try {
 			$invoices = $this->invoiceRepo->getInvoices();
@@ -58,13 +56,8 @@ class InvoiceController extends Controller {
 		try {
 			$sub_categories = $this->subCategoryRepo->getSubCategories();
 
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
-
+			$filtered_sub_categories = filterSavingLoanCategories($sub_categories);
+			
 			usort($filtered_sub_categories, function ($a, $b) {
 				return $a['id'] - $b['id'];
 			});
@@ -77,107 +70,6 @@ class InvoiceController extends Controller {
 		}
 	}
 
-	public function getMemberInvoice() {
-		try {
-
-			$sub_categories = $this->subCategoryRepo->getSubCategories();
-			$members = $this->memberRepo->getMembers();
-
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
-
-			$members_data = $members->map(function($member) use ($filtered_sub_categories) {
-				$data_dinamis = [];
-
-				foreach ($filtered_sub_categories as $sub_category) {
-					$detail = [];
-					$months_saving = [];
-					$months_isntallment = [];
-
-					// simpanan
-					foreach ($member->savings as $saving) {
-						if ($sub_category->id == $saving->sub_category_id) {
-							$months_saving[] = [
-								'month_year' => $saving->month_year,
-								'status' => $saving->status,
-							];
-						}
-
-						if ($saving->sub_category_id == $sub_category->id) {
-							$detail = [
-								'amount' => $saving->amount,
-								'sub_category_id' => $sub_category->id,
-								'type_payment' => $saving->SubCategory->type_payment,
-								'months_status' => $months_saving
-							];
-						}
-					}
-
-					// pinjaman
-					foreach ($member->loans as $loan) {
-						if ($loan->status != 'lunas' && $loan->sub_category_id == $sub_category->id) {
-
-							foreach ($loan->installments as $installment) {
-								$months_isntallment[] = [
-									'month_year' => Carbon::parse($installment->date)->format('m-Y'),
-									'status' => $installment->status,
-								];
-							}
-
-							$detail = [
-								'amount' => $loan->amount,
-								'sub_category_id' => $sub_category->id,
-								'loan_id'=> $loan->id,
-								'total_payment' => $loan->total_payment,
-								'paid' => $this->handlePaid($loan->installments),
-								'remain_payment' => $loan->total_payment - $this->handlePaid($loan->installments),
-								'monthly' => ceil($loan->total_payment / $loan->loan_duration / 1000) * 1000,
-								'months_status' => $months_isntallment
-							];
-						}
-					}
-
-					$data_dinamis[$sub_category->name] = $detail;
-				}
-
-				return [
-					'id' => $member->id,
-					'name' => $member->name,
-					'position' => $member->position,
-					'position_category_id' => $member->group_id,
-					'data' => $data_dinamis
-				];
-			});
-
-			return response()->json([
-				'data' => $members_data
-			]);
-
-		}catch (Exception $e) {
-			return errorResponse($e->getMessage());
-		}
-	}
-
-	
-	private function handlePaid($data) {
-		if (count($data) < 1) {
-			return 0;
-		}
-
-		$totalPaid = 0;
-		foreach ($data as $item) {
-			$totalPaid += $item->amount;
-		}
-		return $totalPaid;
-	}
-
-	/**
-	 * Store a newly created resource in storage.
-	 */
 	public function store(StoreInvoiceRequest $request) {
 		try {
 			$validated = $request->validated();
@@ -222,7 +114,86 @@ class InvoiceController extends Controller {
 		}
 	}
 
-	// get detail invoice
+	public function getMemberInvoice() {
+		try {
+
+			$sub_categories = $this->subCategoryRepo->getSubCategories();
+			$members = $this->memberRepo->getMembers();
+
+			$filtered_sub_categories = filterSavingLoanCategories($sub_categories);
+
+			$members_data = $members->map(function($member) use ($filtered_sub_categories) {
+				$data_dinamis = [];
+
+				foreach ($filtered_sub_categories as $sub_category) {
+					$detail = [];
+					$months_saving = [];
+					$months_isntallment = [];
+
+					// simpanan
+					foreach ($member->savings as $saving) {
+						if ($sub_category->id == $saving->sub_category_id) {
+							$months_saving[] = [
+								'month_year' => $saving->month_year,
+								'status' => $saving->status,
+							];
+						}
+
+						if ($saving->sub_category_id == $sub_category->id) {
+							$detail = [
+								'amount' => $saving->amount,
+								'sub_category_id' => $sub_category->id,
+								'type_payment' => $saving->SubCategory->type_payment,
+								'months_status' => $months_saving
+							];
+						}
+					}
+
+					// pinjaman
+					foreach ($member->loans as $loan) {
+						if ($loan->status != 'lunas' && $loan->sub_category_id == $sub_category->id) {
+
+							foreach ($loan->installments as $installment) {
+								$months_isntallment[] = [
+									'month_year' => Carbon::parse($installment->date)->format('m-Y'),
+									'status' => $installment->status,
+								];
+							}
+
+							$detail = [
+								'amount' => $loan->amount,
+								'sub_category_id' => $sub_category->id,
+								'loan_id'=> $loan->id,
+								'total_payment' => $loan->total_payment,
+								'paid' => handlePaid($loan->installments),
+								'remain_payment' => $loan->total_payment - handlePaid($loan->installments),
+								'monthly' => ceil($loan->total_payment / $loan->loan_duration / 1000) * 1000,
+								'months_status' => $months_isntallment
+							];
+						}
+					}
+
+					$data_dinamis[$sub_category->name] = $detail;
+				}
+
+				return [
+					'id' => $member->id,
+					'name' => $member->name,
+					'position' => $member->position,
+					'position_category_id' => $member->group_id,
+					'data' => $data_dinamis
+				];
+			});
+
+			return response()->json([
+				'data' => $members_data
+			]);
+
+		}catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
 	public function detailInvoice($code) 
 	{
 		try {
@@ -236,22 +207,13 @@ class InvoiceController extends Controller {
 		}
 	}
 
-	/**
-	 * store detial invoice
-	 */
-
 	 public function storeDetailInvoice(StoreDetailInvoiceRequest $request) {
 		try {
 			$validated = $request->validated();
 
 			$sub_categories = $this->subCategoryRepo->getSubCategories();
 
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
+			$filtered_sub_categories = filterSavingLoanCategories($sub_categories);
 
 			DB::beginTransaction();
 
@@ -285,7 +247,7 @@ class InvoiceController extends Controller {
 						if (array_key_exists($sub_category->name, $member)) {
 							$sub_category_data = $member[$sub_category->name];
 							$loan_id = $sub_category_data['loanId'];
-							// cek apakah ada anggota yang sudah membayar piutang pada bulan yang ditentukan
+							
 							if ($sub_category->type_payment == 'monthly') {
 								$is_already_payed_isntallment = $this->installmentRepo->getMemberPaymentMonth($time[1], $time[0], $loan_id);
 								if (count($is_already_payed_isntallment) > 0) {
@@ -294,6 +256,7 @@ class InvoiceController extends Controller {
 									], 400);
 								}
 							}
+
 							$data = $this->generateInstallmentData($member['id'], $loan_id, $sub_category_data['amount'] , $sub_category->id, $validated['invoice_id']);
 
 							$this->installmentRepo->makeInstallmentMembers($data);
@@ -321,27 +284,6 @@ class InvoiceController extends Controller {
 			return errorResponse($e->getMessage());
 		}
 	 }
-
-	/**
-	 * Display the specified resource.
-	 */
-	public function show(Invoice $invoice) {
-		//
-	}
-
-	/**
-	 * Update the specified resource in storage.
-	 */
-	public function update(UpdateInvoiceRequest $request, Invoice $invoice) {
-		//
-	}
-
-	/**
-	 * Remove the specified resource from storage.
-	 */
-	public function destroy(Invoice $invoice) {
-		//
-	}
 
 	private function generateSavingData($member_id, $amount, $sub_category, $description, $month_year, $invoice_id) {
 		return [

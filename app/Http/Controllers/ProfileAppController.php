@@ -19,9 +19,7 @@ class ProfileAppController extends Controller
     {
         $this->profileRepo = $profileAppRepository;
     }
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         try {
@@ -35,25 +33,6 @@ class ProfileAppController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreProfileAppRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(ProfileApp $profileApp)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateProfileAppRequest $request, $id)
     {
         try {
@@ -66,13 +45,5 @@ class ProfileAppController extends Controller
         } catch (Exception $e) {
             return errorResponse($e->getMessage());
         }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ProfileApp $profileApp)
-    {
-        //
     }
 }

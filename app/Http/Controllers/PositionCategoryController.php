@@ -19,9 +19,7 @@ class PositionCategoryController extends Controller
     {
         $this->positionCategoryRepo = $positionCategoryRepository;
     }
-    /**
-     * Display a listing of the resource.
-     */
+    
     public function index()
     {
         try {
@@ -35,17 +33,6 @@ class PositionCategoryController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StorePositionCategoryRequest $request)
     {
         try {
@@ -61,25 +48,6 @@ class PositionCategoryController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(PositionCategory $positionCategory)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(PositionCategory $positionCategory)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdatePositionCategoryRequest $request, PositionCategory $positionCategory)
     {
         try {
@@ -96,9 +64,6 @@ class PositionCategoryController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(PositionCategory $positionCategory)
     {
         try {

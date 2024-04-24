@@ -21,9 +21,7 @@ class StuffController extends Controller
     public function __construct(StuffRepository $stuffRepository) {
         $this->stuffRepo = $stuffRepository;
     }
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         try {
@@ -37,9 +35,6 @@ class StuffController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreStuffRequest $request)
     {
         try {
@@ -65,9 +60,6 @@ class StuffController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         try {
@@ -81,9 +73,6 @@ class StuffController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateStuffRequest $request, $id)
     {
         try {
@@ -113,9 +102,6 @@ class StuffController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         try {

@@ -33,11 +33,4 @@ class SubCategoryRepositoryImplement extends Eloquent implements SubCategoryRepo
 		return $this->delete($id);
 	}
 
-	public function getByCategory($category) {
-		return $this->model::where('category_id', $category)->get();
-	}
-
-	public function getByName($name) {
-		return $this->model->where('name', $name)->first();
-	}
 }

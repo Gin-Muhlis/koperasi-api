@@ -12,5 +12,4 @@ interface CategoryRepository extends Repository
     public function showCategory($id);
     public function updateCategory($id, $request);
     public function deleteCategory($id);
-    public function getByName($name);
 }

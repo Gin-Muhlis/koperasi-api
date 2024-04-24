@@ -11,11 +11,7 @@ interface MemberRepository extends Repository {
 	public function showMember($id);
 	public function updateMember($id, $request);
 	public function deleteMember($id);
-	public function getReportMembers();
 	public function getNotPaidMembers();
 	public function getCountMembers();
-	public function getReportLoanMembers();
 
-	public function getNotPaidMember($member_id);
-	public function getReportMember($id);
 }

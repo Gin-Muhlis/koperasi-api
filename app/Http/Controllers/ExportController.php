@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+require_once app_path() . '/Helpers/helpers.php';
+
 use App\Exports\MembersDataExport;
 use App\Exports\ReportLoanMembersExport;
 use App\Exports\ReportMembersExport;
@@ -15,9 +17,6 @@ use App\Repositories\ProfileApp\ProfileAppRepository;
 use App\Repositories\Saving\SavingRepository;
 use App\Repositories\SubCategory\SubCategoryRepository;
 use Carbon\Carbon;
-
-require_once app_path() . '/Helpers/helpers.php';
-
 use App\Exports\InvoiceExportExcel;
 use App\Http\Requests\DownloadInvoiceRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -49,12 +48,7 @@ class ExportController extends Controller
 			$sub_categories = $this->subCategoryRepo->getSubCategories();
 			$profile = $this->profileRepo->getProfile();
 
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
+			$filtered_sub_categories = filterSavingLoanCategories($sub_categories);
 
 			return Excel::download(new InvoiceExportExcel($data, $filtered_sub_categories, $profile), "Koperasi.xlsx");
 		} catch (Exception $e) {
@@ -67,8 +61,6 @@ class ExportController extends Controller
 		try {
 
 			$data = $this->generateDataExport($invoice_code);
-
-
 			$pdf = Pdf::loadView('pdf.invoice', compact('data'))->setPaper('a4', 'landscape');
 
 			return $pdf->download("Invoice Zie Koperasi.pdf");
@@ -86,12 +78,8 @@ class ExportController extends Controller
 			$detail_invoice = $this->invoiceRepo->getDetailInvoiceByCode($validated['invoice_code']);
 			$profile_app = $this->profileRepo->getProfile();
 
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
+			$filtered_sub_categories = filterSavingLoanCategories($sub_categories);
+			
 
 			usort($filtered_sub_categories, function ($a, $b) {
 				return $a['id'] - $b['id'];
@@ -169,12 +157,7 @@ class ExportController extends Controller
 			$sub_categories = $this->subCategoryRepo->getSubCategories();
 			$profile = $this->profileRepo->getProfile();
 
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
+			$filtered_sub_categories = filterSavingLoanCategories($sub_categories);
 
 			$data = $members->map(function ($member) use ($filtered_sub_categories) {
 				$data_dinamis = [];
@@ -254,13 +237,7 @@ class ExportController extends Controller
 			$sub_categories = $this->subCategoryRepo->getSubCategories();
 			$profile = $this->profileRepo->getProfile();
 
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
-
+			$filtered_sub_categories = filterSavingLoanCategories($sub_categories);
 
 			$total_saving_member = 0;
 			$total_loan_member = 0;
@@ -415,12 +392,7 @@ class ExportController extends Controller
 			$sub_categories = $this->subCategoryRepo->getSubCategories();
 			$profile = $this->profileRepo->getProfile();
 
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'simpanan') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
+			$filtered_sub_categories = filterSavingCategories($sub_categories);
 
 			$data = $members->map(function ($member) use ($filtered_sub_categories) {
 				$data_dinamis = [];
@@ -452,8 +424,6 @@ class ExportController extends Controller
 					'total_saving' => $total_saving_member,
 				];
 			});
-
-
 			return Excel::download(new ReportSavingMembersExport($data, $filtered_sub_categories, $profile), "Koperasi.xlsx");
 
 		} catch (Exception $e) {
@@ -484,12 +454,7 @@ class ExportController extends Controller
 			$sub_categories = $this->subCategoryRepo->getSubCategories();
 			$profile = $this->profileRepo->getProfile();
 
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'simpanan') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
+			$filtered_sub_categories = filterSavingCategories($sub_categories);
 
 
 			$total_saving_member = 0;
@@ -611,13 +576,8 @@ class ExportController extends Controller
 			$sub_categories = $this->subCategoryRepo->getSubCategories();
 			$profile = $this->profileRepo->getProfile();
 
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'piutang') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
-
+			$filtered_sub_categories = filterLoanCategories($sub_categories);
+			
 			$data = $members->map(function ($member) use ($filtered_sub_categories) {
 				$data_dinamis = [];
 				$total_loan_member = 0;
@@ -666,12 +626,7 @@ class ExportController extends Controller
 			$sub_categories = $this->subCategoryRepo->getSubCategories();
 			$profile = $this->profileRepo->getProfile();
 
-			$filtered_sub_categories = [];
-			foreach ($sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'piutang') {
-					$filtered_sub_categories[] = $sub_category;
-				}
-			}
+			$filtered_sub_categories = filterLoanCategories($sub_categories);
 
 			$data_dinamis = [];
 			$total_loan_member = 0;
@@ -731,12 +686,7 @@ class ExportController extends Controller
 		$detail_invoice = $this->invoiceRepo->getDetailInvoiceByCode($invoice_code);
 		$profile_app = $this->profileRepo->getProfile();
 
-		$filtered_sub_categories = [];
-		foreach ($sub_categories as $sub_category) {
-			if ($sub_category->category->name == 'simpanan' || $sub_category->category->name == 'piutang') {
-				$filtered_sub_categories[] = $sub_category;
-			}
-		}
+		$filtered_sub_categories = filterSavingLoanCategories($sub_categories);
 
 		usort($filtered_sub_categories, function ($a, $b) {
 			return $a['id'] - $b['id'];

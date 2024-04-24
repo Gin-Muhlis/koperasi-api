@@ -6,11 +6,9 @@ require_once app_path() . '/Helpers/helpers.php';
 
 use Exception;
 use Carbon\Carbon;
-use App\Models\Payment;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StorePaymentRequest;
-use App\Http\Requests\UpdatePaymentRequest;
 use App\Repositories\Saving\SavingRepository;
 use App\Repositories\Invoice\InvoiceRepository;
 use App\Repositories\Payment\PaymentRepository;
@@ -29,23 +27,7 @@ class PaymentController extends Controller {
 		$this->savingRepo = $savingRepository;
 		$this->installmentRepo = $installmentRepository;
 	}
-	/**
-	 * Display a listing of the resource.
-	 */
-	public function index() {
-		//
-	}
-
-	/**
-	 * Show the form for creating a new resource.
-	 */
-	public function create() {
-		//
-	}
-
-	/**
-	 * Store a newly created resource in storage.
-	 */
+	
 	public function store(StorePaymentRequest $request) {
 		try {
 			$validated = $request->validated();
@@ -55,10 +37,6 @@ class PaymentController extends Controller {
 					'message' => 'Jumlah Pembayaran tidak sesuai dengan total invoice yang harus dibayar',
 				], 400);
 			}
-
-			if ( $request->hasFile( 'image' ) ) {
-                $validated[ 'image' ] = $request->file( 'image' )->store( 'public/payments' );
-            }
 
 			DB::beginTransaction();
 
@@ -95,31 +73,4 @@ class PaymentController extends Controller {
 		}
 	}
 
-	/**
-	 * Display the specified resource.
-	 */
-	public function show(Payment $payment) {
-		//
-	}
-
-	/**
-	 * Show the form for editing the specified resource.
-	 */
-	public function edit(Payment $payment) {
-		//
-	}
-
-	/**
-	 * Update the specified resource in storage.
-	 */
-	public function update(UpdatePaymentRequest $request, Payment $payment) {
-		//
-	}
-
-	/**
-	 * Remove the specified resource from storage.
-	 */
-	public function destroy(Payment $payment) {
-		//
-	}
 }
