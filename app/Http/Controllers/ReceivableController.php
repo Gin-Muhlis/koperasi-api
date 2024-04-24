@@ -90,33 +90,6 @@ class ReceivableController extends Controller
         }
     }
 
-    public function getSubCategories()
-    {
-        try {
-            $sub_categories = $this->subCategoryRepo->getSubCategories();
-
-            $filtered_sub_categories = [];
-            foreach ($sub_categories as $sub_category) {
-                if (
-                    $sub_category->category->name == 'piutang'
-                ) {
-                    $filtered_sub_categories[] = $sub_category;
-                }
-            }
-
-            usort($filtered_sub_categories, function ($a, $b) {
-                return $a['id'] - $b['id'];
-            });
-
-            return response()->json([
-                'data' => SubCategoryResource::collection($filtered_sub_categories)
-            ]);
-        } catch (Exception $e) {
-            return errorResponse($e->getMessage());
-        }
-    }
-
-
     public function store(StoreReceivableRequest $request)
     {
         try {
