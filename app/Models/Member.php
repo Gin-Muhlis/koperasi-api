@@ -23,6 +23,7 @@ class Member extends Model {
 		'date_activation',
 		'user_id',
 	];
+	
 
 	public function user() {
 		return $this->hasOne(User::class);

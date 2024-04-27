@@ -23,7 +23,7 @@ class SubCategoryImport implements ToCollection, WithHeadingRow
 
             $random_number = mt_rand($min, $max);
 
-            $category = Category::whereName($data['category'])->first();
+            $category = Category::where('name', $data['category'])->first();
 
             SubCategory::create([
                 'uuid' => Str::uuid(),

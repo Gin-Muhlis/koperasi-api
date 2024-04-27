@@ -21,9 +21,7 @@ class CategoryController extends Controller
     {
         $this->categoryRepo = $categoryRepository;
     }
-    /**
-     * Display a listing of the resource.
-     */
+    
     public function index()
     {
         try {
@@ -37,9 +35,6 @@ class CategoryController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreCategoryRequest $request)
     {
         try {

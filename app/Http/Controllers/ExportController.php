@@ -1,27 +1,31 @@
 <?php
 
 namespace App\Http\Controllers;
+use Exception;
 
 require_once app_path() . '/Helpers/helpers.php';
 
-use App\Exports\MembersDataExport;
-use App\Exports\ReportLoanMembersExport;
-use App\Exports\ReportMembersExport;
-use App\Exports\ReportSavingMembersExport;
-use App\Http\Requests\ExportInvoiceMemberRequest;
-use App\Repositories\Installment\InstallmentRepository;
-use App\Repositories\Invoice\InvoiceRepository;
-use App\Repositories\Loan\LoanRepository;
-use App\Repositories\Member\MemberRepository;
-use App\Repositories\ProfileApp\ProfileAppRepository;
-use App\Repositories\Saving\SavingRepository;
-use App\Repositories\SubCategory\SubCategoryRepository;
 use Carbon\Carbon;
-use App\Exports\InvoiceExportExcel;
-use App\Http\Requests\DownloadInvoiceRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Exception;
+use App\Exports\MembersDataExport;
+use App\Exports\InvoiceExportExcel;
+use App\Exports\ReportMembersExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ReportLoanMembersExport;
+use App\Repositories\Loan\LoanRepository;
+use App\Exports\ReportSavingMembersExport;
+use App\Repositories\Stuff\StuffRepository;
+use App\Http\Requests\DownloadInvoiceRequest;
+use App\Repositories\Member\MemberRepository;
+use App\Repositories\Saving\SavingRepository;
+use App\Repositories\Invoice\InvoiceRepository;
+use App\Repositories\Product\ProductRepository;
+use App\Http\Requests\ExportInvoiceMemberRequest;
+use App\Repositories\Category\CategoryRepository;
+use App\Repositories\ProfileApp\ProfileAppRepository;
+use App\Repositories\Installment\InstallmentRepository;
+use App\Repositories\SubCategory\SubCategoryRepository;
+use App\Repositories\PositionCategory\PositionCategoryRepository;
 
 class ExportController extends Controller
 {
@@ -31,8 +35,12 @@ class ExportController extends Controller
 	private $profileRepo;
 	private $savingRepo;
 	private $loanRepo;
+	private $categoryRepo;
+	private $productRepo;
+	private $stuffRepo;
+	private $positionCategoryRepo;
 
-	public function __construct(InvoiceRepository $invoiceRepository, SubCategoryRepository $subCategoryRepository, MemberRepository $memberRepository, ProfileAppRepository $profileAppRepository, SavingRepository $savingRepository, LoanRepository $loanRepository)
+	public function __construct(InvoiceRepository $invoiceRepository, SubCategoryRepository $subCategoryRepository, MemberRepository $memberRepository, ProfileAppRepository $profileAppRepository, SavingRepository $savingRepository, LoanRepository $loanRepository, CategoryRepository $categoryRepository, ProductRepository $productRepository, StuffRepository $stuffRepository, PositionCategoryRepository $positionCategoryRepository)
 	{
 		$this->invoiceRepo = $invoiceRepository;
 		$this->subCategoryRepo = $subCategoryRepository;
@@ -40,6 +48,10 @@ class ExportController extends Controller
 		$this->profileRepo = $profileAppRepository;
 		$this->savingRepo = $savingRepository;
 		$this->loanRepo = $loanRepository;
+		$this->categoryRepo = $categoryRepository;
+		$this->productRepo = $productRepository;
+		$this->stuffRepo = $stuffRepository;
+		$this->positionCategoryRepo = $positionCategoryRepository;
 	}
 	public function detailInvoiceExportExcel($invoice_code)
 	{
@@ -539,15 +551,8 @@ class ExportController extends Controller
 				];
 			}
 
-			$sub_categories_saving = [];
-			$sub_categories_loan = [];
-			foreach ($filtered_sub_categories as $sub_category) {
-				if ($sub_category->category->name == 'simpanan') {
-					$sub_categories_saving[] = $sub_category;
-				} else {
-					$sub_categories_loan[] = $sub_category;
-				}
-			}
+			$sub_categories_saving = filterSavingCategories($sub_categories);
+			$sub_categories_loan = filterLoanCategories($sub_categories);
 
 			$year_now = Carbon::now()->year;
 
@@ -680,6 +685,65 @@ class ExportController extends Controller
 		}
 	}
 
+	public function exportCategoriesPdf() {
+		try {
+			$data = $this->categoryRepo->getCategories();
+
+			$pdf = Pdf::loadView('pdf.categories', compact('data'));
+			return $pdf->download('categories.pdf');
+
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+	public function exportSubCategoriesPdf() {
+		try {
+			$data = $this->subCategoryRepo->getSubCategories();
+
+			$pdf = Pdf::loadView('pdf.sub-categories', compact('data'));
+			return $pdf->download('sub-categories.pdf');
+
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	public function exportProductsPdf() {
+		try {
+			$data = $this->productRepo->getProducts();
+
+			$pdf = Pdf::loadView('pdf.products', compact('data'));
+			return $pdf->download('products.pdf');
+
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	public function exportStuffsPdf() {
+		try {
+			$data = $this->stuffRepo->getStuffs();
+
+			$pdf = Pdf::loadView('pdf.stuffs', compact('data'));
+			return $pdf->download('stuffs.pdf');
+
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
+	public function exportPositionCategoriesPdf() {
+		try {
+			$data = $this->positionCategoryRepo->getPositionCategories();
+
+			$pdf = Pdf::loadView('pdf.position-categories', compact('data'));
+			return $pdf->download('position-categories.pdf');
+
+		} catch (Exception $e) {
+			return errorResponse($e->getMessage());
+		}
+	}
+
 	private function generateDataExport($invoice_code)
 	{
 		$sub_categories = $this->subCategoryRepo->getSubCategories();
@@ -770,4 +834,6 @@ class ExportController extends Controller
 
 		return $data;
 	}
+
+
 }

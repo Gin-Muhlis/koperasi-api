@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\ImportController;
 use App\Http\Controllers\InstallmentController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MemberController;
@@ -80,6 +81,17 @@ Route::middleware('json.response')->group(function () {
 		Route::get('/export/invoice-pdf/{invoice_code}', [ExportController::class, 'detailInvoiceExportPdf']);
 		Route::post('/export/invoice-member', [ExportController::class, 'invoiceMember']);
 		Route::get('/export/members', [ExportController::class, 'exportMembers']);
+		Route::get('/export/categories/pdf', [ExportController::class, 'exportCategoriesPdf']);
+		Route::get('/export/sub-categories/pdf', [ExportController::class, 'exportSubCategoriesPdf']);
+		Route::get('/export/products/pdf', [ExportController::class, 'exportProductsPdf']);
+		Route::get('/export/stuffs/pdf', [ExportController::class, 'exportStuffsPdf']);
+		Route::get('/export/position-categories/pdf', [ExportController::class, 'exportPositionCategoriesPdf']);
+
+		// Import
+		Route::post('/import/sub-categories', [ImportController::class, 'importSubCategories']);
+		Route::post('/import/products', [ImportController::class, 'importProducts']);
+		Route::post('/import/stuffs', [ImportController::class, 'importStuffs']);
+		Route::post('/import/position-categories', [ImportController::class, 'importPositionCategories']);
 
 		// laporan
 		Route::prefix('report')->group(function () {
