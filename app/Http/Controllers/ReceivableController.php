@@ -9,6 +9,7 @@ use App\Repositories\SubCategory\SubCategoryRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreReceivableRequest;
+use App\Http\Resources\SubCategoryResource;
 use App\Repositories\Loan\LoanRepository;
 use Exception;
 use Illuminate\Support\Str;
@@ -117,6 +118,25 @@ class ReceivableController extends Controller
             return errorResponse($e->getMessage());
         }
 
+    }
+
+    public function getSubCategories()
+    {
+        try {
+            $sub_categories = $this->subCategoryRepo->getSubCategories();
+
+            $filtered_sub_categories = filterLoanCategories($sub_categories);
+
+            usort($filtered_sub_categories, function ($a, $b) {
+                return $a['id'] - $b['id'];
+            });
+
+            return response()->json([
+                'data' => SubCategoryResource::collection($filtered_sub_categories)
+            ]);
+        } catch (Exception $e) {
+            return errorResponse($e->getMessage());
+        }
     }
 
 }

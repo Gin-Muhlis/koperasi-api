@@ -92,6 +92,7 @@ Route::middleware('json.response')->group(function () {
 		Route::post('/import/products', [ImportController::class, 'importProducts']);
 		Route::post('/import/stuffs', [ImportController::class, 'importStuffs']);
 		Route::post('/import/position-categories', [ImportController::class, 'importPositionCategories']);
+		Route::post('/import/members', [ImportController::class, 'importMembers']);
 
 		// laporan
 		Route::prefix('report')->group(function () {
@@ -123,6 +124,7 @@ Route::middleware('json.response')->group(function () {
 
 		// Sub kategori
 		Route::get('/sub-categories-saving', [SavingController::class, 'getSubCategories']);
+		Route::get('/sub-categories-receivable', [ReceivableController::class, 'getSubCategories']);
 	});
 
 	// Hanya dapat diakses member
