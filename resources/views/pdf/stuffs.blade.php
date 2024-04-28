@@ -65,6 +65,10 @@
             font-size: .7rem;
         }
 
+        table tr td img {
+            object-fit: cover;
+        }
+
         .center {
             text-align: center;
         }
@@ -94,7 +98,13 @@
                             <td width="20" class="center">{{ $loop->index + 1 }}</td>
                             <td>{{ $stuff->name }}</td>
                             <td>{{ $stuff->price }}</td>
-                            <td>{{ $stuff->image ? Storage::url($stuff->image) : '-' }}</td>
+                            <td>
+                                @if (isset($stuff->image))
+                                    <img src="{{ Storage::url($stuff->image) }}" width="50" height="50" alt="Gambar barang">
+                                @else
+                                    <span>-</span>
+                                @endif
+                            </td>
                             <td>{{ $stuff->product->name }}</td>
                         </tr>
                     @endforeach

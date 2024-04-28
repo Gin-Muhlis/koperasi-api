@@ -102,7 +102,7 @@
                 <p class="address">{{ $profile->address }}</p>
             </div>
             <div class="profile-member">
-                <p class="title">Laporan Simpanan Anggota Koperasi {{ $year_now }}</p>
+                <p class="title">Laporan Pinjaman Anggota Koperasi {{ $year_now }}</p>
                 <div>
                     <span class="property">Nama Anggota</span>
                     <span class="value">: {{ $data['name'] }}</span>
