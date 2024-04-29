@@ -33,7 +33,7 @@ class SavingRepositoryImplement extends Eloquent implements SavingRepository {
 	}
 
 	public function getHistorySavingmember($id) {
-		return $this->model->where('member_id', $id)->limit(4)->select('date', 'amount', 'code', 'created_at')->latest()->get();
+		return $this->model->with('subCategory')->where('member_id', $id)->limit(4)->latest()->get();
 	}
 	public function getSavingsMember($member_id) {
 		return $this->model->with('subCategory')->where('member_id', $member_id)->get();

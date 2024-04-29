@@ -52,14 +52,14 @@ class ReceivableController extends Controller
 
                     $detail = [
                         'code' => $loan->code,
+                        'sub_category' => $loan->subCategory->name,
                         'total_loan' => $loan->total_payment,
                         'paid' => handlePaid($loan->installments),
                         'remain_payment' => $loan->total_payment - handlePaid($loan->installments),
-                        'deadline' => $loan->deadline->toDateString(),
-                        'date_completion' => $loan->date_completion,
-                        'status' => $loan->status,
-                        'sub_category' => $loan->subCategory->name,
                         'duration' => $loan->loan_duration,
+                        'deadline' => $loan->deadline->toDateString(),
+                        'date_completion' => $loan->date_completion ? $loan->date_completion->toDateString() : null,
+                        'status' => $loan->status,
                     ];
                     $data_dinamis[] = $detail;
                 }

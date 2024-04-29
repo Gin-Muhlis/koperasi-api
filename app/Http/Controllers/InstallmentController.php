@@ -93,7 +93,7 @@ class InstallmentController extends Controller
 				$total_payment_member = $this->installmentRepo->getSumPayment($loan_member->id);
 
 				if ($total_payment_member >= $loan_member->total_payment) {
-					$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'lunas']);
+					$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'lunas', 'date_completion' => Carbon::now()->setTimezone('Asia/jakarta')->format('Y-m-d')]);
 				} else {
 					$this->loanRepo->updateStatusLoan($loan_member->id, [...$loan_member->toArray(), 'status' => 'berjalan']);
 				}

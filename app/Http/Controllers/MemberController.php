@@ -316,6 +316,7 @@ class MemberController extends Controller
             $filtered_sub_categories = filterSavingCategories($sub_categories);
 
             $time = Carbon::now()->format('m-Y');
+            $not_payed = [];
 
             foreach ($filtered_sub_categories as $sub_category) {
                 if ($sub_category->type_payment == 'monthly') {
@@ -359,22 +360,35 @@ class MemberController extends Controller
             }
 
             $history_savings = $this->savingRepo->getHistorySavingmember($user->id);
-            $history_isntallments = $this->installmentRepo->getHistoryInstallments($user->id);
+            $history_installments = $this->installmentRepo->getHistoryInstallments($user->id);
 
             $result_saving = [];
+            $result_installment = [];
 
             foreach ($history_savings as $saving) {
+                $time_split = explode(' ', Carbon::parse($saving->created_at)->format('Y-m-d H:i:s'));
                 $result_saving[] = [
-                    ...$saving->toArray(),
-                    'date' => $saving->date->toDateString(),
-                    'created_at' => Carbon::parse($saving->created_at)->format('Y-m-d H:i:s')
+                    'amount' => $saving->amount,
+                    'date' => $time_split[0],
+                    'time' => $time_split[1],
+                    'sub_category' => $saving->subCategory->name,
+                ];
+            }
+
+            foreach ($history_installments as $installment) {
+                $time_split = explode(' ', Carbon::parse($installment->created_at)->format('Y-m-d H:i:s'));
+                $result_installment[] = [
+                    'amount' => $installment->amount,
+                    'date' => $time_split[0],
+                    'time' => $time_split[1],
+                    'sub_category' => $installment->subCategory->name,
                 ];
             }
 
             $data = [
                 'data_saving' => $data_saving,
                 'history_savings' => $result_saving,
-                'history_installments' => $history_isntallments,
+                'history_installments' => $result_installment,
                 'not_payed' => $not_payed
             ];
 
