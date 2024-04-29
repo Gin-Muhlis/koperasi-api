@@ -1,10 +1,12 @@
 <?php
 
+use Carbon\Carbon;
 use App\Models\Stuff;
 use App\Models\Member;
 use App\Models\Product;
 use App\Models\SubCategory;
-use Carbon\Carbon;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * generate angka random untuk code

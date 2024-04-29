@@ -10,4 +10,5 @@ interface PositionCategoryRepository extends Repository
     public function createPositionCategory($data);
     public function updatePositionCategory($id, $data);
     public function deletePositionCategory($id);
+    public function getPositionCategoryById($id);
 }

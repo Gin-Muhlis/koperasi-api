@@ -33,7 +33,7 @@ class SavingRepositoryImplement extends Eloquent implements SavingRepository {
 	}
 
 	public function getHistorySavingmember($id) {
-		return $this->model->where('member_id', $id)->limit(4)->select('date', 'amount', 'code')->latest()->get();
+		return $this->model->where('member_id', $id)->limit(4)->select('date', 'amount', 'code', 'created_at')->latest()->get();
 	}
 	public function getSavingsMember($member_id) {
 		return $this->model->with('subCategory')->where('member_id', $member_id)->get();
@@ -48,5 +48,13 @@ class SavingRepositoryImplement extends Eloquent implements SavingRepository {
 			['sub_category_id', $sub_category_id],
 			['member_id', $member_id]
 		])->sum('amount');
+	}
+
+	public function getNotPayedSaving($member_id, $sub_category_id, $time) {
+		return $this->model->with('subCategory')->where([
+			['sub_category_id', $sub_category_id],
+			['member_id', $member_id],
+			['month_year', $time]
+		])->first();
 	}
 }
