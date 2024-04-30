@@ -314,6 +314,7 @@ class MemberController extends Controller
             $sub_categories = $this->subCategoryRepo->getSubCategories();
 
             $filtered_sub_categories = filterSavingCategories($sub_categories);
+            $sub_categories_loan = filterLoanCategories($sub_categories);
 
             $time = Carbon::now()->format('m-Y');
             $not_payed = [];
@@ -357,6 +358,28 @@ class MemberController extends Controller
                 }
 
                 $data_saving[$sub_category->name] = $total;
+            }
+
+            $year = Carbon::now()->year;
+            $month = Carbon::now()->month;
+
+            foreach ($sub_categories_loan as $sub_category) {
+                if ($sub_category->type_payment == 'monthly') {
+                    $amount = 0;
+                    $is_loan = $this->loanRepo->getLoanMemberBySubCategory($sub_category->id, $user->id);
+
+                    if (isset($is_loan)) {
+                        $is_payed = $this->installmentRepo->getNotPayedInstallment($is_loan->id, $year, $month);
+                        if (!isset($is_payed)) {
+                            $amount = ceil($is_loan->total_payment / $is_loan->loan_duration / 1000) * 1000;
+                            $not_payed[] = [
+                                'id' => $sub_category->id,
+                                'category' => $sub_category->name,
+                                'amount' => $amount
+                            ];
+                        }
+                    }
+                }
             }
 
             $history_savings = $this->savingRepo->getHistorySavingmember($user->id);
@@ -465,7 +488,8 @@ class MemberController extends Controller
         }
     }
 
-    private function generateDataLoan() {
+    private function generateDataLoan()
+    {
         $months = [
             '01',
             '02',
@@ -498,7 +522,5 @@ class MemberController extends Controller
             'paid' => $result_paid,
             'not_paid' => $result_not_paid
         ];
-
-        
     }
 }

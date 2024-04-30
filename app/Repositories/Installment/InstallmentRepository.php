@@ -16,5 +16,5 @@ interface InstallmentRepository extends Repository {
 
 	public function getHistoryInstallments($id);
 	
-
+	public function getNotPayedInstallment($loan_id, $year, $month);
 }

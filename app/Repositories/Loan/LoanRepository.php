@@ -14,4 +14,5 @@ interface LoanRepository extends Repository {
 	public function getLoanMembers();
 	public function getSumPaidLoanByMonth($month, $year);
 	public function getSumNotPaidLoanByMonth($month, $year);
+	public function getLoanMemberBySubCategory($sub_category_id, $member_id);
 }

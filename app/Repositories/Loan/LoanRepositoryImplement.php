@@ -57,4 +57,12 @@ class LoanRepositoryImplement extends Eloquent implements LoanRepository
 	{
 		return $this->model->whereYear('date', $year)->whereMonth('date', $month)->where('status', '!=', 'lunas')->sum('total_payment');
 	}
+
+	public function getLoanMemberBySubCategory($sub_category_id, $member_id) {
+		return $this->model->with('subCategory')->where([
+			['sub_category_id', $sub_category_id],
+			['member_id', $member_id],
+			['status', '!=', 'lunas']
+		])->first();
+	}
 }
