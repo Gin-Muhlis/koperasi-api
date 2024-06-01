@@ -77,6 +77,16 @@ class SubCategoryController extends Controller
         try {
             $validated = $request->validated();
 
+            $sub_category = $this->subCategoryRepo->showSubCategory($id);
+
+            $name = $sub_category->name;
+
+            if ($name == 'simpanan pokok' || $name == 'simpanan wajib' || $name == 'simpanan wajib khusus') {
+                return response()->json([
+                    'message' => 'Sub kategori ' . $name . ' tidak bisa diperbarui'
+                ], 400);
+            }
+
             DB::beginTransaction();
 
             $this->subCategoryRepo->updateSubCategory($id, $validated);
@@ -95,6 +105,16 @@ class SubCategoryController extends Controller
     public function destroy($id)
     {
         try {
+            $sub_category = $this->subCategoryRepo->showSubCategory($id);
+
+            $name = $sub_category->name;
+
+            if ($name == 'simpanan pokok' || $name == 'simpanan wajib' || $name == 'simpanan wajib khusus') {
+                return response()->json([
+                    'message' => 'Sub kategori ' . $name . ' tidak bisa dihapus'
+                ], 400);
+            }
+
             DB::beginTransaction();
 
             $this->subCategoryRepo->deleteSubcategory($id);

@@ -117,7 +117,7 @@ class ReceivableController extends Controller
             return errorResponse($e->getMessage());
         }
 
-    }
+}
 
     public function getSubCategories()
     {

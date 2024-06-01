@@ -40,8 +40,5 @@ class InstallmentRepositoryImplement extends Eloquent implements InstallmentRepo
 		})->limit(4)->latest()->get();
 	}
 
-	public function getNotPayedInstallment($loan_id, $year, $month) {
-		return $this->model->where('loan_id', $loan_id)->whereYear('date', $year)->whereMonth('date', $month)->first();
-	}
 
 }

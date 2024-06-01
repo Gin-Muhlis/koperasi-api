@@ -84,9 +84,11 @@ class InstallmentController extends Controller
 
             DB::beginTransaction();
 
-				$data = $this->generateInstallmentData($validated);
+				for ($i = 1; $i <= $validated['month_payment']; $i++) {
+					$data = $this->generateInstallmentData($validated);
 
-				$this->installmentRepo->makeInstallmentMembers($data);
+					$this->installmentRepo->makeInstallmentMembers($data);
+				}
 
 				$loan_member = $this->loanRepo->findLoan($validated['loan_id']);
 
@@ -113,10 +115,11 @@ class InstallmentController extends Controller
 			'uuid' => Str::uuid(),
             'member_id' => $data['member_id'],
 			'loan_id' => $data['loan_id'],
-			'amount' => $data['amount'],
+			'amount' => $data['amount']	/ $data['month_payment'],
 			'date' => Carbon::now()->format('Y-m-d'),
 			'sub_category_id' => $data['sub_category_id'],
 			'user_id' => Auth::user()->id,
+			'status' => 'dibayar'
 		];
 	}
 

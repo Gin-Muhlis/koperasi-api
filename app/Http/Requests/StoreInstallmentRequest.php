@@ -26,6 +26,7 @@ class StoreInstallmentRequest extends FormRequest
 			'loan_id' => ['required', 'exists:loans,id'],
 			'amount' => ['required', 'numeric'],
 			'sub_category_id' => ['required', 'exists:sub_categories,id'],
+			'month_payment' => ['required', 'numeric']
 		];
 	}
 
@@ -39,6 +40,8 @@ class StoreInstallmentRequest extends FormRequest
 			'sub_categori_id.exists' => 'Jenis Pinjaman tidak valid',
 			'amount.string' => 'Jumlah pembayaran tidak valid',
 			'amount.required' => 'Jumlah pembayaran tidak valid',
+			'month_payment.numeric' => 'Jumlah bulan pembayaran tidak valid',
+			'month_payment.required' => 'Jumlah bulan pembayaran tidak valid',
 		];
 	}
 

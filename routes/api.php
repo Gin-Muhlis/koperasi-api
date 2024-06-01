@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\InstallmentController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileAppController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReceivableController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SavingController;
@@ -97,24 +99,24 @@ Route::middleware('json.response')->group(function () {
 		// laporan
 		Route::prefix('report')->group(function () {
 			// Laporan anggota
-			Route::get('/members', [MemberController::class, 'reportMembers']);
+			Route::get('/members', [ReportController::class, 'reportMembers']);
 			Route::get('/export/report-members', [ExportController::class, 'ReportMembers']);
 			Route::get('/export/report-member/{id}', [ExportController::class, 'ReportMember']);
 
 			// Laporan simpanan
-			Route::get('/saving-members', [MemberController::class, 'reportSavingMembers']);
+			Route::get('/saving-members', [ReportController::class, 'reportSavingMembers']);
 			Route::get('/export/report-saving-members', [ExportController::class, 'ReportSavingMembers']);
 			Route::get('/export/report-saving-member/{id}', [ExportController::class, 'ReportSavingMember']);
 
 			// Laporan pinjaman
-			Route::get('/loan-members', [MemberController::class, 'reportLoanMembers']);
+			Route::get('/loan-members', [ReportController::class, 'reportLoanMembers']);
 			Route::get('/export/report-loan-members', [ExportController::class, 'ReportLoanMembers']);
 			Route::get('/export/report-loan-member/{id}', [ExportController::class, 'ReportLoanMember']);
 
 		});
 
 		// Dashboard
-		Route::get('/dashboard/admin', [MemberController::class, 'dashboardAdmin']);
+		Route::get('/dashboard/admin', [DashboardController::class, 'dashboardAdmin']);
 	});
 
 	// Dapat diakses member dan admin
@@ -125,12 +127,18 @@ Route::middleware('json.response')->group(function () {
 		// Sub kategori
 		Route::get('/sub-categories-saving', [SavingController::class, 'getSubCategories']);
 		Route::get('/sub-categories-receivable', [ReceivableController::class, 'getSubCategories']);
+
 	});
 
 	// Hanya dapat diakses member
 	Route::middleware('role:member')->group(function () {
 		// Dashboard
-		Route::get('/dashboard/member', [MemberController::class, 'dashboardMember']);
+		Route::get('/dashboard/member', [DashboardController::class, 'dashboardMember']);
 		Route::put('/change-password-member', [AuthController::class, 'changePasswordMember']);
+		
+		Route::get('/saving-member', [MemberController::class, 'getSavingMember']);
+		Route::get('/loan-member', [MemberController::class, 'getLoanMember']);
+
 	});
+
 });

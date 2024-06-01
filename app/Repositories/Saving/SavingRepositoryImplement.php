@@ -50,11 +50,5 @@ class SavingRepositoryImplement extends Eloquent implements SavingRepository {
 		])->sum('amount');
 	}
 
-	public function getNotPayedSaving($member_id, $sub_category_id, $time) {
-		return $this->model->with('subCategory')->where([
-			['sub_category_id', $sub_category_id],
-			['member_id', $member_id],
-			['month_year', $time]
-		])->first();
-	}
+
 }

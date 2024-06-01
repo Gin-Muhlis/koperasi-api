@@ -18,6 +18,7 @@ return new class extends Migration {
 			$table->string('no_rek')->nullable();
 			$table->string('payer')->nullable();
 			$table->enum('payment_method', ['cash', 'transfer']);
+			$table->softDeletes();
 			$table->timestamps();
 		});
 	}

@@ -284,6 +284,7 @@ class InvoiceController extends Controller {
 	 }
 
 	private function generateSavingData($member_id, $amount, $sub_category, $description, $month_year, $invoice_id) {
+
 		return [
 			'uuid' => Str::uuid(),
 			'member_id' => $member_id,
@@ -298,6 +299,7 @@ class InvoiceController extends Controller {
 	}
 
 	private function generateInstallmentData($member_id, $loan_id, $amount, $sub_category, $invoice_id) {
+		
 		return [
 			'uuid' => Str::uuid(),
 			'loan_id' => $loan_id,

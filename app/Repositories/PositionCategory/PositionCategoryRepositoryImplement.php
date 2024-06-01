@@ -35,7 +35,4 @@ class PositionCategoryRepositoryImplement extends Eloquent implements PositionCa
         $this->delete($id);
     }
 
-    public function getPositionCategoryById($id) {
-        $this->model->find($id);
-    }
 }

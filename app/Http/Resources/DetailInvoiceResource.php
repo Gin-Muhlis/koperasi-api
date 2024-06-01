@@ -7,6 +7,7 @@ use App\Models\Loan;
 use App\Models\Member;
 use App\Models\Saving;
 use App\Models\SubCategory;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -25,8 +26,12 @@ class DetailInvoiceResource extends JsonResource {
 			'status' => $this->status,
 			'date' => $this->date,
 			'due_date' => $this->due_date,
-			'payment_method' => $this->payment_method,
-			'payment_date' => $this->payment_date,
+			'payment_data' => [
+				'time' => $this->payment?->created_at ? Carbon::parse($this->payment->created_at)->format('Y-m-d H:i:s') : null,
+				'payer' => $this->payment?->payer ?? null,
+				'payment_method' => $this->payment?->payment_method ?? null,
+				'norek' => $this->payment?->norek ?? null
+			],
 			'details' => $this->handleData($this->savings, $this->installments),
 		];
 	}
