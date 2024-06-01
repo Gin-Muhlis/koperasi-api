@@ -30,7 +30,6 @@ class MemberImport implements ToCollection, WithHeadingRow {
 				'address' => $data['address'],
 				'phone_number' => $data['phone_number'],
 				'gender' => $data['gender'],
-				'identity_number' => generateCode(),
 				'religion' => $data['religion'],
 				'position' => $data['position'],
 				'group_id' => $group->id,

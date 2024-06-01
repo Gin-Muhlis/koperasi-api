@@ -15,7 +15,6 @@ class Purchase extends Model
         'total',
         'sub_category_id',
         'user_id',
-        'code',
     ];
 
     protected $casts = [

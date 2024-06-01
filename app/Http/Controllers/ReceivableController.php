@@ -91,7 +91,6 @@ class ReceivableController extends Controller
 
             $data = [
                 'uuid' => Str::uuid(),
-                'code' => generateCode(),
                 'member_id' => $validated['member_id'],
                 'amount' => $validated['amount'],
                 'sub_category_id' => $validated['sub_category_id'],

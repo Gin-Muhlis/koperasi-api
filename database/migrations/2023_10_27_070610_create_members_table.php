@@ -17,7 +17,6 @@ return new class extends Migration {
 			$table->text('address');
 			$table->string('phone_number');
 			$table->enum('gender', ['L', 'P']);
-			$table->string('identity_number', 20);
 			$table->string('religion', 20);
 			$table->enum('position', ['pns', 'p3k', 'cpns']);
 			$table->unsignedBigInteger('group_id');

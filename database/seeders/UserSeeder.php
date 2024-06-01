@@ -22,7 +22,6 @@ class UserSeeder extends Seeder {
 			'address' => 'Tokyo, Jepang',
 			'phone_number' => '0895325722289',
 			'gender' => 'P',
-			'identity_number' => '123456789',
 			'religion' => 'islam',
 			'group_id' => '1',
 			'image' => null,

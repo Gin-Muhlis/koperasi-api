@@ -10,7 +10,6 @@ class Saving extends Model {
 
 	protected $fillable = [
 		'uuid',
-		'code',
 		'amount',
 		'date',
 		'member_id',

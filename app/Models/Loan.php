@@ -11,7 +11,6 @@ class Loan extends Model
 
     protected $fillable = [
         'uuid',
-        'code',
         'amount',
         'date',
         'status',

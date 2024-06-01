@@ -6,8 +6,6 @@ require_once app_path() . '/Helpers/helpers.php';
 
 use App\Http\Resources\SubCategoryResource;
 use App\Http\Requests\StoreSavingRequest;
-use App\Http\Requests\UpdateSavingRequest;
-use App\Models\Saving;
 use App\Repositories\Member\MemberRepository;
 use App\Repositories\Saving\SavingRepository;
 use App\Repositories\SubCategory\SubCategoryRepository;
@@ -205,7 +203,6 @@ class SavingController extends Controller
     private function generateSavingData($member_id, $amount, $sub_category_id, $description, $month_year) {
 		return [
 			'uuid' => Str::uuid(),
-			'code' => generateCode(),
 			'member_id' => $member_id,
 			'amount' => $amount,
 			'date' => Carbon::now()->format('Y-m-d'),

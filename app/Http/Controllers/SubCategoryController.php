@@ -43,7 +43,6 @@ class SubCategoryController extends Controller
         try {
             $validated = $request->validated();
             $validated['uuid'] = Str::uuid();
-            $validated['code'] = generateCode();
 
             DB::beginTransaction();
 

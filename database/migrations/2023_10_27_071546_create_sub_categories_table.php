@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('sub_categories', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->string('code', 10)->unique();
             $table->enum('type', ['kredit', 'debit']);
             $table->string('name', 50);
             $table->unsignedBigInteger('category_id');

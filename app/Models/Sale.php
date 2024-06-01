@@ -11,7 +11,6 @@ class Sale extends Model
 
     protected $fillable = [
         'uuid',
-        'code',
         'date',
         'total_payment',
         'sub_category_id',

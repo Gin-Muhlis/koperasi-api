@@ -317,36 +317,36 @@ class MemberController extends Controller
             $sub_categories_loan = filterLoanCategories($sub_categories);
 
             $time = Carbon::now()->format('m-Y');
-            $not_payed = [];
+            // $not_payed = [];
 
             foreach ($filtered_sub_categories as $sub_category) {
-                if ($sub_category->type_payment == 'monthly') {
-                    $amount = 0;
-                    $is_payed = $this->savingRepo->getNotPayedSaving($user->id, $sub_category->id, $time);
+                // if ($sub_category->type_payment == 'monthly') {
+                //     $amount = 0;
+                //     $is_payed = $this->savingRepo->getNotPayedSaving($user->id, $sub_category->id, $time);
 
-                    $savings_sub_category = $this->savingRepo->getMemberSpesificSavings($user->id, $sub_category->id);
+                //     $savings_sub_category = $this->savingRepo->getMemberSpesificSavings($user->id, $sub_category->id);
 
-                    if (count($savings_sub_category) > 0) {
+                //     if (count($savings_sub_category) > 0) {
 
-                        $saving = $savings_sub_category->first();
+                //         $saving = $savings_sub_category->first();
 
-                        $amount = $saving->amount;
-                    } else {
-                        $position_category = $this->positionCategoryRepo->getPositionCategoryById($user->member->group_id);
-                        $sub_category_split = explode(' ', $sub_category);
-                        array_shift($sub_category_split);
-                        $sub_category_name = count($sub_category_split) > 1 ? implode('_', $sub_category_split) : $sub_category_split[0];
-                        $amount = $position_category->$sub_category_name;
-                    }
+                //         $amount = $saving->amount;
+                //     } else {
+                //         $position_category = $this->positionCategoryRepo->getPositionCategoryById($user->member->group_id);
+                //         $sub_category_split = explode(' ', $sub_category);
+                //         array_shift($sub_category_split);
+                //         $sub_category_name = count($sub_category_split) > 1 ? implode('_', $sub_category_split) : $sub_category_split[0];
+                //         $amount = $position_category->$sub_category_name;
+                //     }
 
-                    if (!isset($is_payed)) {
-                        $not_payed[] = [
-                            'id' => $sub_category->id,
-                            'category' => $sub_category->name,
-                            'amount' => $amount
-                        ];
-                    }
-                }
+                //     if (!isset($is_payed)) {
+                //         $not_payed[] = [
+                //             'id' => $sub_category->id,
+                //             'category' => $sub_category->name,
+                //             'amount' => $amount
+                //         ];
+                //     }
+                // }
 
                 // simpanan
                 $total = 0;
@@ -360,27 +360,27 @@ class MemberController extends Controller
                 $data_saving[$sub_category->name] = $total;
             }
 
-            $year = Carbon::now()->year;
-            $month = Carbon::now()->month;
+            // $year = Carbon::now()->year;
+            // $month = Carbon::now()->month;
 
-            foreach ($sub_categories_loan as $sub_category) {
-                if ($sub_category->type_payment == 'monthly') {
-                    $amount = 0;
-                    $is_loan = $this->loanRepo->getLoanMemberBySubCategory($sub_category->id, $user->id);
+            // foreach ($sub_categories_loan as $sub_category) {
+            //     if ($sub_category->type_payment == 'monthly') {
+            //         $amount = 0;
+            //         $is_loan = $this->loanRepo->getLoanMemberBySubCategory($sub_category->id, $user->id);
 
-                    if (isset($is_loan)) {
-                        $is_payed = $this->installmentRepo->getNotPayedInstallment($is_loan->id, $year, $month);
-                        if (!isset($is_payed)) {
-                            $amount = ceil($is_loan->total_payment / $is_loan->loan_duration / 1000) * 1000;
-                            $not_payed[] = [
-                                'id' => $sub_category->id,
-                                'category' => $sub_category->name,
-                                'amount' => $amount
-                            ];
-                        }
-                    }
-                }
-            }
+            //         if (isset($is_loan)) {
+            //             $is_payed = $this->installmentRepo->getNotPayedInstallment($is_loan->id, $year, $month);
+            //             if (!isset($is_payed)) {
+            //                 $amount = ceil($is_loan->total_payment / $is_loan->loan_duration / 1000) * 1000;
+            //                 $not_payed[] = [
+            //                     'id' => $sub_category->id,
+            //                     'category' => $sub_category->name,
+            //                     'amount' => $amount
+            //                 ];
+            //             }
+            //         }
+            //     }
+            // }
 
             $history_savings = $this->savingRepo->getHistorySavingmember($user->id);
             $history_installments = $this->installmentRepo->getHistoryInstallments($user->id);
@@ -412,7 +412,7 @@ class MemberController extends Controller
                 'data_saving' => $data_saving,
                 'history_savings' => $result_saving,
                 'history_installments' => $result_installment,
-                'not_payed' => $not_payed
+                // 'not_payed' => $not_payed
             ];
 
             return response()->json([

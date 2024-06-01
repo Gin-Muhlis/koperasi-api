@@ -111,7 +111,6 @@ class InstallmentController extends Controller
     private function generateInstallmentData($data) {
 		return [
 			'uuid' => Str::uuid(),
-			'code' => generateCode(),
             'member_id' => $data['member_id'],
 			'loan_id' => $data['loan_id'],
 			'amount' => $data['amount'],

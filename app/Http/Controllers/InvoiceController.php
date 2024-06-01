@@ -7,10 +7,8 @@ require_once app_path() . '/Helpers/helpers.php';
 
 use App\Http\Requests\StoreDetailInvoiceRequest;
 use App\Http\Requests\StoreInvoiceRequest;
-use App\Http\Requests\UpdateInvoiceRequest;
 use App\Http\Resources\DetailInvoiceResource;
 use App\Http\Resources\InvoiceResource;
-use App\Models\Invoice;
 use App\Repositories\Installment\InstallmentRepository;
 use App\Repositories\Invoice\InvoiceRepository;
 use App\Repositories\Loan\LoanRepository;
@@ -288,7 +286,6 @@ class InvoiceController extends Controller {
 	private function generateSavingData($member_id, $amount, $sub_category, $description, $month_year, $invoice_id) {
 		return [
 			'uuid' => Str::uuid(),
-			'code' => generateCode(),
 			'member_id' => $member_id,
 			'amount' => $amount,
 			'date' => Carbon::now()->format('Y-m-d'),
@@ -303,7 +300,6 @@ class InvoiceController extends Controller {
 	private function generateInstallmentData($member_id, $loan_id, $amount, $sub_category, $invoice_id) {
 		return [
 			'uuid' => Str::uuid(),
-			'code' => generateCode(),
 			'loan_id' => $loan_id,
 			'member_id' => $member_id,
 			'amount' => $amount,

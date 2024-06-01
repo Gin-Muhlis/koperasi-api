@@ -50,7 +50,6 @@ class SaleController extends Controller
 
             $validated = $request->validated();
             $validated['uuid'] = Str::uuid();
-            $validated['code'] = generateCode();
             $validated['date'] = Carbon::now()->format('Y-m-d');
             $validated['user_id'] = $user->id;
 

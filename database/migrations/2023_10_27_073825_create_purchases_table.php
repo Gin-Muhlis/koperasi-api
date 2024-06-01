@@ -16,7 +16,6 @@ return new class extends Migration
             $table->uuid('uuid')->unique();
             $table->unsignedBigInteger('sub_category_id');
             $table->date('date_purchase');
-            $table->string('code', 10);
             $table->double('total');
             $table->unsignedBigInteger('user_id');
             $table->softDeletes();

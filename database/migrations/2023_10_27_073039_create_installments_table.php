@@ -12,7 +12,6 @@ return new class extends Migration {
 		Schema::create('installments', function (Blueprint $table) {
 			$table->id();
 			$table->uuid('uuid')->unique();
-			$table->string('code', 10);
 			$table->unsignedBigInteger('loan_id');
 			$table->unsignedBigInteger('member_id');
 			$table->unsignedBigInteger('sub_category_id');

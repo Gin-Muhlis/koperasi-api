@@ -14,7 +14,6 @@ return new class extends Migration
 		Schema::create('savings', function (Blueprint $table) {
 			$table->id();
 			$table->uuid('uuid')->unique();
-			$table->string('code', 10);
 			$table->unsignedBigInteger('member_id');
 			$table->double('amount');
 			$table->unsignedBigInteger('sub_category_id');

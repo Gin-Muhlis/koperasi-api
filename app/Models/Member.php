@@ -17,7 +17,6 @@ class Member extends Model {
 		'group_id',
 		'phone_number',
 		'gender',
-		'identity_number',
 		'religion',
 		'image',
 		'date_activation',

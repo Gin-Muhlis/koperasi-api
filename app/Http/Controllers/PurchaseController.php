@@ -50,7 +50,6 @@ class PurchaseController extends Controller
 
             $validated = $request->validated();
             $validated['uuid'] = Str::uuid();
-            $validated['code'] = generateCode();
             $validated['date_purchase'] = Carbon::now()->format('Y-m-d');
             $validated['user_id'] = $user->id;
 
