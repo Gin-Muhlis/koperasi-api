@@ -154,6 +154,7 @@ class ExportController extends Controller
 
 			$pdf = Pdf::loadView('pdf.invoice-member', compact('result'))->setPaper('a4');
 			return $pdf->download("zie_koperasi.pdf");
+			
 
 		} catch (Exception $e) {
 			return errorResponse($e->getMessage());
