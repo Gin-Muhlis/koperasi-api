@@ -12,11 +12,9 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PositionCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileAppController;
-use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReceivableController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\StuffController;
 use App\Http\Controllers\SubCategoryController;
@@ -135,7 +133,7 @@ Route::middleware('json.response')->group(function () {
 		// Dashboard
 		Route::get('/dashboard/member', [DashboardController::class, 'dashboardMember']);
 		Route::put('/change-password-member', [AuthController::class, 'changePasswordMember']);
-		
+
 		Route::get('/saving-member', [MemberController::class, 'getSavingMember']);
 		Route::get('/loan-member', [MemberController::class, 'getLoanMember']);
 
